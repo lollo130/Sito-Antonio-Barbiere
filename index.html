@@ -12,6 +12,18 @@
     <title>Antonio — Barbiere a Solarino</title>
 
     <!--
+      iPhone: Safari ignora manifest.json quando si aggiunge alla schermata
+      Home. Senza queste righe l'icona diventa uno screenshot della pagina e
+      il nome sotto l'icona è il titolo intero, troncato. Sono l'unico modo
+      di controllare come appare l'app su iOS.
+    -->
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Antonio" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+    <!--
       Rete di sicurezza contro la pagina bianca.
       Se il bundle va in errore mentre si carica (caso tipico: variabili
       d'ambiente mancanti sul server di pubblicazione), React non monta mai e

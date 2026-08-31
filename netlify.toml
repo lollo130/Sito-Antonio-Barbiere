@@ -5,6 +5,15 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# Il collegamento fra l'app Android (TWA) e il sito passa da
+# /.well-known/assetlinks.json: deve essere servito così com'è e mai
+# riscritto sull'app React, altrimenti l'app mostra la barra del browser.
+[[redirects]]
+  from = "/.well-known/*"
+  to = "/.well-known/:splat"
+  status = 200
+  force = false
+
 # Il sito è una single page app: le rotte (/prenota, /admin, /installa…)
 # esistono solo dentro React, non come file sul disco. Senza questa regola
 # Netlify risponde 404 a chi apre un link diretto o ricarica la pagina.
@@ -26,3 +35,8 @@
   for = "/index.html"
   [headers.values]
     Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/.well-known/assetlinks.json"
+  [headers.values]
+    Content-Type = "application/json"

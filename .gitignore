@@ -26,3 +26,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# App Android (TWA). La chiave di firma NON va mai nel repository:
+# chi ce l'ha può pubblicare aggiornamenti a nome tuo. Tienila nel
+# gestore di password. Se la perdi, l'app non è più aggiornabile.
+*.keystore
+*.jks
+android/twa-manifest.json
+android/app-release-*.apk
+android/app-release-*.aab
+android/.bubblewrap/
