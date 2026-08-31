@@ -1,20 +1,57 @@
 @import "tailwindcss";
 
-/* Identità visiva: toni caldi (stone) invece di grigio freddo, un
-   accento oro discreto (amber, già nella palette Tailwind — nessun
-   colore nuovo da mantenere), titoli in serif per un'aria da salone
-   classico. Il corpo del testo resta sans-serif di sistema: è la parte
-   più letta, cambiarlo è un rischio per la leggibilità con un pubblico
-   anziano che non vale la resa estetica. */
+/* Identità visiva "calce e ottone".
+   I toni sono quelli delle facciate e delle insegne del posto: pietra
+   chiara, ottone, verde persiana. Il verde compare solo sulle conferme,
+   il rosso solo sugli errori: se un colore vuol dire una cosa sola, non
+   c'è bisogno di leggere per capire.
+
+   I caratteri: DM Serif Display solo per insegna, titoli, ore e prezzi.
+   Atkinson Hyperlegible per tutto il resto — è disegnato dal Braille
+   Institute per chi ci vede poco, ogni lettera è distinguibile dalle
+   altre (la I maiuscola non si confonde con la l minuscola). Con un
+   pubblico anziano è la scelta che conta più di ogni altra. */
 @theme {
-  --font-titolo: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-titolo: 'DM Serif Display', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  --color-calce: #f6f2ea;
+  --color-carta: #fffcf7;
+  --color-inchiostro: #1c1917;
+  --color-grigio: #57534e;
+  --color-bordo: #e4dcce;
+
+  --color-ottone: #8a5a1e;
+  --color-ottone-scuro: #6e4715;
+  --color-ottone-chiaro: #fbefdc;
+
+  --color-pietra: #e6dfd2;
+  --color-pietra-testo: #554e44;
+
+  --color-persiana: #2d4a3e;
+  --color-persiana-chiaro: #c9d6ce;
+
+  --color-allarme: #b3261e;
+  --color-allarme-sfondo: #fbe9e7;
+  --color-allarme-testo: #7f1d1b;
 }
 
 /* Pubblico anziano (SPECIFICA.md § 6): corpo del testo minimo 18px ovunque. */
 html {
   font-size: 18px;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: #faf8f4;
+  background: var(--color-calce);
+  color: var(--color-inchiostro);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Il tocco deve dare una risposta visibile: su un telefono senza cursore
+   è l'unico modo di capire che il dito ha preso il bottone. */
+button:active,
+a:active {
+  transform: scale(0.985);
 }

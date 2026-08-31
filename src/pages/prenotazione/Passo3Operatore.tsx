@@ -46,19 +46,19 @@ export default function Passo3Operatore({ servizio, onScelto, onIndietro }: Prop
   }, [operatori, onScelto]);
 
   if (errore) {
-    return <p className="text-lg font-medium text-red-700">{errore}</p>;
+    return <p className="text-lg font-medium text-allarme-testo">{errore}</p>;
   }
 
   if (!operatori || operatori.length <= 1) {
-    return <p className="text-lg text-stone-700">Un attimo…</p>;
+    return <p className="text-lg text-grigio">Un attimo…</p>;
   }
 
   return (
     <div className="flex flex-col gap-6">
-      <button type="button" onClick={onIndietro} className="self-start text-lg font-medium text-stone-600">
+      <button type="button" onClick={onIndietro} className="self-start text-lg font-medium text-grigio">
         ‹ Cambia orario
       </button>
-      <h1 className="font-titolo text-3xl font-semibold text-stone-900">Vuoi un barbiere in particolare?</h1>
+      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Vuoi un barbiere in particolare?</h1>
 
       <div className="flex flex-col gap-3">
         <BottoneScelta etichetta="Nessuna preferenza" selezionato onClick={() => onScelto(null)} />

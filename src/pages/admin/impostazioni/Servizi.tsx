@@ -132,11 +132,11 @@ export default function Servizi() {
         <button
           type="button"
           onClick={() => setEditando(null)}
-          className="self-start text-lg font-medium text-stone-600"
+          className="self-start text-lg font-medium text-grigio"
         >
           ‹ Indietro
         </button>
-        <h1 className="font-titolo text-3xl font-semibold text-stone-900">
+        <h1 className="font-titolo text-3xl font-semibold text-inchiostro">
           {editando === 'nuovo' ? 'Nuovo servizio' : 'Modifica servizio'}
         </h1>
 
@@ -204,13 +204,13 @@ export default function Servizi() {
           </div>
         </div>
 
-        {errore && <p className="text-lg font-medium text-red-700">{errore}</p>}
+        {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
 
         <button
           type="button"
           disabled={salvando}
           onClick={salva}
-          className="flex min-h-[56px] w-full items-center justify-center rounded-xl bg-stone-900 px-6 text-lg font-semibold text-white disabled:opacity-60"
+          className="flex min-h-[56px] w-full items-center justify-center rounded-2xl bg-inchiostro px-6 text-lg font-semibold text-white disabled:opacity-60"
         >
           {salvando ? 'Salvo…' : 'Salva'}
         </button>
@@ -219,7 +219,7 @@ export default function Servizi() {
           <button
             type="button"
             onClick={() => cambiaAttivo(editando)}
-            className="flex min-h-[56px] w-full items-center justify-center rounded-xl border-2 border-stone-300 px-6 text-lg font-semibold text-stone-900"
+            className="flex min-h-[56px] w-full items-center justify-center rounded-2xl border-2 border-bordo px-6 text-lg font-semibold text-inchiostro"
           >
             {editando.attivo ? 'Disattiva servizio' : 'Riattiva servizio'}
           </button>
@@ -230,13 +230,13 @@ export default function Servizi() {
 
   return (
     <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
-      <Link to="/admin/impostazioni" className="self-start text-lg font-medium text-stone-600">
+      <Link to="/admin/impostazioni" className="self-start text-lg font-medium text-grigio">
         ‹ Impostazioni
       </Link>
-      <h1 className="font-titolo text-3xl font-semibold text-stone-900">Servizi</h1>
+      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Servizi</h1>
 
-      {errore && <p className="text-lg font-medium text-red-700">{errore}</p>}
-      {!servizi && !errore && <p className="text-lg text-stone-700">Carico…</p>}
+      {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
+      {!servizi && !errore && <p className="text-lg text-grigio">Carico…</p>}
 
       <div className="flex flex-col gap-3">
         {servizi?.map((s) => (
@@ -244,14 +244,14 @@ export default function Servizi() {
             key={s.id}
             type="button"
             onClick={() => apriModifica(s)}
-            className={`flex flex-col gap-1 rounded-xl border-2 p-4 text-left ${
-              s.attivo ? 'border-stone-300' : 'border-stone-200 bg-stone-50'
+            className={`flex flex-col gap-1 rounded-2xl border-2 p-4 text-left ${
+              s.attivo ? 'border-bordo' : 'border-bordo bg-carta'
             }`}
           >
-            <span className={`text-lg font-semibold ${s.attivo ? 'text-stone-900' : 'text-stone-500'}`}>
+            <span className={`text-lg font-semibold ${s.attivo ? 'text-inchiostro' : 'text-grigio'}`}>
               {s.nome} {!s.attivo && '(disattivo)'}
             </span>
-            <span className="text-base text-stone-700">
+            <span className="text-base text-grigio">
               {s.durata_minuti} min · {formattatorePrezzo.format(s.prezzo_cent / 100)} · {s.categoria}
             </span>
           </button>
@@ -261,7 +261,7 @@ export default function Servizi() {
       <button
         type="button"
         onClick={apriNuovo}
-        className="flex min-h-[56px] w-full items-center justify-center rounded-xl border-2 border-stone-900 px-6 text-lg font-semibold text-stone-900"
+        className="flex min-h-[56px] w-full items-center justify-center rounded-2xl border-2 border-inchiostro px-6 text-lg font-semibold text-inchiostro"
       >
         + Nuovo servizio
       </button>

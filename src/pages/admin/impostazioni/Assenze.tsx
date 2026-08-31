@@ -86,10 +86,10 @@ export default function Assenze() {
 
   return (
     <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
-      <Link to="/admin/impostazioni" className="self-start text-lg font-medium text-stone-600">
+      <Link to="/admin/impostazioni" className="self-start text-lg font-medium text-grigio">
         ‹ Impostazioni
       </Link>
-      <h1 className="font-titolo text-3xl font-semibold text-stone-900">Assenze</h1>
+      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Assenze</h1>
 
       <div className="flex flex-wrap gap-2">
         {operatori.map((o) => (
@@ -102,28 +102,28 @@ export default function Assenze() {
         ))}
       </div>
 
-      {errore && <p className="text-lg font-medium text-red-700">{errore}</p>}
-      {!assenze && !errore && <p className="text-lg text-stone-700">Carico…</p>}
-      {assenze && assenze.length === 0 && <p className="text-base text-stone-600">Nessuna assenza in programma.</p>}
+      {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
+      {!assenze && !errore && <p className="text-lg text-grigio">Carico…</p>}
+      {assenze && assenze.length === 0 && <p className="text-base text-grigio">Nessuna assenza in programma.</p>}
 
       <div className="flex flex-col gap-3">
         {assenze?.map((a) => (
-          <div key={a.id} className="flex items-center justify-between gap-3 rounded-xl border-2 border-stone-300 p-4">
+          <div key={a.id} className="flex items-center justify-between gap-3 rounded-2xl border-2 border-bordo p-4">
             <div>
-              <p className="text-lg font-semibold text-stone-900">
+              <p className="text-lg font-semibold text-inchiostro">
                 {formattaGiornoEsteso(dataRomaDi(a.inizio))}
                 {dataRomaDi(a.inizio) !== dataRomaDi(a.fine) && ` – ${formattaGiornoEsteso(dataRomaDi(a.fine))}`}
               </p>
-              {a.motivo && <p className="text-base text-stone-700">{a.motivo}</p>}
+              {a.motivo && <p className="text-base text-grigio">{a.motivo}</p>}
             </div>
-            <button type="button" onClick={() => rimuoviAssenza(a)} className="shrink-0 text-base font-semibold text-red-700">
+            <button type="button" onClick={() => rimuoviAssenza(a)} className="shrink-0 text-base font-semibold text-allarme-testo">
               Rimuovi
             </button>
           </div>
         ))}
       </div>
 
-      <div className="flex flex-col gap-3 rounded-xl border-2 border-stone-300 p-4">
+      <div className="flex flex-col gap-3 rounded-2xl border-2 border-bordo p-4">
         <label className={classeEtichetta} htmlFor="assenza-inizio">
           Dal
         </label>
@@ -145,7 +145,7 @@ export default function Assenze() {
           onChange={(e) => setDataFine(e.target.value)}
         />
         <label className={classeEtichetta} htmlFor="assenza-motivo">
-          Motivo <span className="font-normal text-stone-600">(facoltativo)</span>
+          Motivo <span className="font-normal text-grigio">(facoltativo)</span>
         </label>
         <input
           id="assenza-motivo"
@@ -157,7 +157,7 @@ export default function Assenze() {
         <button
           type="button"
           onClick={aggiungiAssenza}
-          className="flex min-h-[56px] w-full items-center justify-center rounded-xl border-2 border-stone-900 px-6 text-lg font-semibold text-stone-900"
+          className="flex min-h-[56px] w-full items-center justify-center rounded-2xl border-2 border-inchiostro px-6 text-lg font-semibold text-inchiostro"
         >
           + Aggiungi assenza
         </button>

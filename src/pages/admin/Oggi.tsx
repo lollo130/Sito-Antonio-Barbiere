@@ -44,16 +44,16 @@ function Riga({
   }
 
   return (
-    <div className="flex flex-col gap-2 rounded-xl border-2 border-stone-300 p-4">
+    <div className="flex flex-col gap-2 rounded-2xl border-2 border-bordo p-4">
       <div className="flex items-baseline justify-between gap-3">
-        <span className="text-xl font-bold text-stone-900">{formattaOra(p.inizio)}</span>
-        {!attiva && <span className="text-base font-semibold text-stone-600">{ETICHETTA_STATO[p.stato]}</span>}
+        <span className="text-xl font-bold text-inchiostro">{formattaOra(p.inizio)}</span>
+        {!attiva && <span className="text-base font-semibold text-grigio">{ETICHETTA_STATO[p.stato]}</span>}
       </div>
-      <p className="text-lg font-semibold text-stone-900">{nomeCompleto}</p>
-      <p className="text-base text-stone-700">
+      <p className="text-lg font-semibold text-inchiostro">{nomeCompleto}</p>
+      <p className="text-base text-grigio">
         {p.servizi?.nome} · {p.operatori?.nome}
       </p>
-      <a href={`tel:${p.cliente_telefono.replace(/\s/g, '')}`} className="text-base font-semibold text-stone-900 underline">
+      <a href={`tel:${p.cliente_telefono.replace(/\s/g, '')}`} className="text-base font-semibold text-inchiostro underline">
         {p.cliente_telefono}
       </a>
 
@@ -62,21 +62,21 @@ function Riga({
           <button
             type="button"
             onClick={() => onAggiorna(p.id, 'completata')}
-            className="flex-1 rounded-lg border-2 border-stone-300 py-2 text-base font-semibold text-stone-900"
+            className="flex-1 rounded-lg border-2 border-bordo py-2 text-base font-semibold text-inchiostro"
           >
             Fatto
           </button>
           <button
             type="button"
             onClick={() => onAggiorna(p.id, 'non_presentato')}
-            className="flex-1 rounded-lg border-2 border-stone-300 py-2 text-base font-semibold text-stone-900"
+            className="flex-1 rounded-lg border-2 border-bordo py-2 text-base font-semibold text-inchiostro"
           >
             Non presentato
           </button>
           <button
             type="button"
             onClick={cancella}
-            className="flex-1 rounded-lg border-2 border-red-300 py-2 text-base font-semibold text-red-700"
+            className="flex-1 rounded-lg border-2 border-red-300 py-2 text-base font-semibold text-allarme-testo"
           >
             Cancella
           </button>
@@ -142,8 +142,8 @@ export default function Oggi() {
   return (
     <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
       <div className="flex items-center justify-between">
-        <h1 className="font-titolo text-3xl font-semibold text-stone-900">Oggi</h1>
-        <Link to="/admin/impostazioni" className="text-lg font-medium text-stone-600 underline">
+        <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Oggi</h1>
+        <Link to="/admin/impostazioni" className="text-lg font-medium text-grigio underline">
           Impostazioni
         </Link>
       </div>
@@ -152,16 +152,16 @@ export default function Oggi() {
         <button
           type="button"
           onClick={() => setGiorno((g) => aggiungiGiorni(g, -1))}
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 border-stone-300 text-2xl font-bold text-stone-900"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-bordo text-2xl font-bold text-inchiostro"
           aria-label="Giorno precedente"
         >
           ‹
         </button>
-        <p className="flex-1 text-center text-lg font-bold text-stone-900">{formattaGiornoEsteso(giorno)}</p>
+        <p className="flex-1 text-center text-lg font-bold text-inchiostro">{formattaGiornoEsteso(giorno)}</p>
         <button
           type="button"
           onClick={() => setGiorno((g) => aggiungiGiorni(g, 1))}
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 border-stone-300 text-2xl font-bold text-stone-900"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-bordo text-2xl font-bold text-inchiostro"
           aria-label="Giorno successivo"
         >
           ›
@@ -171,7 +171,7 @@ export default function Oggi() {
         <button
           type="button"
           onClick={() => setGiorno(oggi)}
-          className="self-center text-base font-semibold text-stone-600 underline"
+          className="self-center text-base font-semibold text-grigio underline"
         >
           Torna a oggi
         </button>
@@ -182,7 +182,7 @@ export default function Oggi() {
           type="button"
           onClick={() => setFiltroOperatore(null)}
           className={`rounded-lg border-2 px-4 py-2 text-base font-semibold ${
-            filtroOperatore === null ? 'border-stone-900 bg-stone-900 text-white' : 'border-stone-300 text-stone-900'
+            filtroOperatore === null ? 'border-inchiostro bg-inchiostro text-white' : 'border-bordo text-inchiostro'
           }`}
         >
           Tutti
@@ -193,7 +193,7 @@ export default function Oggi() {
             type="button"
             onClick={() => setFiltroOperatore(o.id)}
             className={`rounded-lg border-2 px-4 py-2 text-base font-semibold ${
-              filtroOperatore === o.id ? 'border-stone-900 bg-stone-900 text-white' : 'border-stone-300 text-stone-900'
+              filtroOperatore === o.id ? 'border-inchiostro bg-inchiostro text-white' : 'border-bordo text-inchiostro'
             }`}
           >
             {o.nome}
@@ -201,10 +201,10 @@ export default function Oggi() {
         ))}
       </div>
 
-      {errore && <p className="text-lg font-medium text-red-700">{errore}</p>}
-      {!prenotazioni && !errore && <p className="text-lg text-stone-700">Carico le prenotazioni…</p>}
+      {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
+      {!prenotazioni && !errore && <p className="text-lg text-grigio">Carico le prenotazioni…</p>}
       {prenotazioni && prenotazioni.length === 0 && !errore && (
-        <p className="text-lg text-stone-700">Nessuna prenotazione per questo giorno.</p>
+        <p className="text-lg text-grigio">Nessuna prenotazione per questo giorno.</p>
       )}
 
       <div className="flex flex-col gap-3">

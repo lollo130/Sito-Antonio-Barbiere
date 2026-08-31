@@ -45,7 +45,7 @@ export default function Admin() {
   if (sessione === undefined || (sessione && autorizzato === null)) {
     return (
       <main className="mx-auto flex min-h-svh max-w-md items-center justify-center px-5">
-        <p className="text-lg text-stone-700">Un attimo…</p>
+        <p className="text-lg text-grigio">Un attimo…</p>
       </main>
     );
   }
@@ -57,14 +57,14 @@ export default function Admin() {
   if (!autorizzato) {
     return (
       <main className="mx-auto flex min-h-svh max-w-md flex-col items-center justify-center gap-6 px-5 text-center">
-        <h1 className="font-titolo text-3xl font-semibold text-stone-900">Accesso non autorizzato</h1>
-        <p className="text-lg text-stone-700">
+        <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Accesso non autorizzato</h1>
+        <p className="text-lg text-grigio">
           Questo account non ha accesso al pannello. Contatta chi gestisce il sito.
         </p>
         <button
           type="button"
           onClick={() => supabase.auth.signOut()}
-          className="text-lg font-semibold text-stone-600 underline"
+          className="text-lg font-semibold text-grigio underline"
         >
           Esci
         </button>

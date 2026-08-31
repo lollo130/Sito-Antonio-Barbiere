@@ -17,15 +17,15 @@ export default function BottoneScelta({
     <button
       type="button"
       aria-pressed={selezionato}
-      className={`flex min-h-[56px] w-full items-center justify-between gap-4 rounded-xl border-2 px-5 py-3 text-left text-lg font-semibold transition-colors ${
+      className={`flex min-h-[64px] w-full items-center justify-between gap-4 rounded-2xl border-2 px-5 py-3 text-left text-lg font-bold transition-colors ${
         selezionato
-          ? 'border-stone-900 bg-stone-900 text-white ring-2 ring-amber-400 ring-offset-2'
-          : 'border-stone-300 bg-white text-stone-900 active:bg-stone-100'
+          ? 'border-inchiostro bg-inchiostro text-carta'
+          : 'border-bordo bg-carta text-inchiostro active:bg-ottone-chiaro'
       } ${className}`}
       {...resto}
     >
       <span>{etichetta}</span>
-      {dettaglio && <span className="text-base font-normal opacity-80">{dettaglio}</span>}
+      {dettaglio && <span className="text-base font-normal opacity-90">{dettaglio}</span>}
     </button>
   );
 }

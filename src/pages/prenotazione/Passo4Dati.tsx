@@ -17,8 +17,8 @@ function valida(nome: string, telefono: string, email: string): string | null {
 }
 
 const classeCampo =
-  'min-h-[56px] w-full rounded-xl border-2 border-stone-300 px-4 text-lg text-stone-900 focus:border-stone-900 focus:outline-none';
-const classeEtichetta = 'block text-lg font-semibold text-stone-900';
+  'min-h-[56px] w-full rounded-2xl border-2 border-bordo px-4 text-lg text-inchiostro focus:border-inchiostro focus:outline-none';
+const classeEtichetta = 'block text-lg font-semibold text-inchiostro';
 
 type Props = {
   servizio: Servizio;
@@ -84,12 +84,12 @@ export default function Passo4Dati({ servizio, inizio, operatorePreferenza, onIn
 
   return (
     <div className="flex flex-col gap-6">
-      <button type="button" onClick={onIndietro} className="self-start text-lg font-medium text-stone-600">
+      <button type="button" onClick={onIndietro} className="self-start text-lg font-medium text-grigio">
         ‹ Indietro
       </button>
-      <h1 className="font-titolo text-3xl font-semibold text-stone-900">I tuoi dati</h1>
+      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">I tuoi dati</h1>
 
-      <p className="text-lg text-stone-700">
+      <p className="text-lg text-grigio">
         {servizio.nome} — {formattaGiornoEsteso(dataRomaDi(inizioEffettivo))}, alle {formattaOra(inizioEffettivo)}
       </p>
 
@@ -116,7 +116,7 @@ export default function Passo4Dati({ servizio, inizio, operatorePreferenza, onIn
 
         <div className="flex flex-col gap-2">
           <label className={classeEtichetta} htmlFor="cognome">
-            Cognome <span className="font-normal text-stone-600">(facoltativo)</span>
+            Cognome <span className="font-normal text-grigio">(facoltativo)</span>
           </label>
           <input
             id="cognome"
@@ -145,7 +145,7 @@ export default function Passo4Dati({ servizio, inizio, operatorePreferenza, onIn
 
         <div className="flex flex-col gap-2">
           <label className={classeEtichetta} htmlFor="email">
-            Email <span className="font-normal text-stone-600">(facoltativa)</span>
+            Email <span className="font-normal text-grigio">(facoltativa)</span>
           </label>
           <input
             id="email"
@@ -158,18 +158,18 @@ export default function Passo4Dati({ servizio, inizio, operatorePreferenza, onIn
           />
         </div>
 
-        <p className="text-base text-stone-600">
+        <p className="text-base text-grigio">
           I tuoi dati servono solo per gestire la prenotazione.{' '}
           <a href="/privacy" className="underline">
             Leggi come li trattiamo.
           </a>
         </p>
 
-        {errore && <p className="text-lg font-medium text-red-700">{errore}</p>}
+        {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
 
         {alternative && alternative.length > 0 && (
           <div className="flex flex-col gap-3">
-            <p className="text-lg text-stone-700">Puoi scegliere uno di questi orari:</p>
+            <p className="text-lg text-grigio">Puoi scegliere uno di questi orari:</p>
             {alternative.map((s) => (
               <BottoneScelta
                 key={s.inizio}
@@ -183,7 +183,7 @@ export default function Passo4Dati({ servizio, inizio, operatorePreferenza, onIn
         <button
           type="submit"
           disabled={inviando}
-          className="flex min-h-[56px] w-full items-center justify-center rounded-xl bg-stone-900 px-6 text-lg font-semibold text-white disabled:opacity-60"
+          className="flex min-h-[56px] w-full items-center justify-center rounded-2xl bg-inchiostro px-6 text-lg font-semibold text-white disabled:opacity-60"
         >
           {inviando ? 'Prenoto…' : 'Prenota'}
         </button>

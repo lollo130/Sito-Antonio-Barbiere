@@ -2,8 +2,8 @@ import { useState, type FormEvent } from 'react';
 import { supabase } from '../../lib/supabase';
 
 const classeCampo =
-  'min-h-[56px] w-full rounded-xl border-2 border-stone-300 px-4 text-lg text-stone-900 focus:border-stone-900 focus:outline-none';
-const classeEtichetta = 'block text-lg font-semibold text-stone-900';
+  'min-h-[56px] w-full rounded-2xl border-2 border-bordo px-4 text-lg text-inchiostro focus:border-inchiostro focus:outline-none';
+const classeEtichetta = 'block text-lg font-semibold text-inchiostro';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -22,7 +22,7 @@ export default function AdminLogin() {
 
   return (
     <main className="mx-auto flex min-h-svh max-w-md flex-col justify-center gap-6 px-5 py-8">
-      <h1 className="font-titolo text-3xl font-semibold text-stone-900">Accedi al pannello</h1>
+      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Accedi al pannello</h1>
       <form className="flex flex-col gap-5" onSubmit={accedi}>
         <div className="flex flex-col gap-2">
           <label className={classeEtichetta} htmlFor="email">
@@ -50,11 +50,11 @@ export default function AdminLogin() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        {errore && <p className="text-lg font-medium text-red-700">{errore}</p>}
+        {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
         <button
           type="submit"
           disabled={inviando}
-          className="flex min-h-[56px] w-full items-center justify-center rounded-xl bg-stone-900 px-6 text-lg font-semibold text-white disabled:opacity-60"
+          className="flex min-h-[56px] w-full items-center justify-center rounded-2xl bg-inchiostro px-6 text-lg font-semibold text-white disabled:opacity-60"
         >
           {inviando ? 'Accesso…' : 'Accedi'}
         </button>

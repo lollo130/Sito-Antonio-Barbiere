@@ -55,16 +55,16 @@ function RigaGiorno({
   const [oraFine, setOraFine] = useState('13:00');
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border-2 border-stone-300 p-4">
-      <p className="text-lg font-semibold text-stone-900">{etichetta}</p>
+    <div className="flex flex-col gap-3 rounded-2xl border-2 border-bordo p-4">
+      <p className="text-lg font-semibold text-inchiostro">{etichetta}</p>
 
-      {fasce.length === 0 && <p className="text-base text-stone-600">Chiuso</p>}
+      {fasce.length === 0 && <p className="text-base text-grigio">Chiuso</p>}
       {fasce.map((f) => (
         <div key={f.id} className="flex items-center justify-between gap-3">
-          <span className="text-base text-stone-900">
+          <span className="text-base text-inchiostro">
             {f.ora_inizio.slice(0, 5)} – {f.ora_fine.slice(0, 5)}
           </span>
-          <button type="button" onClick={() => onRimuovi(f.id)} className="text-base font-semibold text-red-700">
+          <button type="button" onClick={() => onRimuovi(f.id)} className="text-base font-semibold text-allarme-testo">
             Rimuovi
           </button>
         </div>
@@ -75,19 +75,19 @@ function RigaGiorno({
           type="time"
           value={oraInizio}
           onChange={(e) => setOraInizio(e.target.value)}
-          className="min-h-[48px] rounded-lg border-2 border-stone-300 px-2 text-base text-stone-900"
+          className="min-h-[48px] rounded-lg border-2 border-bordo px-2 text-base text-inchiostro"
         />
-        <span className="text-base text-stone-600">–</span>
+        <span className="text-base text-grigio">–</span>
         <input
           type="time"
           value={oraFine}
           onChange={(e) => setOraFine(e.target.value)}
-          className="min-h-[48px] rounded-lg border-2 border-stone-300 px-2 text-base text-stone-900"
+          className="min-h-[48px] rounded-lg border-2 border-bordo px-2 text-base text-inchiostro"
         />
         <button
           type="button"
           onClick={() => onAggiungi(giorno, oraInizio, oraFine)}
-          className="ml-auto min-h-[48px] rounded-lg border-2 border-stone-900 px-4 text-base font-semibold text-stone-900"
+          className="ml-auto min-h-[48px] rounded-lg border-2 border-inchiostro px-4 text-base font-semibold text-inchiostro"
         >
           + Aggiungi
         </button>

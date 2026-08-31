@@ -96,16 +96,16 @@ export default function OrariChiusure() {
 
   return (
     <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
-      <Link to="/admin/impostazioni" className="self-start text-lg font-medium text-stone-600">
+      <Link to="/admin/impostazioni" className="self-start text-lg font-medium text-grigio">
         ‹ Impostazioni
       </Link>
-      <h1 className="font-titolo text-3xl font-semibold text-stone-900">Orari del salone e chiusure</h1>
+      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Orari del salone e chiusure</h1>
 
-      {errore && <p className="text-lg font-medium text-red-700">{errore}</p>}
+      {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-xl font-bold text-stone-900">Orari settimanali</h2>
-        <p className="text-base text-stone-600">
+        <h2 className="text-xl font-bold text-inchiostro">Orari settimanali</h2>
+        <p className="text-base text-grigio">
           Informativi (per il sito pubblico): la disponibilità delle prenotazioni dipende sempre dagli orari di ogni
           singolo operatore, in "Impostazioni → Operatori".
         </p>
@@ -113,26 +113,26 @@ export default function OrariChiusure() {
       </div>
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-xl font-bold text-stone-900">Chiusure</h2>
-        <p className="text-base text-stone-600">Festivi, ferie collettive: valgono per tutti gli operatori.</p>
+        <h2 className="text-xl font-bold text-inchiostro">Chiusure</h2>
+        <p className="text-base text-grigio">Festivi, ferie collettive: valgono per tutti gli operatori.</p>
 
-        {!chiusure && <p className="text-lg text-stone-700">Carico…</p>}
-        {chiusure && chiusure.length === 0 && <p className="text-base text-stone-600">Nessuna chiusura in programma.</p>}
+        {!chiusure && <p className="text-lg text-grigio">Carico…</p>}
+        {chiusure && chiusure.length === 0 && <p className="text-base text-grigio">Nessuna chiusura in programma.</p>}
 
         <div className="flex flex-col gap-3">
           {chiusure?.map((c) => (
-            <div key={c.id} className="flex items-center justify-between gap-3 rounded-xl border-2 border-stone-300 p-4">
+            <div key={c.id} className="flex items-center justify-between gap-3 rounded-2xl border-2 border-bordo p-4">
               <div>
-                <p className="text-lg font-semibold text-stone-900">
+                <p className="text-lg font-semibold text-inchiostro">
                   {formattaGiornoEsteso(dataRomaDi(c.inizio))}
                   {dataRomaDi(c.inizio) !== dataRomaDi(c.fine) && ` – ${formattaGiornoEsteso(dataRomaDi(c.fine))}`}
                 </p>
-                {c.motivo && <p className="text-base text-stone-700">{c.motivo}</p>}
+                {c.motivo && <p className="text-base text-grigio">{c.motivo}</p>}
               </div>
               <button
                 type="button"
                 onClick={() => rimuoviChiusura(c)}
-                className="shrink-0 text-base font-semibold text-red-700"
+                className="shrink-0 text-base font-semibold text-allarme-testo"
               >
                 Rimuovi
               </button>
@@ -140,7 +140,7 @@ export default function OrariChiusure() {
           ))}
         </div>
 
-        <div className="flex flex-col gap-3 rounded-xl border-2 border-stone-300 p-4">
+        <div className="flex flex-col gap-3 rounded-2xl border-2 border-bordo p-4">
           <label className={classeEtichetta} htmlFor="chiusura-inizio">
             Dal
           </label>
@@ -162,7 +162,7 @@ export default function OrariChiusure() {
             onChange={(e) => setDataFine(e.target.value)}
           />
           <label className={classeEtichetta} htmlFor="chiusura-motivo">
-            Motivo <span className="font-normal text-stone-600">(facoltativo)</span>
+            Motivo <span className="font-normal text-grigio">(facoltativo)</span>
           </label>
           <input
             id="chiusura-motivo"
@@ -174,7 +174,7 @@ export default function OrariChiusure() {
           <button
             type="button"
             onClick={aggiungiChiusura}
-            className="flex min-h-[56px] w-full items-center justify-center rounded-xl border-2 border-stone-900 px-6 text-lg font-semibold text-stone-900"
+            className="flex min-h-[56px] w-full items-center justify-center rounded-2xl border-2 border-inchiostro px-6 text-lg font-semibold text-inchiostro"
           >
             + Aggiungi chiusura
           </button>

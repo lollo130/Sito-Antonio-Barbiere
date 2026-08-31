@@ -62,13 +62,13 @@ export default function Operatori() {
 
   return (
     <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
-      <Link to="/admin/impostazioni" className="self-start text-lg font-medium text-stone-600">
+      <Link to="/admin/impostazioni" className="self-start text-lg font-medium text-grigio">
         ‹ Impostazioni
       </Link>
-      <h1 className="font-titolo text-3xl font-semibold text-stone-900">Operatori</h1>
+      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Operatori</h1>
 
-      {errore && <p className="text-lg font-medium text-red-700">{errore}</p>}
-      {!operatori && !errore && <p className="text-lg text-stone-700">Carico…</p>}
+      {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
+      {!operatori && !errore && <p className="text-lg text-grigio">Carico…</p>}
 
       <div className="flex flex-col gap-3">
         {operatori?.map((o) => (
@@ -76,8 +76,8 @@ export default function Operatori() {
             key={o.id}
             type="button"
             onClick={() => setSelezionato(o)}
-            className={`flex min-h-[56px] items-center rounded-xl border-2 px-5 text-left text-lg font-semibold ${
-              o.attivo ? 'border-stone-300 text-stone-900' : 'border-stone-200 bg-stone-50 text-stone-500'
+            className={`flex min-h-[56px] items-center rounded-2xl border-2 px-5 text-left text-lg font-semibold ${
+              o.attivo ? 'border-bordo text-inchiostro' : 'border-bordo bg-carta text-grigio'
             }`}
           >
             {o.nome} {!o.attivo && '(disattivo)'}
@@ -85,7 +85,7 @@ export default function Operatori() {
         ))}
       </div>
 
-      <div className="flex flex-col gap-3 rounded-xl border-2 border-stone-300 p-4">
+      <div className="flex flex-col gap-3 rounded-2xl border-2 border-bordo p-4">
         <label className={classeEtichetta} htmlFor="nome-nuovo">
           Nuovo operatore
         </label>
@@ -99,7 +99,7 @@ export default function Operatori() {
         <button
           type="button"
           onClick={aggiungiOperatore}
-          className="flex min-h-[56px] w-full items-center justify-center rounded-xl border-2 border-stone-900 px-6 text-lg font-semibold text-stone-900"
+          className="flex min-h-[56px] w-full items-center justify-center rounded-2xl border-2 border-inchiostro px-6 text-lg font-semibold text-inchiostro"
         >
           + Aggiungi operatore
         </button>
@@ -209,15 +209,15 @@ function DettaglioOperatore({ operatore, onIndietro }: { operatore: Operatore; o
 
   return (
     <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
-      <button type="button" onClick={onIndietro} className="self-start text-lg font-medium text-stone-600">
+      <button type="button" onClick={onIndietro} className="self-start text-lg font-medium text-grigio">
         ‹ Operatori
       </button>
-      <h1 className="font-titolo text-3xl font-semibold text-stone-900">{operatore.nome}</h1>
+      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">{operatore.nome}</h1>
 
-      {errore && <p className="text-lg font-medium text-red-700">{errore}</p>}
+      {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
 
       {prenotazioniFuture && (
-        <div className="flex flex-col gap-3 rounded-xl border-2 border-red-300 bg-red-50 p-4">
+        <div className="flex flex-col gap-3 rounded-2xl border-2 border-red-300 bg-allarme-sfondo p-4">
           <p className="text-lg font-semibold text-red-900">
             {operatore.nome} ha {prenotazioniFuture.length} prenotazion{prenotazioniFuture.length === 1 ? 'e' : 'i'} futur
             {prenotazioniFuture.length === 1 ? 'a' : 'e'}:
@@ -238,14 +238,14 @@ function DettaglioOperatore({ operatore, onIndietro }: { operatore: Operatore; o
             <button
               type="button"
               onClick={() => setPrenotazioniFuture(null)}
-              className="flex-1 rounded-lg border-2 border-stone-300 py-2 text-base font-semibold text-stone-900"
+              className="flex-1 rounded-lg border-2 border-bordo py-2 text-base font-semibold text-inchiostro"
             >
               Annulla
             </button>
             <button
               type="button"
               onClick={() => salvaAttivo(false)}
-              className="flex-1 rounded-lg border-2 border-red-700 py-2 text-base font-semibold text-red-700"
+              className="flex-1 rounded-lg border-2 border-allarme py-2 text-base font-semibold text-allarme-testo"
             >
               Disattiva comunque
             </button>
@@ -256,13 +256,13 @@ function DettaglioOperatore({ operatore, onIndietro }: { operatore: Operatore; o
       <button
         type="button"
         onClick={attivo ? disattiva : riattiva}
-        className="flex min-h-[56px] w-full items-center justify-center rounded-xl border-2 border-stone-300 px-6 text-lg font-semibold text-stone-900"
+        className="flex min-h-[56px] w-full items-center justify-center rounded-2xl border-2 border-bordo px-6 text-lg font-semibold text-inchiostro"
       >
         {attivo ? 'Disattiva operatore' : 'Riattiva operatore'}
       </button>
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-xl font-bold text-stone-900">Servizi che sa fare</h2>
+        <h2 className="text-xl font-bold text-inchiostro">Servizi che sa fare</h2>
         <div className="flex flex-col gap-2">
           {servizi.map((s) => {
             const assegnato = serviziAssegnati.has(s.id);
@@ -271,8 +271,8 @@ function DettaglioOperatore({ operatore, onIndietro }: { operatore: Operatore; o
                 key={s.id}
                 type="button"
                 onClick={() => toggleServizio(s.id)}
-                className={`flex min-h-[56px] items-center justify-between rounded-xl border-2 px-5 text-left text-lg font-semibold ${
-                  assegnato ? 'border-stone-900 bg-stone-900 text-white' : 'border-stone-300 text-stone-900'
+                className={`flex min-h-[56px] items-center justify-between rounded-2xl border-2 px-5 text-left text-lg font-semibold ${
+                  assegnato ? 'border-inchiostro bg-inchiostro text-white' : 'border-bordo text-inchiostro'
                 }`}
               >
                 {s.nome}
@@ -284,7 +284,7 @@ function DettaglioOperatore({ operatore, onIndietro }: { operatore: Operatore; o
       </div>
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-xl font-bold text-stone-900">Orari settimanali</h2>
+        <h2 className="text-xl font-bold text-inchiostro">Orari settimanali</h2>
         <EditorOrariSettimanali fasce={fasce} onAggiungi={aggiungiFascia} onRimuovi={rimuoviFascia} />
       </div>
     </main>

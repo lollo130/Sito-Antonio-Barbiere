@@ -124,16 +124,16 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
         <button
           type="button"
           onClick={() => setVista('mese')}
-          className="self-start text-lg font-medium text-stone-600"
+          className="self-start text-lg font-medium text-grigio"
         >
           ‹ Torna al calendario
         </button>
-        <h1 className="font-titolo text-3xl font-semibold text-stone-900">{formattaGiornoEsteso(giornoScelto)}</h1>
+        <h1 className="font-titolo text-3xl font-semibold text-inchiostro">{formattaGiornoEsteso(giornoScelto)}</h1>
 
-        {erroreGiorno && <p className="text-lg font-medium text-red-700">{erroreGiorno}</p>}
-        {!righeGiorno && !erroreGiorno && <p className="text-lg text-stone-700">Controllo gli orari…</p>}
+        {erroreGiorno && <p className="text-lg font-medium text-allarme-testo">{erroreGiorno}</p>}
+        {!righeGiorno && !erroreGiorno && <p className="text-lg text-grigio">Controllo gli orari…</p>}
         {righeGiorno && righeGiorno.length === 0 && !erroreGiorno && (
-          <p className="text-lg text-stone-700">Il salone è chiuso questo giorno.</p>
+          <p className="text-lg text-grigio">Il salone è chiuso questo giorno.</p>
         )}
 
         <div className="flex flex-col gap-3">
@@ -143,13 +143,15 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
               type="button"
               disabled={!r.libero}
               onClick={() => onScelto(r.inizio)}
-              className={`flex min-h-[56px] w-full items-center justify-between gap-4 rounded-xl border-2 px-5 py-3 text-left text-lg font-semibold ${
+              className={`flex min-h-[56px] w-full items-center justify-between gap-4 rounded-2xl border-2 px-5 py-3 text-left text-lg font-semibold ${
                 r.libero
-                  ? 'border-stone-900 bg-white text-stone-900 active:bg-stone-100'
-                  : 'border-stone-200 bg-stone-100 text-stone-400'
+                  ? 'border-inchiostro bg-carta text-inchiostro active:bg-ottone-chiaro'
+                  : 'border-pietra bg-pietra text-pietra-testo'
               }`}
             >
-              <span>{formattaOra(r.inizio)}</span>
+              <span className={`font-titolo text-2xl tabular-nums ${r.libero ? 'text-ottone' : 'text-pietra-testo'}`}>
+                {formattaOra(r.inizio)}
+              </span>
               <span className="text-base font-normal">{r.libero ? (r.operatore_nome ?? 'Libero') : 'Occupato'}</span>
             </button>
           ))}
@@ -169,10 +171,10 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
 
   return (
     <div className="flex flex-col gap-6">
-      <button type="button" onClick={onIndietro} className="self-start text-lg font-medium text-stone-600">
+      <button type="button" onClick={onIndietro} className="self-start text-lg font-medium text-grigio">
         ‹ Cambia servizio
       </button>
-      <h1 className="font-titolo text-3xl font-semibold text-stone-900">Quando vuoi venire?</h1>
+      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Quando vuoi venire?</h1>
 
       <BottoneScelta
         etichetta={cercandoPrimoLibero ? 'Cerco il primo giorno libero…' : 'Il prima possibile'}
@@ -185,30 +187,30 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
           type="button"
           disabled={!puoMesePrecedente}
           onClick={() => setMese((m) => mesePrecedente(m))}
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 border-stone-300 text-2xl font-bold text-stone-900 disabled:opacity-30"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-bordo text-2xl font-bold text-inchiostro disabled:opacity-30"
           aria-label="Mese precedente"
         >
           ‹
         </button>
-        <p className="flex-1 text-center text-xl font-bold text-stone-900">
+        <p className="flex-1 text-center text-xl font-bold text-inchiostro">
           {formattaMeseAnno(mese.anno, mese.mese)}
         </p>
         <button
           type="button"
           disabled={!puoMeseSuccessivo}
           onClick={() => setMese((m) => meseSuccessivo(m))}
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 border-stone-300 text-2xl font-bold text-stone-900 disabled:opacity-30"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-bordo text-2xl font-bold text-inchiostro disabled:opacity-30"
           aria-label="Mese successivo"
         >
           ›
         </button>
       </div>
 
-      {erroreMese && <p className="text-lg font-medium text-red-700">{erroreMese}</p>}
-      {!giorniMese && !erroreMese && <p className="text-lg text-stone-700">Controllo il calendario…</p>}
+      {erroreMese && <p className="text-lg font-medium text-allarme-testo">{erroreMese}</p>}
+      {!giorniMese && !erroreMese && <p className="text-lg text-grigio">Controllo il calendario…</p>}
 
       <div>
-        <div className="mb-1 grid grid-cols-7 gap-1 text-center text-base font-semibold text-stone-600">
+        <div className="mb-1 grid grid-cols-7 gap-1 text-center text-base font-semibold text-grigio">
           {NOMI_GIORNI.map((n) => (
             <div key={n}>{n}</div>
           ))}
@@ -223,11 +225,11 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
             let classi =
               'flex aspect-square w-full flex-col items-center justify-center rounded-lg border-2 text-lg font-semibold ';
             if (fuoriRange || !giorniMese) {
-              classi += 'border-stone-100 text-stone-300';
+              classi += 'border-transparent text-stone-400';
             } else if (libero) {
-              classi += 'border-green-700 bg-green-50 text-green-900 active:bg-green-100';
+              classi += 'border-inchiostro bg-carta text-inchiostro active:bg-ottone-chiaro';
             } else {
-              classi += 'border-stone-300 bg-stone-100 text-stone-500';
+              classi += 'border-pietra bg-pietra text-pietra-testo';
             }
 
             return (
@@ -245,12 +247,12 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
         </div>
       </div>
 
-      <p className="flex items-center gap-4 text-base text-stone-600">
+      <p className="flex items-center gap-4 text-base text-grigio">
         <span className="flex items-center gap-2">
-          <span className="inline-block h-4 w-4 rounded border-2 border-green-700 bg-green-50" /> libero
+          <span className="inline-block h-4 w-4 rounded border-2 border-inchiostro bg-carta" /> libero
         </span>
         <span className="flex items-center gap-2">
-          <span className="inline-block h-4 w-4 rounded border-2 border-stone-300 bg-stone-100" /> pieno
+          <span className="inline-block h-4 w-4 rounded border-2 border-pietra bg-pietra" /> pieno
         </span>
       </p>
     </div>

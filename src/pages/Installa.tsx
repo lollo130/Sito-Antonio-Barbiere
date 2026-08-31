@@ -70,14 +70,14 @@ export default function Installa() {
 
   return (
     <main className="mx-auto max-w-md px-5 py-10 text-[18px] leading-relaxed">
-      <h1 className="font-titolo mb-6 text-3xl font-semibold text-stone-900">Installa l'app del salone</h1>
+      <h1 className="font-titolo mb-6 text-3xl font-semibold text-inchiostro">Installa l'app del salone</h1>
 
       {ambiente === 'installata' && (
         <>
           <p className="mb-6">L'app è già installata su questo telefono.</p>
           <a
             href="/admin"
-            className="flex min-h-[56px] items-center justify-center rounded-xl bg-stone-900 px-6 text-lg font-semibold text-white"
+            className="flex min-h-[56px] items-center justify-center rounded-2xl bg-inchiostro px-6 text-lg font-semibold text-white"
           >
             Apri il pannello
           </a>
@@ -93,12 +93,12 @@ export default function Installa() {
             <button
               onClick={installa}
               disabled={esito === 'in-corso'}
-              className="flex min-h-[56px] w-full items-center justify-center rounded-xl bg-stone-900 px-6 text-lg font-semibold text-white disabled:opacity-60"
+              className="flex min-h-[56px] w-full items-center justify-center rounded-2xl bg-inchiostro px-6 text-lg font-semibold text-white disabled:opacity-60"
             >
               Installa app
             </button>
           ) : (
-            <p className="rounded-xl bg-stone-100 p-4">
+            <p className="rounded-2xl bg-pietra p-4">
               Se il pulsante non compare, apri il menu del browser (i tre puntini in alto)
               e scegli <strong>Installa app</strong> o <strong>Aggiungi a schermata Home</strong>.
             </p>
@@ -134,25 +134,25 @@ export default function Installa() {
       )}
 
       {ambiente === 'ios-altro' && (
-        <p className="rounded-xl bg-stone-100 p-4">
+        <p className="rounded-2xl bg-pietra p-4">
           Per installare l'app su iPhone serve <strong>Safari</strong>. Copia l'indirizzo di
           questa pagina, aprilo con Safari e torna qui: troverai le istruzioni.
         </p>
       )}
 
       {ambiente === 'desktop' && (
-        <p className="rounded-xl bg-stone-100 p-4">
+        <p className="rounded-2xl bg-pietra p-4">
           Apri questa pagina dal telefono per installare l'app. Puoi inquadrare il codice QR
           qui sotto con la fotocamera.
         </p>
       )}
 
-      <hr className="my-10 border-stone-200" />
+      <hr className="my-10 border-bordo" />
 
-      <p className="mb-4 text-stone-600">
+      <p className="mb-4 text-grigio">
         Da condividere con chi deve installarla: inquadra il codice con la fotocamera.
       </p>
-      <div className="flex h-48 w-48 items-center justify-center rounded-xl border-2 border-stone-300 p-3">
+      <div className="flex h-48 w-48 items-center justify-center rounded-2xl border-2 border-bordo p-3">
         <QRCodeSVG value={URL_INSTALLA} size={168} className="h-full w-full" title="QR per aprire questa pagina" />
       </div>
     </main>

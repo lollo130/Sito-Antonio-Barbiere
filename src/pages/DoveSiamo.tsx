@@ -29,26 +29,26 @@ export default function DoveSiamo() {
       <Intestazione />
 
       <main className="mx-auto max-w-2xl px-5 py-12">
-        <h1 className="font-titolo text-3xl font-semibold text-stone-900">Dove siamo</h1>
+        <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Dove siamo</h1>
 
-        <div className="mt-6 flex h-64 items-center justify-center rounded-2xl border-2 border-dashed border-stone-300 bg-white text-lg text-stone-400">
+        <div className="mt-6 flex h-64 items-center justify-center rounded-2xl border-2 border-dashed border-bordo bg-carta text-lg text-pietra-testo">
           Mappa — in arrivo con l'indirizzo definitivo
         </div>
 
-        <p className="mt-6 text-xl text-stone-900">{INDIRIZZO_SALONE}</p>
+        <p className="mt-6 text-xl text-inchiostro">{INDIRIZZO_SALONE}</p>
 
         <div className="mt-4">
           <ChiamaSalone />
         </div>
 
-        <h2 className="mt-12 font-titolo text-2xl font-semibold text-stone-900">Orari</h2>
+        <h2 className="mt-12 font-titolo text-2xl font-semibold text-inchiostro">Orari</h2>
         <div className="mt-4 flex flex-col gap-1">
           {ORDINE_SETTIMANA.map((giorno) => {
             const fasce = orari?.filter((o) => o.giorno === giorno) ?? [];
             return (
-              <div key={giorno} className="flex items-baseline justify-between border-b border-stone-200 py-2">
-                <span className="text-lg font-semibold text-stone-900">{NOMI_GIORNI[giorno]}</span>
-                <span className="text-lg text-stone-700">
+              <div key={giorno} className="flex items-baseline justify-between border-b border-bordo py-2">
+                <span className="text-lg font-semibold text-inchiostro">{NOMI_GIORNI[giorno]}</span>
+                <span className="text-lg text-grigio">
                   {fasce.length === 0
                     ? 'Chiuso'
                     : fasce.map((f) => `${f.ora_inizio.slice(0, 5)}–${f.ora_fine.slice(0, 5)}`).join(', ')}
@@ -56,7 +56,7 @@ export default function DoveSiamo() {
               </div>
             );
           })}
-          {!orari && <p className="text-lg text-stone-700">Carico gli orari…</p>}
+          {!orari && <p className="text-lg text-grigio">Carico gli orari…</p>}
         </div>
       </main>
 

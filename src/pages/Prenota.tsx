@@ -7,6 +7,7 @@ import Passo2Quando from './prenotazione/Passo2Quando';
 import Passo3Operatore from './prenotazione/Passo3Operatore';
 import Passo4Dati from './prenotazione/Passo4Dati';
 import type { PrenotazioneConfermata } from '../lib/prenota';
+import { NOME_SALONE, SOTTOTITOLO_SALONE } from '../lib/salone';
 
 // Le quattro schermate di SPECIFICA.md § 5, più la conferma finale.
 export default function Prenota() {
@@ -18,7 +19,18 @@ export default function Prenota() {
   const passo = !servizio ? 1 : !inizio ? 2 : operatore === undefined ? 3 : 4;
 
   return (
-    <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
+    <>
+      {/* Solo l'insegna, senza navigazione: qui si fa una cosa sola. */}
+      <header className="border-b border-bordo bg-carta px-5 py-3">
+        <div className="mx-auto max-w-md">
+          <p className="font-titolo text-2xl leading-tight text-inchiostro">{NOME_SALONE}</p>
+          <p className="text-[0.62rem] uppercase tracking-[0.14em] text-ottone">
+            {SOTTOTITOLO_SALONE}
+          </p>
+        </div>
+      </header>
+
+      <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-7">
       {!prenotazione && <Progresso passo={passo} />}
       <ChiamaSalone />
 
@@ -43,6 +55,7 @@ export default function Prenota() {
       )}
 
       {prenotazione && <ConfermaPrenotazione prenotazione={prenotazione} />}
-    </main>
+      </main>
+    </>
   );
 }

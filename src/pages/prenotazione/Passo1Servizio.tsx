@@ -48,7 +48,7 @@ export default function Passo1Servizio({ onScelto }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-titolo text-3xl font-semibold text-stone-900">Cosa ti serve?</h1>
+      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Cosa ti serve?</h1>
 
       <div className="flex gap-3">
         <BottoneScelta
@@ -65,8 +65,8 @@ export default function Passo1Servizio({ onScelto }: Props) {
         />
       </div>
 
-      {errore && <p className="text-lg font-medium text-red-700">{errore}</p>}
-      {!servizi && !errore && <p className="text-lg text-stone-700">Carico i servizi…</p>}
+      {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
+      {!servizi && !errore && <p className="text-lg text-grigio">Carico i servizi…</p>}
 
       <div className="flex flex-col gap-3">
         {serviziVisibili.map((s) => (
@@ -76,7 +76,7 @@ export default function Passo1Servizio({ onScelto }: Props) {
             dettaglio={
               <>
                 {s.durata_minuti} min ·{' '}
-                <span className="font-semibold text-amber-800">{formattatorePrezzo.format(s.prezzo_cent / 100)}</span>
+                <span className="font-semibold text-ottone">{formattatorePrezzo.format(s.prezzo_cent / 100)}</span>
               </>
             }
             onClick={() => onScelto(s)}
@@ -85,7 +85,7 @@ export default function Passo1Servizio({ onScelto }: Props) {
       </div>
 
       {servizi && serviziVisibili.length === 0 && (
-        <p className="text-lg text-stone-700">Nessun servizio in questa categoria al momento.</p>
+        <p className="text-lg text-grigio">Nessun servizio in questa categoria al momento.</p>
       )}
     </div>
   );
