@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { apriPreferenze } from '../../lib/consenso';
 import {
   CAP_CITTA_SALONE,
   NOME_SALONE,
@@ -38,6 +39,14 @@ export default function Piede() {
           <Link to="/privacy" className="underline">
             Privacy
           </Link>
+          {' · '}
+          <Link to="/cookie" className="underline">
+            Cookie
+          </Link>
+          {' · '}
+          <button type="button" onClick={apriPreferenze} className="underline">
+            Preferenze cookie
+          </button>
           {' · '}
           <Link to="/dove-siamo" className="underline">
             Dove siamo
