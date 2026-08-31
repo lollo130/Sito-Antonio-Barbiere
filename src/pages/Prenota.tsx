@@ -21,10 +21,10 @@ export default function Prenota() {
   return (
     <>
       {/* Solo l'insegna, senza navigazione: qui si fa una cosa sola. */}
-      <header className="border-b border-bordo bg-carta px-5 py-3">
+      <header className="border-b border-bordo bg-carta-chiara px-5 py-3">
         <div className="mx-auto max-w-md">
           <p className="font-titolo text-2xl leading-tight text-inchiostro">{NOME_SALONE}</p>
-          <p className="text-[0.62rem] uppercase tracking-[0.14em] text-ottone">
+          <p className="text-[0.62rem] uppercase tracking-[0.14em] text-marrone">
             {SOTTOTITOLO_SALONE}
           </p>
         </div>

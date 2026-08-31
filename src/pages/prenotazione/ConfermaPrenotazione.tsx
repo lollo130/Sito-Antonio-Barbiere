@@ -15,7 +15,7 @@ export default function ConfermaPrenotazione({ prenotazione }: Props) {
 
   return (
     <div className="flex flex-col items-center gap-5 text-center">
-      <span className="flex h-20 w-20 items-center justify-center rounded-full bg-persiana">
+      <span className="flex h-20 w-20 items-center justify-center rounded-full bg-verde">
         <svg
           width="40"
           height="40"
@@ -36,9 +36,9 @@ export default function ConfermaPrenotazione({ prenotazione }: Props) {
         <p className="mt-2 text-lg text-grigio">Ti aspettiamo. Non serve fare altro.</p>
       </div>
 
-      <div className="w-full rounded-2xl border-2 border-inchiostro bg-carta px-5 py-6 text-left">
+      <div className="w-full rounded-2xl border-2 border-inchiostro bg-carta-chiara px-5 py-6 text-left">
         <p className="font-titolo text-2xl leading-snug text-inchiostro">{giorno}</p>
-        <p className="font-titolo text-2xl leading-snug text-ottone">
+        <p className="font-titolo text-2xl leading-snug text-marrone">
           alle {formattaOra(prenotazione.inizio)} con {prenotazione.operatore}
         </p>
 

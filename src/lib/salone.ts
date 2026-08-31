@@ -2,6 +2,7 @@
 // (vedi SPECIFICA.md § 11 — indirizzo e telefono in cima alla lista).
 export const NOME_SALONE = 'Antonio';
 export const SOTTOTITOLO_SALONE = 'Barbiere · Solarino';
+export const ANNO_FONDAZIONE = 1982;
 export const INDIRIZZO_SALONE = 'Via Roma 1, 96010 Solarino (SR)';
 export const VIA_SALONE = 'Via Roma 1';
 export const CAP_CITTA_SALONE = '96010 Solarino (SR)';

@@ -245,7 +245,7 @@ export default function Servizi() {
             type="button"
             onClick={() => apriModifica(s)}
             className={`flex flex-col gap-1 rounded-2xl border-2 p-4 text-left ${
-              s.attivo ? 'border-bordo' : 'border-bordo bg-carta'
+              s.attivo ? 'border-bordo' : 'border-bordo bg-carta-chiara'
             }`}
           >
             <span className={`text-lg font-semibold ${s.attivo ? 'text-inchiostro' : 'text-grigio'}`}>

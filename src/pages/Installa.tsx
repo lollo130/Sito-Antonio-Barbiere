@@ -98,7 +98,7 @@ export default function Installa() {
               Installa app
             </button>
           ) : (
-            <p className="rounded-2xl bg-pietra p-4">
+            <p className="rounded-2xl bg-pieno p-4">
               Se il pulsante non compare, apri il menu del browser (i tre puntini in alto)
               e scegli <strong>Installa app</strong> o <strong>Aggiungi a schermata Home</strong>.
             </p>
@@ -134,14 +134,14 @@ export default function Installa() {
       )}
 
       {ambiente === 'ios-altro' && (
-        <p className="rounded-2xl bg-pietra p-4">
+        <p className="rounded-2xl bg-pieno p-4">
           Per installare l'app su iPhone serve <strong>Safari</strong>. Copia l'indirizzo di
           questa pagina, aprilo con Safari e torna qui: troverai le istruzioni.
         </p>
       )}
 
       {ambiente === 'desktop' && (
-        <p className="rounded-2xl bg-pietra p-4">
+        <p className="rounded-2xl bg-pieno p-4">
           Apri questa pagina dal telefono per installare l'app. Puoi inquadrare il codice QR
           qui sotto con la fotocamera.
         </p>

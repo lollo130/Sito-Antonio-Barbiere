@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import type { Session } from '@supabase/supabase-js';
 import AdminLogin from '../components/admin/AdminLogin';
 import { supabase } from '../lib/supabase';
+import AggiungiPrenotazione from './admin/AggiungiPrenotazione';
 import Oggi from './admin/Oggi';
 import Assenze from './admin/impostazioni/Assenze';
 import MenuImpostazioni from './admin/impostazioni/MenuImpostazioni';
@@ -75,6 +76,7 @@ export default function Admin() {
   return (
     <Routes>
       <Route path="/" element={<Oggi />} />
+      <Route path="/aggiungi" element={<AggiungiPrenotazione />} />
       <Route path="/impostazioni" element={<MenuImpostazioni />} />
       <Route path="/impostazioni/operatori" element={<Operatori />} />
       <Route path="/impostazioni/servizi" element={<Servizi />} />

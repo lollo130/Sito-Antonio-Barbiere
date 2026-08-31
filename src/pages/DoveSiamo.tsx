@@ -31,7 +31,7 @@ export default function DoveSiamo() {
       <main className="mx-auto max-w-2xl px-5 py-12">
         <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Dove siamo</h1>
 
-        <div className="mt-6 flex h-64 items-center justify-center rounded-2xl border-2 border-dashed border-bordo bg-carta text-lg text-pietra-testo">
+        <div className="mt-6 flex h-64 items-center justify-center rounded-2xl border-2 border-dashed border-bordo bg-carta-chiara text-lg text-pieno-testo">
           Mappa — in arrivo con l'indirizzo definitivo
         </div>
 

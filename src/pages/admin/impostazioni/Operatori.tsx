@@ -77,7 +77,7 @@ export default function Operatori() {
             type="button"
             onClick={() => setSelezionato(o)}
             className={`flex min-h-[56px] items-center rounded-2xl border-2 px-5 text-left text-lg font-semibold ${
-              o.attivo ? 'border-bordo text-inchiostro' : 'border-bordo bg-carta text-grigio'
+              o.attivo ? 'border-bordo text-inchiostro' : 'border-bordo bg-carta-chiara text-grigio'
             }`}
           >
             {o.nome} {!o.attivo && '(disattivo)'}

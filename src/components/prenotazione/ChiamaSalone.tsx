@@ -8,7 +8,7 @@ export default function ChiamaSalone() {
   return (
     <a
       href={TELEFONO_SALONE_TEL}
-      className="flex min-h-[56px] w-full items-center justify-center gap-2.5 rounded-2xl border-2 border-ottone bg-ottone-chiaro px-5 text-lg font-bold text-ottone-scuro"
+      className="flex min-h-[56px] w-full items-center justify-center gap-2.5 rounded-2xl border-2 border-marrone bg-marrone-chiaro px-5 text-lg font-bold text-marrone"
     >
       <svg
         width="19"

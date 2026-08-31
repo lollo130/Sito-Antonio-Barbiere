@@ -76,7 +76,7 @@ export default function Passo1Servizio({ onScelto }: Props) {
             dettaglio={
               <>
                 {s.durata_minuti} min ·{' '}
-                <span className="font-semibold text-ottone">{formattatorePrezzo.format(s.prezzo_cent / 100)}</span>
+                <span className="font-semibold text-marrone">{formattatorePrezzo.format(s.prezzo_cent / 100)}</span>
               </>
             }
             onClick={() => onScelto(s)}

@@ -19,8 +19,8 @@ export default function BottoneScelta({
       aria-pressed={selezionato}
       className={`flex min-h-[64px] w-full items-center justify-between gap-4 rounded-2xl border-2 px-5 py-3 text-left text-lg font-bold transition-colors ${
         selezionato
-          ? 'border-inchiostro bg-inchiostro text-carta'
-          : 'border-bordo bg-carta text-inchiostro active:bg-ottone-chiaro'
+          ? 'border-inchiostro bg-inchiostro text-carta-chiara'
+          : 'border-bordo bg-carta-chiara text-inchiostro active:bg-marrone-chiaro'
       } ${className}`}
       {...resto}
     >

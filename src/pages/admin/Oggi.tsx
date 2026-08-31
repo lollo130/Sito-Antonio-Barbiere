@@ -207,6 +207,13 @@ export default function Oggi() {
         <p className="text-lg text-grigio">Nessuna prenotazione per questo giorno.</p>
       )}
 
+      <Link
+        to="/admin/aggiungi"
+        className="flex min-h-[60px] items-center justify-center gap-2 rounded-lg bg-verde font-titolo text-lg font-bold uppercase tracking-wide text-carta-chiara"
+      >
+        + Aggiungi a mano
+      </Link>
+
       <div className="flex flex-col gap-3">
         {prenotazioni?.map((p) => (
           <Riga key={p.id} p={p} onAggiorna={aggiornaStato} />

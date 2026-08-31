@@ -13,11 +13,11 @@ import {
 // la strada giusta, e deve essere raggiungibile senza pensarci.
 export default function Intestazione() {
   return (
-    <header className="border-b border-bordo bg-carta">
+    <header className="border-b border-bordo bg-carta-chiara">
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-5 py-3">
         <Link to="/" className="flex flex-col gap-px">
           <span className="font-titolo text-2xl leading-tight text-inchiostro">{NOME_SALONE}</span>
-          <span className="text-[0.62rem] uppercase tracking-[0.14em] text-ottone">
+          <span className="text-[0.62rem] uppercase tracking-[0.14em] text-marrone">
             {SOTTOTITOLO_SALONE}
           </span>
         </Link>

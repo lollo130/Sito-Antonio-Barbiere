@@ -1,39 +1,45 @@
 @import "tailwindcss";
 
-/* Identità visiva "calce e ottone".
-   I toni sono quelli delle facciate e delle insegne del posto: pietra
-   chiara, ottone, verde persiana. Il verde compare solo sulle conferme,
-   il rosso solo sugli errori: se un colore vuol dire una cosa sola, non
-   c'è bisogno di leggere per capire.
+/* Identità visiva: bottega storica, aperta nel 1982.
+   Tre colori chiesti dal titolare — verde, bianco, marrone — trattati come
+   una vecchia insegna smaltata: verde bottiglia per le superfici che
+   contano, bianco caldo da carta invecchiata per il fondo, marrone tabacco
+   per prezzi, orari e dettagli. Rosso solo per gli errori.
 
-   I caratteri: DM Serif Display solo per insegna, titoli, ore e prezzi.
-   Atkinson Hyperlegible per tutto il resto — è disegnato dal Braille
-   Institute per chi ci vede poco, ogni lettera è distinguibile dalle
-   altre (la I maiuscola non si confonde con la l minuscola). Con un
-   pubblico anziano è la scelta che conta più di ogni altra. */
+   Il carattere: Courier Prime, una macchina da scrivere ridisegnata per lo
+   schermo. Regge insegna, titoli, bottoni, numeri del calendario, orari e
+   prezzi — cioè quasi tutto quello che si vede.
+   I paragrafi restano in Atkinson Hyperlegible: il monospazio su blocchi di
+   testo rallenta la lettura, e il pubblico anziano viene prima dell'effetto
+   (SPECIFICA.md § 6). L'aria da macchina da scrivere si sente lo stesso. */
 @theme {
-  --font-titolo: 'DM Serif Display', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --font-titolo: 'Courier Prime', 'Courier New', Courier, monospace;
   --font-sans: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, -apple-system, sans-serif;
 
-  --color-calce: #f6f2ea;
-  --color-carta: #fffcf7;
-  --color-inchiostro: #1c1917;
-  --color-grigio: #57534e;
-  --color-bordo: #e4dcce;
+  /* bianchi caldi, da carta */
+  --color-carta: #fbf8f1;
+  --color-carta-chiara: #fffdf8;
 
-  --color-ottone: #8a5a1e;
-  --color-ottone-scuro: #6e4715;
-  --color-ottone-chiaro: #fbefdc;
+  /* verdi */
+  --color-verde: #2e5949;
+  --color-verde-scuro: #1f3e33;
+  --color-verde-chiaro: #e4ece7;
 
-  --color-pietra: #e6dfd2;
-  --color-pietra-testo: #554e44;
+  /* marroni */
+  --color-marrone: #6b4a2b;
+  --color-marrone-chiaro: #f2e8db;
 
-  --color-persiana: #2d4a3e;
-  --color-persiana-chiaro: #c9d6ce;
+  /* neutri */
+  --color-inchiostro: #2a241e;
+  --color-grigio: #5a5045;
+  --color-bordo: #d8cebd;
+  --color-pieno: #e8e1d4;
+  --color-pieno-testo: #6b6153;
 
-  --color-allarme: #b3261e;
-  --color-allarme-sfondo: #fbe9e7;
-  --color-allarme-testo: #7f1d1b;
+  /* errori */
+  --color-allarme: #9b2c22;
+  --color-allarme-sfondo: #fbeae7;
+  --color-allarme-testo: #7a221a;
 }
 
 /* Pubblico anziano (SPECIFICA.md § 6): corpo del testo minimo 18px ovunque. */
@@ -43,7 +49,7 @@ html {
 }
 
 body {
-  background: var(--color-calce);
+  background: var(--color-carta);
   color: var(--color-inchiostro);
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
@@ -54,4 +60,12 @@ body {
 button:active,
 a:active {
   transform: scale(0.985);
+}
+
+/* Etichettine maiuscole spaziate: il tono da insegna smaltata. */
+.etichetta {
+  font-family: var(--font-titolo);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
