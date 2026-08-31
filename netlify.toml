@@ -1,0 +1,28 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Il sito è una single page app: le rotte (/prenota, /admin, /installa…)
+# esistono solo dentro React, non come file sul disco. Senza questa regola
+# Netlify risponde 404 a chi apre un link diretto o ricarica la pagina.
+# I file veri (assets, sw.js, manifest.json, icone) hanno la precedenza:
+# questa cattura solo ciò che non corrisponde a nessun file.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Il service worker non deve mai essere servito dalla cache del browser,
+# altrimenti un aggiornamento del sito non arriva mai a chi l'ha già aperto.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"

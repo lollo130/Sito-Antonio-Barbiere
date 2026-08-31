@@ -4,6 +4,9 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 
+// Se questo modulo non riesce nemmeno a caricarsi (tipicamente: variabili
+// d'ambiente mancanti sul server di pubblicazione), la rete di sicurezza è
+// lo script inline dentro index.html: qui non ci arriveremmo comunque.
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>

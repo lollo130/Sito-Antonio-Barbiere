@@ -16,6 +16,54 @@
       href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Atkinson+Hyperlegible:wght@400;700&display=swap"
       rel="stylesheet"
     />
+
+    <!--
+      Rete di sicurezza contro la pagina bianca.
+      Se il bundle va in errore mentre si carica (caso tipico: variabili
+      d'ambiente mancanti sul server di pubblicazione), React non monta mai e
+      l'utente vede una pagina vuota, senza nessuna indicazione. Questo script
+      sta nell'HTML, quindi gira anche quando il modulo dell'app non parte.
+    -->
+    <script>
+      (function () {
+        var mostrato = false;
+
+        function guasto(dettaglio) {
+          if (mostrato) return;
+          var radice = document.getElementById('root');
+          if (!radice || radice.hasChildNodes()) return;
+          mostrato = true;
+
+          var testo = String(dettaglio || 'errore sconosciuto')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;');
+
+          radice.innerHTML =
+            '<div style="min-height:100svh;display:flex;align-items:center;justify-content:center;padding:24px;' +
+            'background:#f6f2ea;color:#1c1917;font-family:\'Atkinson Hyperlegible\',\'Segoe UI\',system-ui,sans-serif">' +
+            '<div style="max-width:34rem;background:#fffcf7;border:2px solid #1c1917;border-radius:16px;padding:28px">' +
+            '<p style="margin:0 0 12px;font-size:1.4rem;font-weight:700">Il sito non è riuscito ad avviarsi</p>' +
+            '<p style="margin:0 0 18px;font-size:1rem;line-height:1.6;color:#57534e">' +
+            'Se stai vedendo questo messaggio, chiama pure il salone: la prenotazione si può sempre fare per telefono.' +
+            '</p>' +
+            '<p style="margin:0;font-size:0.8rem;line-height:1.6;color:#57534e">Dettaglio tecnico: ' +
+            '<code style="font-family:Consolas,monospace">' + testo + '</code></p>' +
+            '</div></div>';
+        }
+
+        window.addEventListener('error', function (e) {
+          guasto((e && (e.message || (e.error && e.error.message))) || null);
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          guasto((e && e.reason && (e.reason.message || e.reason)) || null);
+        });
+        window.addEventListener('load', function () {
+          setTimeout(function () {
+            guasto('l\'applicazione non si è avviata entro il tempo previsto');
+          }, 3000);
+        });
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
