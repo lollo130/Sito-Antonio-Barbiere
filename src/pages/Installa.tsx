@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 
-const URL_INSTALLA = `${import.meta.env.VITE_SITE_URL}/installa`;
+// Il QR punta al dominio da cui la pagina è servita davvero. Prima leggeva
+// VITE_SITE_URL, che è facile dimenticare al segnaposto: il codice veniva
+// generato bello e stampabile, e portava su un dominio inesistente.
+function urlDiQuestaPagina(): string {
+  if (typeof window === 'undefined') return '';
+  return `${window.location.origin}/installa`;
+}
 
 /**
  * Pagina /installa — "scaricare l'app da un link".
@@ -37,9 +43,12 @@ export default function Installa() {
   const [ambiente, setAmbiente] = useState<Ambiente>('desktop');
   const [promptInstall, setPromptInstall] = useState<Event | null>(null);
   const [esito, setEsito] = useState<'idle' | 'in-corso' | 'rifiutata'>('idle');
+  const [urlInstalla, setUrlInstalla] = useState('');
+  const [copiato, setCopiato] = useState(false);
 
   useEffect(() => {
     setAmbiente(rilevaAmbiente());
+    setUrlInstalla(urlDiQuestaPagina());
 
     const onPrompt = (e: Event) => {
       e.preventDefault();       // blocca il banner automatico di Chrome
@@ -77,7 +86,7 @@ export default function Installa() {
           <p className="mb-6">L'app è già installata su questo telefono.</p>
           <a
             href="/admin"
-            className="flex min-h-[56px] items-center justify-center rounded-2xl bg-inchiostro px-6 text-lg font-semibold text-white"
+            className="flex min-h-[56px] items-center justify-center rounded-2xl bg-verde px-6 text-lg font-semibold text-carta-chiara"
           >
             Apri il pannello
           </a>
@@ -93,7 +102,7 @@ export default function Installa() {
             <button
               onClick={installa}
               disabled={esito === 'in-corso'}
-              className="flex min-h-[56px] w-full items-center justify-center rounded-2xl bg-inchiostro px-6 text-lg font-semibold text-white disabled:opacity-60"
+              className="flex min-h-[56px] w-full items-center justify-center rounded-2xl bg-verde px-6 text-lg font-semibold text-carta-chiara disabled:opacity-60"
             >
               Installa app
             </button>
@@ -150,11 +159,41 @@ export default function Installa() {
       <hr className="my-10 border-bordo" />
 
       <p className="mb-4 text-grigio">
-        Da condividere con chi deve installarla: inquadra il codice con la fotocamera.
+        Da condividere con chi deve installarla: inquadra il codice con la fotocamera, oppure
+        mandagli il link su WhatsApp.
       </p>
-      <div className="flex h-48 w-48 items-center justify-center rounded-2xl border-2 border-bordo p-3">
-        <QRCodeSVG value={URL_INSTALLA} size={168} className="h-full w-full" title="QR per aprire questa pagina" />
+
+      <div className="flex h-48 w-48 items-center justify-center rounded-2xl border-2 border-bordo bg-carta-chiara p-3">
+        {urlInstalla && (
+          <QRCodeSVG
+            value={urlInstalla}
+            size={168}
+            className="h-full w-full"
+            title="QR per aprire questa pagina"
+          />
+        )}
       </div>
+
+      {/* L'indirizzo anche scritto: se la fotocamera non legge il codice,
+          si può sempre digitare o dettare al telefono. */}
+      <p className="mt-4 break-all font-titolo text-base text-grigio">{urlInstalla}</p>
+
+      <button
+        type="button"
+        onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(urlInstalla);
+            setCopiato(true);
+            setTimeout(() => setCopiato(false), 2500);
+          } catch {
+            setCopiato(false);
+          }
+        }}
+        className="mt-3 min-h-[56px] w-full rounded-2xl border-2 border-verde font-titolo text-lg font-bold uppercase text-verde"
+      >
+        {copiato ? 'Link copiato' : 'Copia il link'}
+      </button>
+
     </main>
   );
 }
