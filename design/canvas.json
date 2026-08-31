@@ -1,0 +1,69 @@
+{
+  "pages": [
+    { "id": "page-1", "name": "Da mostrare" },
+    { "id": "page-2", "name": "Direzioni" },
+    { "id": "page-3", "name": "Sistema" }
+  ],
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 390, "h": 844, "page": "page-1", "title": "Prenotazione — si tocca", "is_interactive": true },
+    { "file": "Home.dc.html", "x": 490, "y": 0, "w": 390, "h": 1560, "page": "page-1", "title": "Home" },
+    { "file": "PannelloOggi.dc.html", "x": 980, "y": 0, "w": 390, "h": 844, "page": "page-1", "title": "Pannello — Oggi", "is_interactive": true },
+
+    { "file": "DirezioneA.dc.html", "x": 0, "y": 0, "w": 390, "h": 844, "page": "page-2", "title": "A — Calce e ottone" },
+    { "file": "DirezioneB.dc.html", "x": 490, "y": 0, "w": 390, "h": 844, "page": "page-2", "title": "B — Insegna" },
+    { "file": "DirezioneC.dc.html", "x": 980, "y": 0, "w": 390, "h": 844, "page": "page-2", "title": "C — Essenziale" },
+
+    { "file": "Stile.dc.html", "x": 0, "y": 0, "w": 880, "h": 1180, "page": "page-3", "title": "Colori, caratteri, misure" }
+  ],
+  "annotations": [
+    {
+      "id": "nota-flusso",
+      "page": "page-1",
+      "x": 0,
+      "y": -150,
+      "w": 390,
+      "text": "Questa si tocca davvero.\nScegli un servizio, tocca un giorno sul calendario, si apre l'agenda di quel giorno. Il passo \"quale barbiere\" si salta da solo quando ne resta uno solo (es. i servizi donna).\nProva anche a premere Conferma senza scrivere il telefono."
+    },
+    {
+      "id": "nota-pannello",
+      "page": "page-1",
+      "x": 980,
+      "y": -150,
+      "w": 390,
+      "text": "Il pannello che usa lui, non il cliente.\nFiltro per barbiere e spunta \"fatto\" funzionanti. Il numero di telefono è un bottone: lo tocca e parte la chiamata."
+    },
+    {
+      "id": "nota-dir-a",
+      "page": "page-2",
+      "x": 0,
+      "y": 930,
+      "w": 390,
+      "text": "A — CALCE E OTTONE  (la mia proposta)\nPietra chiara, ottone, un serif da insegna dipinta. Caldo, del posto, e il testo scuro su fondo chiaro è quello che si legge meglio a settant'anni.\nCosto: fa meno colpo di B nella prima mezza occhiata."
+    },
+    {
+      "id": "nota-dir-b",
+      "page": "page-2",
+      "x": 490,
+      "y": 930,
+      "w": 390,
+      "text": "B — INSEGNA\nScuro e oro, il barbershop classico. È quello che piace di più a vederlo la prima volta, soprattutto la sera sul telefono.\nCosto: testo chiaro su fondo scuro affatica la vista, e chi ha la cataratta legge peggio. Va contro il vincolo principale del progetto."
+    },
+    {
+      "id": "nota-dir-c",
+      "page": "page-2",
+      "x": 980,
+      "y": 930,
+      "w": 390,
+      "text": "C — ESSENZIALE\nBianco, nero, caratteri enormi. Il più leggibile in assoluto e il più veloce da costruire.\nCosto: è anonimo. Sembra il sito di un ufficio, non il suo negozio — e il punto era che fosse riconoscibilmente suo."
+    },
+    {
+      "id": "nota-segnaposto",
+      "page": "page-1",
+      "x": 490,
+      "y": -150,
+      "w": 390,
+      "text": "Tutto quello che è tra parentesi quadre è segnaposto: nome del salone, testo \"Da noi\", ragione sociale, P. IVA.\nAnche prezzi, orari, nomi dei barbieri e foto sono inventati per far vedere come si comporta — vanno sostituiti con i suoi."
+    }
+  ],
+  "launch": { "view": "focused", "file": "Main.dc.html" }
+}

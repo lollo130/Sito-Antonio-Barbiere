@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+  <style>
+    body { margin: 0; background: #F6F2EA; }
+    * { box-sizing: border-box; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    a { color: #8A5A1E; }
+    a:hover { color: #6E4715; }
+  </style>
+</helmet>
+
+<div style="width: 880px; min-height: 1180px; padding: 44px 48px; background: #F6F2EA; font-family: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif; color: #1C1917;">
+
+  <div style="margin-bottom: 38px; padding-bottom: 22px; border-bottom: 2px solid #1C1917;">
+    <div style="font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A5A1E; margin-bottom: 8px;">Direzione A · Calce e ottone</div>
+    <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 40px; line-height: 1.1;">Sistema visivo</div>
+  </div>
+
+  <!-- COLORI -->
+  <div style="margin-bottom: 40px;">
+    <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 26px; margin-bottom: 4px;">Colori</div>
+    <p style="font-size: 16px; color: #57534E; margin: 0 0 18px; max-width: 620px;">Pietra chiara e ottone: i toni delle facciate e delle insegne del posto. Il verde serve solo per le conferme, il rosso solo per gli errori.</p>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px;">
+      <sc-for list="{{colori}}" as="c" hint-placeholder-count="8">
+        <div style="border-radius: 12px; overflow: hidden; background: #FFFCF7; border: 1px solid #E4DCCE;">
+          <div style="height: 76px; background: {{c.hex}}; border-bottom: 1px solid #E4DCCE;"></div>
+          <div style="padding: 11px 13px;">
+            <div style="font-size: 15px; font-weight: 700; margin-bottom: 2px;">{{c.nome}}</div>
+            <div style="font-size: 13px; color: #57534E; font-variant-numeric: tabular-nums;">{{c.hex}}</div>
+            <div style="font-size: 13px; color: #57534E; margin-top: 4px;">{{c.uso}}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- TIPOGRAFIA -->
+  <div style="margin-bottom: 40px;">
+    <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 26px; margin-bottom: 18px;">Tipografia</div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+
+      <div style="padding: 22px 24px; border-radius: 14px; background: #FFFCF7; border: 1px solid #E4DCCE;">
+        <div style="font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A5A1E; margin-bottom: 12px;">Insegna e titoli</div>
+        <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 46px; line-height: 1.1; margin-bottom: 10px;">DM Serif Display</div>
+        <p style="font-size: 15px; line-height: 1.55; color: #57534E; margin: 0;">Un serif con grazie marcate, da insegna dipinta. Compare solo nei titoli, nell'ora e nel prezzo: dà carattere senza mai toccare il testo che si deve leggere in fretta.</p>
+      </div>
+
+      <div style="padding: 22px 24px; border-radius: 14px; background: #FFFCF7; border: 1px solid #E4DCCE;">
+        <div style="font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A5A1E; margin-bottom: 12px;">Tutto il resto</div>
+        <div style="font-size: 38px; font-weight: 700; line-height: 1.15; margin-bottom: 10px;">Atkinson Hyperlegible</div>
+        <p style="font-size: 15px; line-height: 1.55; color: #57534E; margin: 0;">Disegnato dal Braille Institute per chi ci vede poco: ogni lettera è distinguibile dalle altre, la I maiuscola non si confonde con la l minuscola. È la scelta che regge il pubblico anziano.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MISURE -->
+  <div style="margin-bottom: 40px;">
+    <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 26px; margin-bottom: 4px;">Misure minime</div>
+    <p style="font-size: 16px; color: #57534E; margin: 0 0 18px; max-width: 620px;">Non sono preferenze estetiche: sono i numeri sotto i quali una persona di settant'anni comincia a sbagliare tocco.</p>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;">
+      <sc-for list="{{misure}}" as="m" hint-placeholder-count="3">
+        <div style="padding: 18px 20px; border-radius: 12px; background: #FFFCF7; border: 1px solid #E4DCCE;">
+          <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 34px; color: #8A5A1E; line-height: 1.1; margin-bottom: 6px;">{{m.valore}}</div>
+          <div style="font-size: 15px; line-height: 1.5; color: #44403C;">{{m.cosa}}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- COMPONENTI -->
+  <div>
+    <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 26px; margin-bottom: 18px;">Pezzi ricorrenti</div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+
+      <div style="padding: 22px 24px; border-radius: 14px; background: #FFFCF7; border: 1px solid #E4DCCE;">
+        <div style="font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: #57534E; margin-bottom: 14px;">Azioni</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button style="display: flex; align-items: center; justify-content: center; min-height: 60px; border-radius: 14px; background: #1C1917; color: #FFFCF7; font-size: 20px; font-weight: 700;">Azione principale</button>
+          <button style="display: flex; align-items: center; justify-content: center; min-height: 56px; border-radius: 14px; border: 2px solid #1C1917; color: #1C1917; font-size: 18px; font-weight: 700;">Azione secondaria</button>
+          <button style="display: flex; align-items: center; justify-content: center; min-height: 56px; border-radius: 14px; border: 2px solid #8A5A1E; background: #FBEFDC; color: #6E4715; font-size: 18px; font-weight: 700;">Scorciatoia</button>
+        </div>
+      </div>
+
+      <div style="padding: 22px 24px; border-radius: 14px; background: #FFFCF7; border: 1px solid #E4DCCE;">
+        <div style="font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: #57534E; margin-bottom: 14px;">Stati del calendario</div>
+        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 10px; border: 2px solid #1C1917; background: #FFFCF7; font-size: 19px; font-weight: 700;">10</div>
+          <div style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 10px; background: #E6DFD2; color: #554E44; font-size: 19px;">13</div>
+          <div style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 10px; background: #1C1917; color: #FFFCF7; font-size: 19px; font-weight: 700;">17</div>
+        </div>
+        <div style="font-size: 15px; line-height: 1.6; color: #44403C;">Libero, pieno o chiuso, scelto. Un giorno pieno non dice mai chi lo occupa, e un giorno di chiusura si comporta come un giorno pieno: al cliente non serve saperne la differenza.</div>
+      </div>
+
+      <div style="padding: 22px 24px; border-radius: 14px; background: #FFFCF7; border: 1px solid #E4DCCE;">
+        <div style="font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: #57534E; margin-bottom: 14px;">Campo</div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 17px; font-weight: 700;">Telefono</span>
+          <div style="display: flex; align-items: center; min-height: 56px; padding: 0 15px; font-size: 19px; color: #A8A29E; border-radius: 12px; border: 2px solid #1C1917; background: #FFFCF7;">Per avvisarti se serve</div>
+        </div>
+      </div>
+
+      <div style="padding: 22px 24px; border-radius: 14px; background: #FFFCF7; border: 1px solid #E4DCCE;">
+        <div style="font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: #57534E; margin-bottom: 14px;">Errore</div>
+        <div style="display: flex; align-items: flex-start; gap: 10px; padding: 13px 15px; border-radius: 12px; background: #FBE9E7; border: 2px solid #B3261E;">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16.5h.01"/></svg>
+          <span style="font-size: 17px; font-weight: 700; color: #7F1D1B;">Manca il numero di telefono</span>
+        </div>
+        <div style="font-size: 15px; line-height: 1.6; color: #44403C; margin-top: 12px;">Dice cosa manca e basta. Mai "campo obbligatorio non valorizzato".</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"$preview":{"width":880,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      colori: [
+        { nome: 'Calce', hex: '#F6F2EA', uso: 'Fondo di ogni pagina' },
+        { nome: 'Carta', hex: '#FFFCF7', uso: 'Schede e bottoni chiari' },
+        { nome: 'Inchiostro', hex: '#1C1917', uso: 'Testo e azione principale' },
+        { nome: 'Ottone', hex: '#8A5A1E', uso: 'Prezzi, ore, accenti' },
+        { nome: 'Pietra', hex: '#E6DFD2', uso: 'Slot occupati o chiusi' },
+        { nome: 'Persiana', hex: '#2D4A3E', uso: 'Conferme e orari' },
+        { nome: 'Grigio testo', hex: '#57534E', uso: 'Testo secondario' },
+        { nome: 'Allarme', hex: '#B3261E', uso: 'Solo messaggi di errore' },
+      ],
+      misure: [
+        { valore: '18 px', cosa: 'Corpo minimo del testo, ovunque. Niente grigio chiaro su bianco.' },
+        { valore: '56 px', cosa: 'Altezza minima di ogni bottone. L\'azione principale è sempre in fondo, sempre nello stesso posto.' },
+        { valore: '46 px', cosa: 'Cella del calendario mensile: il limite fisico di sette colonne su un telefono. È l\'unico compromesso, ed è voluto.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

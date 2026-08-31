@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* Identità visiva: toni caldi (stone) invece di grigio freddo, un
+   accento oro discreto (amber, già nella palette Tailwind — nessun
+   colore nuovo da mantenere), titoli in serif per un'aria da salone
+   classico. Il corpo del testo resta sans-serif di sistema: è la parte
+   più letta, cambiarlo è un rischio per la leggibilità con un pubblico
+   anziano che non vale la resa estetica. */
+@theme {
+  --font-titolo: 'Fraunces', Georgia, 'Times New Roman', serif;
+}
+
+/* Pubblico anziano (SPECIFICA.md § 6): corpo del testo minimo 18px ovunque. */
+html {
+  font-size: 18px;
+}
+
+body {
+  background: #faf8f4;
+}

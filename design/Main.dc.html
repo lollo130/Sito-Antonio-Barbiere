@@ -1,0 +1,464 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+  <style>
+    body { margin: 0; background: #F6F2EA; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    input { font-family: inherit; }
+    a { color: #8A5A1E; text-decoration: underline; }
+    a:hover { color: #6E4715; }
+    .sched::-webkit-scrollbar { width: 0; }
+  </style>
+</helmet>
+
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #F6F2EA; font-family: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif; color: #1C1917; overflow: hidden;">
+
+  <!-- INTESTAZIONE: insegna + Chiama, presente su ogni schermata -->
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px 12px; background: #FFFCF7; border-bottom: 1px solid #E4DCCE;">
+    <div style="display: flex; flex-direction: column; gap: 1px;">
+      <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 22px; line-height: 1.1; color: #1C1917;">Antonio</div>
+      <div style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: {{accento}};">Barbiere · Solarino</div>
+    </div>
+    <button style="display: flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 14px; border: 2px solid #1C1917; border-radius: 999px; background: #FFFCF7; color: #1C1917; font-size: 15px; font-weight: 700;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
+      Chiama
+    </button>
+  </div>
+
+  <!-- AVANZAMENTO -->
+  <sc-if value="{{mostraPassi}}" hint-placeholder-val="{{true}}">
+    <div style="padding: 12px 18px 0; background: #F6F2EA;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px;">
+        <div style="font-size: 14px; font-weight: 700; color: #57534E;">{{etichettaPasso}}</div>
+        <button onClick="{{indietro}}" style="display: flex; align-items: center; gap: 4px; min-height: 30px; font-size: 14px; font-weight: 700; color: #57534E;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Indietro
+        </button>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px;">
+        <sc-for list="{{barre}}" as="b" hint-placeholder-count="4">
+          <div style="height: 5px; border-radius: 999px; background: {{b.colore}};"></div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- CORPO -->
+  <div class="sched" style="flex: 1; overflow-y: auto; padding: 18px;">
+
+    <!-- ============ PASSO 1 — COSA TI SERVE ============ -->
+    <sc-if value="{{eServizio}}" hint-placeholder-val="{{true}}">
+      <div>
+        <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 30px; line-height: 1.15; margin-bottom: 16px;">Cosa ti serve?</div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 20px;">
+          <sc-for list="{{categorie}}" as="c" hint-placeholder-count="2">
+            <button onClick="{{c.scegli}}" style="min-height: 56px; border-radius: 14px; border: 2px solid {{c.bordo}}; background: {{c.sfondo}}; color: {{c.testo}}; font-size: 18px; font-weight: 700;">{{c.nome}}</button>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <sc-for list="{{servizi}}" as="s" hint-placeholder-count="4">
+            <button onClick="{{s.scegli}}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 76px; padding: 12px 16px; border-radius: 14px; border: 2px solid #E4DCCE; background: #FFFCF7; text-align: left;">
+              <span style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 19px; font-weight: 700; color: #1C1917;">{{s.nome}}</span>
+                <span style="font-size: 15px; color: #57534E;">{{s.durata}}</span>
+              </span>
+              <span style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 22px; color: {{accento}}; white-space: nowrap;">{{s.prezzo}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ PASSO 2 — QUANDO (mese) ============ -->
+    <sc-if value="{{eQuando}}" hint-placeholder-val="{{true}}">
+      <div>
+        <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 30px; line-height: 1.15; margin-bottom: 4px;">Quando?</div>
+        <div style="font-size: 16px; color: #57534E; margin-bottom: 14px;">{{riepilogoServizio}}</div>
+
+        <button onClick="{{primaPossibile}}" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 56px; margin-bottom: 16px; border-radius: 14px; border: 2px solid {{accento}}; background: #FBEFDC; color: #6E4715; font-size: 18px; font-weight: 700;">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.1 12.7a1 1 0 0 0 .8 1.6h6L10 22l8.9-10.7a1 1 0 0 0-.8-1.6h-6L13 2Z"/></svg>
+          Il prima possibile
+        </button>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <button style="display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 12px; border: 2px solid #E4DCCE; background: #FFFCF7; color: #A8A29E;">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 23px;">Settembre 2026</div>
+          <button style="display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 12px; border: 2px solid #1C1917; background: #FFFCF7; color: #1C1917;">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-bottom: 6px;">
+          <sc-for list="{{intestazioniGiorni}}" as="g" hint-placeholder-count="7">
+            <div style="text-align: center; font-size: 13px; font-weight: 700; color: #57534E; padding: 2px 0;">{{g.sigla}}</div>
+          </sc-for>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px;">
+          <sc-for list="{{celle}}" as="c" hint-placeholder-count="35">
+            <button onClick="{{c.apri}}" style="display: flex; align-items: center; justify-content: center; height: 46px; border-radius: 10px; border: {{c.bordo}}; background: {{c.sfondo}}; color: {{c.testo}}; font-size: 17px; font-weight: {{c.peso}};">{{c.numero}}</button>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px; margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: #FFFCF7; border: 1px solid #E4DCCE;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 20px; height: 20px; border-radius: 6px; border: 2px solid #1C1917; background: #FFFCF7;"></div>
+            <span style="font-size: 15px; color: #1C1917;">Libero</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 20px; height: 20px; border-radius: 6px; background: #E6DFD2;"></div>
+            <span style="font-size: 15px; color: #57534E;">Pieno o chiuso</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ PASSO 2b — AGENDA DEL GIORNO ============ -->
+    <sc-if value="{{eAgenda}}" hint-placeholder-val="{{true}}">
+      <div>
+        <button onClick="{{tornaAlMese}}" style="display: flex; align-items: center; gap: 6px; min-height: 40px; margin-bottom: 6px; font-size: 15px; font-weight: 700; color: #57534E;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Tutto il mese
+        </button>
+        <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 28px; line-height: 1.15; margin-bottom: 4px;">{{giornoEsteso}}</div>
+        <div style="font-size: 16px; color: #57534E; margin-bottom: 16px;">{{riepilogoServizio}}</div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <sc-for list="{{orari}}" as="o" hint-placeholder-count="8">
+            <button onClick="{{o.scegli}}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 60px; padding: 10px 16px; border-radius: 14px; border: {{o.bordo}}; background: {{o.sfondo}}; text-align: left;">
+              <span style="font-size: 21px; font-weight: 700; color: {{o.testo}}; font-variant-numeric: tabular-nums;">{{o.ora}}</span>
+              <span style="font-size: 15px; color: {{o.testoNota}};">{{o.nota}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ PASSO 3 — OPERATORE ============ -->
+    <sc-if value="{{eOperatore}}" hint-placeholder-val="{{true}}">
+      <div>
+        <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 30px; line-height: 1.15; margin-bottom: 4px;">Vuoi un barbiere in particolare?</div>
+        <div style="font-size: 16px; color: #57534E; margin-bottom: 18px;">Se non hai preferenze, ci pensiamo noi.</div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <sc-for list="{{operatori}}" as="p" hint-placeholder-count="3">
+            <button onClick="{{p.scegli}}" style="display: flex; align-items: center; gap: 14px; width: 100%; min-height: 68px; padding: 12px 16px; border-radius: 14px; border: {{p.bordo}}; background: {{p.sfondo}}; text-align: left;">
+              <span style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 999px; border: 2px solid {{p.cerchio}}; background: {{p.riempimento}}; flex-shrink: 0;">
+                <sc-if value="{{p.attivo}}" hint-placeholder-val="{{true}}">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFFCF7" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </sc-if>
+              </span>
+              <span style="font-size: 19px; font-weight: 700; color: #1C1917;">{{p.nome}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ PASSO 4 — DATI ============ -->
+    <sc-if value="{{eDati}}" hint-placeholder-val="{{true}}">
+      <div>
+        <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 30px; line-height: 1.15; margin-bottom: 4px;">Come ti chiami?</div>
+        <div style="font-size: 16px; color: #57534E; margin-bottom: 18px;">{{riepilogoAppuntamento}}</div>
+
+        <sc-if value="{{cErrore}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; align-items: flex-start; gap: 10px; padding: 13px 15px; margin-bottom: 16px; border-radius: 12px; background: #FBE9E7; border: 2px solid #B3261E;">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16.5h.01"/></svg>
+            <span style="font-size: 17px; font-weight: 700; color: #7F1D1B;">{{errore}}</span>
+          </div>
+        </sc-if>
+
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <label style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 17px; font-weight: 700;">Nome</span>
+            <input onChange="{{scriviNome}}" type="text" placeholder="Come ti chiamano" style="min-height: 56px; padding: 0 15px; font-size: 19px; color: #1C1917; border-radius: 12px; border: 2px solid #1C1917; background: #FFFCF7;">
+          </label>
+          <label style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 17px; font-weight: 700;">Telefono</span>
+            <input onChange="{{scriviTelefono}}" type="tel" placeholder="Per avvisarti se serve" style="min-height: 56px; padding: 0 15px; font-size: 19px; color: #1C1917; border-radius: 12px; border: 2px solid #1C1917; background: #FFFCF7;">
+          </label>
+          <label style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 17px; font-weight: 700; color: #57534E;">Email <span style="font-weight: 400;">— se la vuoi, ti mando la conferma</span></span>
+            <input type="email" placeholder="Facoltativa" style="min-height: 56px; padding: 0 15px; font-size: 19px; color: #1C1917; border-radius: 12px; border: 2px solid #E4DCCE; background: #FFFCF7;">
+          </label>
+        </div>
+
+        <p style="font-size: 14px; line-height: 1.5; color: #57534E; margin: 18px 0 0;">Usiamo nome e telefono solo per gestire l'appuntamento. <a href="#">Come trattiamo i dati</a>.</p>
+      </div>
+    </sc-if>
+
+    <!-- ============ CONFERMA ============ -->
+    <sc-if value="{{eFatto}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 14px;">
+        <div style="display: flex; align-items: center; justify-content: center; width: 78px; height: 78px; border-radius: 999px; background: #2D4A3E; margin-bottom: 20px;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FFFCF7" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
+        <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 30px; line-height: 1.15; margin-bottom: 8px;">È tutto a posto{{salutoNome}}</div>
+        <p style="font-size: 17px; color: #57534E; margin: 0 0 20px;">Ti aspettiamo. Non serve fare altro.</p>
+
+        <div style="width: 100%; padding: 20px 18px; border-radius: 16px; background: #FFFCF7; border: 2px solid #1C1917; text-align: left;">
+          <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 26px; line-height: 1.25; margin-bottom: 3px;">{{confermaGiorno}}</div>
+          <div style="font-family: 'DM Serif Display', 'Iowan Old Style', Georgia, serif; font-size: 26px; line-height: 1.25; color: {{accento}}; margin-bottom: 14px;">alle {{confermaOra}} con {{confermaOperatore}}</div>
+          <div style="height: 1px; background: #E4DCCE; margin-bottom: 14px;"></div>
+          <div style="font-size: 18px; font-weight: 700; margin-bottom: 2px;">{{confermaServizio}}</div>
+          <div style="font-size: 16px; color: #57534E;">Via Roma 1, Solarino</div>
+        </div>
+
+        <button onClick="{{ricomincia}}" style="min-height: 48px; margin-top: 18px; font-size: 16px; font-weight: 700; color: #57534E; text-decoration: underline;">Prenota un altro appuntamento</button>
+      </div>
+    </sc-if>
+
+  </div>
+
+  <!-- AZIONE PRINCIPALE: sempre in fondo, sempre nello stesso posto -->
+  <sc-if value="{{mostraAzione}}" hint-placeholder-val="{{true}}">
+    <div style="padding: 12px 18px 18px; background: #F6F2EA; border-top: 1px solid #E4DCCE;">
+      <button onClick="{{avanti}}" style="display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; min-height: 60px; border-radius: 14px; background: #1C1917; color: #FFFCF7; font-size: 20px; font-weight: 700;">
+        {{testoAzione}}
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"accento":{"editor":"color","default":"#8A5A1E","options":["#8A5A1E","#2D4A3E","#7C2D12","#1C1917"],"section":"Colore"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      passo: 'servizio',
+      categoria: 'uomo',
+      servizio: null,
+      giorno: null,
+      ora: null,
+      operatore: 'nessuna',
+      errore: null,
+    };
+    this.nomeInput = '';
+    this.telefonoInput = '';
+    this.nomeConfermato = '';
+  }
+
+  dati() {
+    return {
+      servizi: [
+        { id: 'tu', nome: 'Taglio uomo', minuti: 30, cent: 1500, cat: 'uomo' },
+        { id: 'tb', nome: 'Taglio e barba', minuti: 45, cent: 2200, cat: 'uomo' },
+        { id: 'ba', nome: 'Barba', minuti: 20, cent: 1000, cat: 'uomo' },
+        { id: 'bm', nome: 'Taglio bambino', minuti: 30, cent: 1200, cat: 'uomo' },
+        { id: 'pg', nome: 'Piega', minuti: 45, cent: 2000, cat: 'donna' },
+        { id: 'td', nome: 'Taglio donna', minuti: 60, cent: 2800, cat: 'donna' },
+        { id: 'co', nome: 'Colore', minuti: 90, cent: 4500, cat: 'donna' },
+      ],
+      // Settembre 2026 comincia di martedì. Domenica e lunedì il salone è chiuso:
+      // stesso trattamento visivo di un giorno pieno (SPECIFICA.md § 5).
+      pieni: [1, 2, 6, 7, 13, 14, 20, 21, 27, 28],
+      nomiGiorni: ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'],
+    };
+  }
+
+  prezzo(cent) {
+    return (cent / 100).toFixed(2).replace('.', ',') + ' €';
+  }
+
+  servizioScelto() {
+    return this.dati().servizi.find((s) => s.id === this.state.servizio) || null;
+  }
+
+  // Un solo operatore fa i servizi donna: il passo 3 si salta da solo.
+  operatoriPer(servizio) {
+    if (!servizio) return [];
+    return servizio.cat === 'donna' ? ['Rosa'] : ['Salvo', 'Nunzio'];
+  }
+
+  giornoEsteso(n) {
+    if (!n) return '';
+    const d = new Date(2026, 8, n);
+    return this.dati().nomiGiorni[d.getDay()] + ' ' + n + ' settembre';
+  }
+
+  maiuscola(t) {
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }
+
+  renderVals() {
+    const st = this.state;
+    const accento = this.props.accento ?? '#8A5A1E';
+    const d = this.dati();
+    const scelto = this.servizioScelto();
+    const squadra = this.operatoriPer(scelto);
+
+    const vaiA = (p) => this.setState({ passo: p, errore: null });
+
+    // ---- passo 1
+    const categorie = [
+      { id: 'uomo', nome: 'Uomo' },
+      { id: 'donna', nome: 'Donna' },
+    ].map((c) => ({
+      nome: c.nome,
+      bordo: st.categoria === c.id ? '#1C1917' : '#E4DCCE',
+      sfondo: st.categoria === c.id ? '#1C1917' : '#FFFCF7',
+      testo: st.categoria === c.id ? '#FFFCF7' : '#57534E',
+      scegli: () => this.setState({ categoria: c.id, servizio: null }),
+    }));
+
+    const servizi = d.servizi
+      .filter((s) => s.cat === st.categoria)
+      .map((s) => ({
+        nome: s.nome,
+        durata: s.minuti + ' minuti',
+        prezzo: this.prezzo(s.cent),
+        scegli: () => this.setState({ passo: 'quando', servizio: s.id, operatore: 'nessuna', errore: null }),
+      }));
+
+    // ---- passo 2: griglia del mese
+    const intestazioniGiorni = ['L', 'M', 'M', 'G', 'V', 'S', 'D'].map((s) => ({ sigla: s }));
+    const celle = [];
+    celle.push({ numero: '', sfondo: 'transparent', bordo: 'none', testo: 'transparent', peso: '400', apri: null });
+    for (let n = 1; n <= 30; n++) {
+      const pieno = d.pieni.indexOf(n) !== -1;
+      celle.push({
+        numero: String(n),
+        sfondo: pieno ? '#E6DFD2' : '#FFFCF7',
+        bordo: pieno ? '2px solid #E6DFD2' : '2px solid #1C1917',
+        testo: pieno ? '#554E44' : '#1C1917',
+        peso: pieno ? '400' : '700',
+        apri: pieno ? null : () => this.setState({ passo: 'agenda', giorno: n, errore: null }),
+      });
+    }
+
+    // ---- passo 2b: agenda del giorno
+    const griglia = [
+      { ora: '09:00', libero: true },
+      { ora: '09:30', libero: false },
+      { ora: '10:00', libero: false },
+      { ora: '10:30', libero: true },
+      { ora: '11:00', libero: true },
+      { ora: '11:30', libero: false },
+      { ora: '16:00', libero: true },
+      { ora: '16:30', libero: true },
+      { ora: '17:00', libero: false },
+      { ora: '17:30', libero: true },
+      { ora: '18:00', libero: true },
+    ];
+    const orari = griglia.map((o) => ({
+      ora: o.ora,
+      // Il nome dell'operatore compare solo se ne resta uno solo libero a quell'ora.
+      // Sugli occupati non compare mai nulla: si vede che è pieno, non chi c'è.
+      nota: o.libero ? (squadra.length === 1 ? 'con ' + squadra[0] : 'libero') : 'occupato',
+      sfondo: o.libero ? '#FFFCF7' : '#E6DFD2',
+      bordo: o.libero ? '2px solid #1C1917' : '2px solid #E6DFD2',
+      testo: o.libero ? '#1C1917' : '#554E44',
+      testoNota: o.libero ? '#57534E' : '#554E44',
+      scegli: o.libero
+        ? () => {
+            if (squadra.length <= 1) {
+              this.setState({ passo: 'dati', ora: o.ora, operatore: squadra[0] || 'Salvo', errore: null });
+            } else {
+              this.setState({ passo: 'operatore', ora: o.ora, errore: null });
+            }
+          }
+        : null,
+    }));
+
+    // ---- passo 3
+    const operatori = [{ id: 'nessuna', nome: 'Nessuna preferenza' }]
+      .concat(squadra.map((n) => ({ id: n, nome: n })))
+      .map((p) => ({
+        nome: p.nome,
+        attivo: st.operatore === p.id,
+        bordo: st.operatore === p.id ? '2px solid #1C1917' : '2px solid #E4DCCE',
+        sfondo: st.operatore === p.id ? '#FBEFDC' : '#FFFCF7',
+        cerchio: st.operatore === p.id ? '#1C1917' : '#A8A29E',
+        riempimento: st.operatore === p.id ? '#1C1917' : '#FFFCF7',
+        scegli: () => this.setState({ operatore: p.id }),
+      }));
+
+    const operatoreFinale = st.operatore === 'nessuna' ? squadra[0] || 'Salvo' : st.operatore;
+
+    // ---- avanzamento
+    const indicePasso = { servizio: 1, quando: 2, agenda: 2, operatore: 3, dati: 4 }[st.passo] || 0;
+    const barre = [1, 2, 3, 4].map((i) => ({ colore: i <= indicePasso ? '#1C1917' : '#E4DCCE' }));
+
+    const avanti = () => {
+      if (st.passo === 'operatore') return vaiA('dati');
+      if (st.passo === 'dati') {
+        if (!this.nomeInput.trim()) return this.setState({ errore: 'Manca il nome' });
+        if (!this.telefonoInput.trim()) return this.setState({ errore: 'Manca il numero di telefono' });
+        this.nomeConfermato = this.nomeInput.trim();
+        return this.setState({ passo: 'fatto', errore: null });
+      }
+      return null;
+    };
+
+    const indietro = () => {
+      const percorso = { quando: 'servizio', agenda: 'quando', operatore: 'agenda', dati: squadra.length > 1 ? 'operatore' : 'agenda' };
+      vaiA(percorso[st.passo] || 'servizio');
+    };
+
+    return {
+      accento,
+      // stato delle schermate
+      eServizio: st.passo === 'servizio',
+      eQuando: st.passo === 'quando',
+      eAgenda: st.passo === 'agenda',
+      eOperatore: st.passo === 'operatore',
+      eDati: st.passo === 'dati',
+      eFatto: st.passo === 'fatto',
+      mostraPassi: st.passo !== 'servizio' && st.passo !== 'fatto',
+      mostraAzione: st.passo === 'operatore' || st.passo === 'dati',
+      testoAzione: st.passo === 'dati' ? 'Conferma la prenotazione' : 'Avanti',
+      etichettaPasso: 'Passo ' + indicePasso + ' di 4',
+      barre,
+      // contenuti
+      categorie,
+      servizi,
+      intestazioniGiorni,
+      celle,
+      orari,
+      operatori,
+      riepilogoServizio: scelto ? scelto.nome + ' · ' + scelto.minuti + ' minuti · ' + this.prezzo(scelto.cent) : '',
+      giornoEsteso: this.maiuscola(this.giornoEsteso(st.giorno)),
+      riepilogoAppuntamento: st.giorno ? this.maiuscola(this.giornoEsteso(st.giorno)) + ' alle ' + st.ora : '',
+      // errori
+      cErrore: !!st.errore,
+      errore: st.errore || '',
+      // conferma
+      salutoNome: this.nomeConfermato ? ', ' + this.nomeConfermato : '',
+      confermaGiorno: this.maiuscola(this.giornoEsteso(st.giorno)),
+      confermaOra: st.ora || '',
+      confermaOperatore: operatoreFinale,
+      confermaServizio: scelto ? scelto.nome + ' · ' + this.prezzo(scelto.cent) : '',
+      // azioni
+      avanti,
+      indietro,
+      tornaAlMese: () => vaiA('quando'),
+      primaPossibile: () => this.setState({ passo: 'agenda', giorno: 3, errore: null }),
+      ricomincia: () => {
+        this.nomeInput = '';
+        this.telefonoInput = '';
+        this.nomeConfermato = '';
+        this.setState({ passo: 'servizio', servizio: null, giorno: null, ora: null, operatore: 'nessuna', errore: null });
+      },
+      scriviNome: (e) => { this.nomeInput = e.target.value; },
+      scriviTelefono: (e) => { this.telefonoInput = e.target.value; },
+    };
+  }
+}
+</script>
+</body>
+</html>
