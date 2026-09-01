@@ -3,11 +3,11 @@
 export const NOME_SALONE = 'Antonio';
 export const SOTTOTITOLO_SALONE = 'Barbiere · Solarino';
 export const ANNO_FONDAZIONE = 1982;
-export const INDIRIZZO_SALONE = 'Via Roma 1, 96010 Solarino (SR)';
-export const VIA_SALONE = 'Via Roma 1';
+export const INDIRIZZO_SALONE = 'Via Rattazzi 12, 96010 Solarino (SR)';
+export const VIA_SALONE = 'Via Rattazzi 12';
 export const CAP_CITTA_SALONE = '96010 Solarino (SR)';
-export const TELEFONO_SALONE = '0931 000000';
-export const TELEFONO_SALONE_TEL = 'tel:+390931000000';
+export const TELEFONO_SALONE = '371 413 5124';
+export const TELEFONO_SALONE_TEL = 'tel:+393714135124';
 export const EMAIL_SALONE = 'info@dominio-del-salone.it';
 
 // Orari di apertura: segnaposto finché non arrivano quelli veri (§ 11).
