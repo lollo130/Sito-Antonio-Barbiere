@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import GalleriaTagli from '../components/GalleriaTagli';
+import { Cucitura, PiantaInVaso, PoltronaInPelle, Rametto } from '../components/Ornamenti';
 import Intestazione from '../components/layout/Intestazione';
 import Piede from '../components/layout/Piede';
 import {
@@ -61,13 +62,23 @@ export default function Home() {
       <Intestazione />
 
       <main>
-        {/* Finché non arrivano le foto vere, un pannello disegnato: dà
-            comunque un'immagine al salone invece di un buco tratteggiato. */}
-        <div className="flex h-60 flex-col items-center justify-center gap-3 border-b-2 border-verde bg-pieno sm:h-80">
-          <MotivoBarbiere />
-          <p className="font-titolo text-[0.66rem] uppercase tracking-[0.18em] text-pieno-testo">
-            Foto del salone
-          </p>
+        {/* L'apertura: la poltrona in pelle e la pianta, cioè quello che si
+            vede entrando in bottega. Quando arrivano le foto vere del salone
+            si sostituisce questo blocco, ma nel frattempo non è un buco:
+            è un'illustrazione che racconta il posto. */}
+        <div className="relative overflow-hidden border-b-2 border-verde bg-pieno">
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(ellipse at 50% 88%, rgba(107,74,43,0.16), transparent 62%)',
+            }}
+          />
+          <div className="relative mx-auto flex max-w-3xl items-end justify-center gap-1 px-5 pt-6 sm:gap-6">
+            <PiantaInVaso className="h-32 w-auto sm:h-44" />
+            <PoltronaInPelle className="h-48 w-auto sm:h-64" />
+          </div>
+          <div className="relative h-px bg-verde/25" />
         </div>
 
         <section className="mx-auto max-w-3xl px-5 pb-7 pt-8 text-center">
@@ -86,7 +97,7 @@ export default function Home() {
 
           <Link
             to="/prenota"
-            className="mt-6 flex min-h-[60px] items-center justify-center gap-2 rounded-lg bg-verde px-8 font-titolo text-xl font-bold uppercase tracking-wide text-carta-chiara"
+            className="pelle mt-6 flex min-h-[60px] items-center justify-center gap-2 rounded-lg px-8 font-titolo text-xl font-bold uppercase tracking-wide text-carta-chiara"
           >
             Prenota ora
             <IconaFreccia />
@@ -147,9 +158,13 @@ export default function Home() {
           </div>
         </section>
 
+        <div className="mx-auto mt-12 max-w-3xl px-5">
+          <Cucitura />
+        </div>
+
         {/* La storia della bottega. Il 1982 è l'unico dato certo che ho:
             il resto è segnaposto, da riscrivere con le sue parole. */}
-        <section className="mt-12 border-y-2 border-verde bg-carta-chiara px-5 py-10">
+        <section className="mt-8 border-y-2 border-verde bg-carta-chiara px-5 py-10">
           <div className="mx-auto max-w-3xl">
             <div className="flex items-baseline gap-4">
               <span className="font-titolo text-5xl font-bold leading-none text-verde">
@@ -175,7 +190,10 @@ export default function Home() {
         </section>
 
         <section className="mx-auto max-w-3xl px-5 py-10">
-          <Titolo>I nostri tagli</Titolo>
+          <div className="flex items-center gap-3">
+            <Titolo>I nostri tagli</Titolo>
+            <Rametto className="h-6 w-20 opacity-80" />
+          </div>
           <p className="mb-5 mt-1 text-base text-grigio">Qualche lavoro fatto in bottega.</p>
           <GalleriaTagli />
         </section>
@@ -211,27 +229,6 @@ function Titolo({ children }: { children: ReactNode }) {
     <h2 className="font-titolo text-2xl font-bold uppercase tracking-wide text-inchiostro">
       {children}
     </h2>
-  );
-}
-
-function MotivoBarbiere() {
-  return (
-    <svg
-      width="70"
-      height="70"
-      viewBox="0 0 48 48"
-      className="text-pieno-testo"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="5" />
-      <circle cx="12" cy="34" r="5" />
-      <path d="M40 6 15.5 30.5M28 28l12 12M15.5 15.5 24 24" />
-    </svg>
   );
 }
 
