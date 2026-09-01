@@ -1,7 +1,7 @@
 {
   "packageId": "it.solarino.barbiereantonio",
   "host": "barbieresolarino.netlify.app",
-  "name": "Antonio — Barbiere",
+  "name": "Antonio — Barbiere a Solarino",
   "launcherName": "Antonio",
   "display": "standalone",
   "themeColor": "#2E5949",
@@ -12,7 +12,7 @@
   "navigationDividerColorDark": "#000000",
   "backgroundColor": "#FBF8F1",
   "enableNotifications": true,
-  "startUrl": "/admin",
+  "startUrl": "/",
   "iconUrl": "https://barbieresolarino.netlify.app/icons/icon-512.png",
   "maskableIconUrl": "https://barbieresolarino.netlify.app/icons/icon-maskable-512.png",
   "splashScreenFadeOutDuration": 300,
@@ -20,8 +20,8 @@
     "path": "C:\\Users\\loren\\Desktop\\Sito Antonio\\android\\android.keystore",
     "alias": "android"
   },
-  "appVersionName": "1",
-  "appVersionCode": 1,
+  "appVersionName": "2",
+  "appVersionCode": 2,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://barbieresolarino.netlify.app/manifest.json",

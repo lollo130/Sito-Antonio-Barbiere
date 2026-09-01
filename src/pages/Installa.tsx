@@ -79,7 +79,9 @@ export default function Installa() {
 
   return (
     <main className="mx-auto max-w-md px-5 py-10 text-[18px] leading-relaxed">
-      <h1 className="font-titolo mb-6 text-3xl font-semibold text-inchiostro">Installa l'app del salone</h1>
+      <h1 className="font-titolo mb-6 text-3xl font-bold uppercase text-inchiostro">
+        Metti il salone sul telefono
+      </h1>
 
       {ambiente === 'installata' && (
         <>

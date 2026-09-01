@@ -1,8 +1,8 @@
 {
-  "name": "Antonio — Gestione prenotazioni",
+  "name": "Antonio — Barbiere a Solarino",
   "short_name": "Antonio",
-  "description": "Agenda e prenotazioni del salone",
-  "start_url": "/admin",
+  "description": "Prenota taglio e barba dal tuo barbiere a Solarino",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

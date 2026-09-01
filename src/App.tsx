@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import BannerCookie from "./components/BannerCookie";
+import Benvenuto from "./components/Benvenuto";
+import { inApp, leggiCliente } from "./lib/cliente";
 import Admin from "./pages/Admin";
 import Cookie from "./pages/Cookie";
 import DoveSiamo from "./pages/DoveSiamo";
@@ -9,6 +12,12 @@ import Prenota from "./pages/Prenota";
 import Privacy from "./pages/Privacy";
 
 export default function App() {
+  // Il benvenuto compare solo dentro l'app installata e solo la prima volta.
+  // Nel browser non si sbarra mai la strada a chi cerca gli orari.
+  const [presentato, setPresentato] = useState(() => !inApp() || leggiCliente() !== null);
+
+  if (!presentato) return <Benvenuto onFatto={() => setPresentato(true)} />;
+
   return (
     <>
       <Routes>

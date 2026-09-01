@@ -2,6 +2,7 @@ import { useState } from 'react';
 import BottoneScelta from '../../components/prenotazione/BottoneScelta';
 import { formattaGiornoEsteso, formattaOra, dataRomaDi } from '../../lib/data';
 import { chiamaPrenota, type PrenotazioneConfermata, type SlotAlternativo } from '../../lib/prenota';
+import { leggiCliente } from '../../lib/cliente';
 import type { Servizio } from './Passo1Servizio';
 
 // SPECIFICA.md § 5, passo 4: solo nome e telefono obbligatori.
@@ -29,10 +30,14 @@ type Props = {
 };
 
 export default function Passo4Dati({ servizio, inizio, operatorePreferenza, onIndietro, onConfermata }: Props) {
+  // Se il cliente si è presentato alla prima apertura dell'app, i campi
+  // sono già compilati: gli resta solo da confermare.
+  const salvato = leggiCliente();
+
   const [inizioEffettivo, setInizioEffettivo] = useState(inizio);
-  const [nome, setNome] = useState('');
-  const [cognome, setCognome] = useState('');
-  const [telefono, setTelefono] = useState('');
+  const [nome, setNome] = useState(salvato?.nome ?? '');
+  const [cognome, setCognome] = useState(salvato?.cognome ?? '');
+  const [telefono, setTelefono] = useState(salvato?.telefono ?? '');
   const [email, setEmail] = useState('');
 
   const [inviando, setInviando] = useState(false);
