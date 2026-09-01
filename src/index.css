@@ -70,27 +70,3 @@ a:active {
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
-
-/* Pelle: il trattamento dei bottoni principali e delle fasce importanti.
-   Un marrone che vira, un filo di luce in alto come sul cuoio lucidato, e
-   la cucitura chiara appena dentro il bordo — come sulle poltrone del
-   salone. Niente immagini: sono due gradienti, non pesano nulla. */
-.pelle {
-  background-image: linear-gradient(170deg, #7d5730 0%, #6b4a2b 46%, #55381f 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 240, 220, 0.28),
-    inset 0 0 0 2px rgba(255, 240, 220, 0.1),
-    0 2px 0 rgba(78, 52, 28, 0.5);
-}
-
-.pelle-cucita {
-  position: relative;
-}
-.pelle-cucita::after {
-  content: '';
-  position: absolute;
-  inset: 6px;
-  border: 1.5px dashed rgba(251, 248, 241, 0.38);
-  border-radius: inherit;
-  pointer-events: none;
-}
