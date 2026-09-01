@@ -27,12 +27,16 @@ dist-ssr
 *.sln
 *.sw?
 
-# App Android (TWA). La chiave di firma NON va mai nel repository:
-# chi ce l'ha può pubblicare aggiornamenti a nome tuo. Tienila nel
-# gestore di password. Se la perdi, l'app non è più aggiornabile.
+# App Android (TWA) — generata da Bubblewrap.
+# Del progetto Android teniamo solo il README e twa-manifest.json (le
+# risposte che hai dato all'init). Tutto il resto si rigenera con
+# "bubblewrap init" e non ha senso in un repository: sono migliaia di file
+# di compilazione.
+android/*
+!android/README.md
+!android/twa-manifest.json
+
+# La chiave di firma NON va MAI nel repository: chi ce l'ha può pubblicare
+# aggiornamenti a nome tuo. Tienila nel gestore di password e su Drive.
 *.keystore
 *.jks
-android/twa-manifest.json
-android/app-release-*.apk
-android/app-release-*.aab
-android/.bubblewrap/
