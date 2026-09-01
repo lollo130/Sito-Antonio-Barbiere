@@ -21,7 +21,7 @@
     "alias": "android"
   },
   "appVersionName": "2",
-  "appVersionCode": 2,
+  "appVersionCode": 3,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://barbieresolarino.netlify.app/manifest.json",
@@ -43,5 +43,5 @@
   "fileHandlers": [],
   "launchHandlerClientMode": "",
   "displayOverride": [],
-  "appVersion": "1"
+  "appVersion": "2"
 }
