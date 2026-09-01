@@ -18,8 +18,12 @@ import {
 import { supabase } from '../lib/supabase';
 
 // SPECIFICA.md § 10 — Home: chi siamo, foto, servizi con prezzi, Prenota
-// sempre visibile. Più le due sezioni chieste dal titolare: la storia della
-// bottega dal 1982 e una piccola galleria di tagli.
+// sempre visibile. Più la storia della bottega dal 1982 e la galleria.
+//
+// Impaginazione a fasce di colore piene e alternate: verde scuro, pietra,
+// carta, pietra, verde chiaro, inchiostro. Ogni fascia occupa tutta la
+// larghezza, così su schermo grande non restano corridoi vuoti ai lati e la
+// pagina ha un ritmo, invece di essere una colonna stretta sul bianco.
 
 type Servizio = { id: string; nome: string; durata_minuti: number; prezzo_cent: number };
 
@@ -61,142 +65,136 @@ export default function Home() {
       <Intestazione />
 
       <main>
-        {/* Finché non arrivano le foto vere, un pannello disegnato: dà
-            comunque un'immagine al salone invece di un buco tratteggiato. */}
-        <div className="flex h-60 flex-col items-center justify-center gap-3 border-b-2 border-verde bg-pieno sm:h-80">
-          <MotivoBarbiere />
-          <p className="font-titolo text-[0.66rem] uppercase tracking-[0.18em] text-pieno-testo">
-            Foto del salone
-          </p>
-        </div>
+        {/* APERTURA — blocco verde pieno. È quello che dà peso alla pagina e
+            la toglie dall'aria di foglio bianco. Testo grande e chiaro su
+            verde scuro: ben sopra il contrasto richiesto. */}
+        <section className="bg-verde px-5 py-14 text-carta-chiara sm:py-20">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="font-titolo text-[0.7rem] uppercase tracking-[0.28em] text-marrone-chiaro">
+              Dal {ANNO_FONDAZIONE} a Solarino
+            </p>
+            <h1 className="mt-5 font-titolo text-4xl font-bold uppercase leading-[1.12] sm:text-6xl">
+              Il tuo barbiere
+              <br />a Solarino
+            </h1>
+            <p className="mx-auto mt-5 max-w-md text-lg leading-relaxed text-verde-chiaro sm:text-xl">
+              Taglio, barba e cura della persona. Prenoti in un minuto, senza registrarti.
+            </p>
 
-        <section className="mx-auto max-w-3xl px-5 pb-7 pt-8 text-center">
-          <p className="font-titolo text-[0.66rem] uppercase tracking-[0.24em] text-marrone">
-            Dal {ANNO_FONDAZIONE} a Solarino
-          </p>
-          <h1 className="mt-3 font-titolo text-3xl font-bold uppercase leading-[1.18] text-inchiostro sm:text-4xl">
-            Il tuo barbiere
-            <br />a Solarino
-          </h1>
-          <p className="mx-auto mt-3 max-w-md text-lg leading-relaxed text-grigio">
-            Taglio, barba e cura della persona.
-            <br />
-            Prenoti in un minuto, senza registrarti.
-          </p>
-
-          <Link
-            to="/prenota"
-            className="mt-6 flex min-h-[60px] items-center justify-center gap-2 rounded-lg bg-verde px-8 font-titolo text-xl font-bold uppercase tracking-wide text-carta-chiara"
-          >
-            Prenota ora
-            <IconaFreccia />
-          </Link>
-
-          <p className="mt-4 text-base text-grigio">
-            Oppure{' '}
-            <a href={TELEFONO_SALONE_TEL} className="font-bold text-marrone underline">
-              chiamaci allo {TELEFONO_SALONE}
-            </a>
-          </p>
-        </section>
-
-        {/* Orari: la domanda che la gente si fa prima di tutte le altre. */}
-        <section className="mx-auto max-w-3xl px-5">
-          <div className="flex items-center gap-3 rounded-lg bg-verde px-5 py-4 text-carta-chiara">
-            <IconaOrologio />
-            <div>
-              <p className="font-titolo text-base font-bold leading-snug">{ORARIO_SINTESI}</p>
-              <p className="text-[0.85rem] text-verde-chiaro">{GIORNI_CHIUSURA}</p>
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-3xl px-5 pt-10">
-          <Titolo>I nostri servizi</Titolo>
-          <p className="mt-1 text-base text-grigio">Prezzi chiari, nessuna sorpresa alla cassa.</p>
-
-          <div className="mt-5 overflow-hidden rounded-lg border-2 border-verde">
-            {servizi?.map((s, i) => (
-              <div
-                key={s.id}
-                className={`flex items-center justify-between gap-4 bg-carta-chiara px-5 py-4 ${
-                  i > 0 ? 'border-t border-bordo' : ''
-                }`}
+            <div className="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
+              <Link
+                to="/prenota"
+                className="flex min-h-[64px] items-center justify-center gap-2 rounded-lg bg-carta-chiara px-10 font-titolo text-xl font-bold uppercase tracking-wide text-verde"
               >
-                <div>
-                  <p className="font-titolo text-lg font-bold text-inchiostro">{s.nome}</p>
-                  <p className="text-base text-grigio">{s.durata_minuti} minuti</p>
-                </div>
-                <p className="whitespace-nowrap font-titolo text-xl font-bold text-marrone">
-                  {formattatorePrezzo.format(s.prezzo_cent / 100)}
-                </p>
-              </div>
-            ))}
-            {!servizi && (
-              <p className="bg-carta-chiara px-5 py-4 text-lg text-grigio">Carico i servizi…</p>
-            )}
-            {servizi?.length === 0 && (
-              <p className="bg-carta-chiara px-5 py-4 text-lg text-grigio">
-                Il listino non è ancora online.{' '}
-                <a href={TELEFONO_SALONE_TEL} className="font-bold text-marrone underline">
-                  Chiamaci
-                </a>{' '}
-                e te lo diciamo noi.
-              </p>
-            )}
-          </div>
-        </section>
-
-        {/* La storia della bottega. Il 1982 è l'unico dato certo che ho:
-            il resto è segnaposto, da riscrivere con le sue parole. */}
-        <section className="mt-12 border-y-2 border-verde bg-carta-chiara px-5 py-10">
-          <div className="mx-auto max-w-3xl">
-            <div className="flex items-baseline gap-4">
-              <span className="font-titolo text-5xl font-bold leading-none text-verde">
-                {ANNO_FONDAZIONE}
-              </span>
-              <span className="h-px flex-1 bg-bordo" />
+                Prenota ora
+                <IconaFreccia />
+              </Link>
+              <a
+                href={TELEFONO_SALONE_TEL}
+                className="flex min-h-[64px] items-center justify-center rounded-lg border-2 border-carta-chiara/60 px-8 font-titolo text-lg font-bold uppercase tracking-wide text-carta-chiara"
+              >
+                Chiama
+              </a>
             </div>
 
-            <h2 className="mt-4 font-titolo text-2xl font-bold uppercase tracking-wide text-inchiostro">
-              La bottega
-            </h2>
-
-            <p className="mt-4 text-lg leading-relaxed text-grigio">
-              Abbiamo aperto nel {ANNO_FONDAZIONE} e da allora tagliamo capelli a Solarino, nello
-              stesso quartiere e spesso agli stessi cognomi. Sono passati i figli di chi si sedeva
-              qui il sabato mattina, e adesso passano i loro.
-            </p>
-            <p className="mt-3 text-lg leading-relaxed text-grigio">
-              [DA RISCRIVERE CON LE PAROLE DEL TITOLARE — chi ha aperto, chi ci lavora oggi, cosa non
-              è cambiato in tutti questi anni. Bastano tre righe, purché siano sue.]
-            </p>
+            <div className="mt-10 flex flex-col items-center justify-center gap-1 border-t border-carta-chiara/25 pt-6 sm:flex-row sm:gap-4">
+              <span className="flex items-center gap-2 font-titolo text-base font-bold">
+                <IconaOrologio />
+                {ORARIO_SINTESI}
+              </span>
+              <span className="text-base text-verde-chiaro">{GIORNI_CHIUSURA}</span>
+            </div>
           </div>
         </section>
 
-        <section className="mx-auto max-w-3xl px-5 py-10">
-          <Titolo>I nostri tagli</Titolo>
-          <p className="mb-5 mt-1 text-base text-grigio">Qualche lavoro fatto in bottega.</p>
-          <GalleriaTagli />
+        {/* SERVIZI — fascia pietra con schede chiare, due colonne da tablet
+            in su, così su schermo grande lo spazio è occupato davvero. */}
+        <section className="bg-pieno px-5 py-12 sm:py-16">
+          <div className="mx-auto max-w-4xl">
+            <Titolo>I nostri servizi</Titolo>
+            <p className="mt-2 text-lg text-grigio">Prezzi chiari, nessuna sorpresa alla cassa.</p>
+
+            <div className="mt-7 grid gap-3 sm:grid-cols-2">
+              {servizi?.map((s) => (
+                <div
+                  key={s.id}
+                  className="flex items-center justify-between gap-4 rounded-lg border border-bordo bg-carta-chiara px-5 py-4"
+                >
+                  <div>
+                    <p className="font-titolo text-lg font-bold text-inchiostro">{s.nome}</p>
+                    <p className="text-base text-grigio">{s.durata_minuti} minuti</p>
+                  </div>
+                  <p className="whitespace-nowrap font-titolo text-2xl font-bold text-marrone">
+                    {formattatorePrezzo.format(s.prezzo_cent / 100)}
+                  </p>
+                </div>
+              ))}
+              {!servizi && <p className="text-lg text-grigio">Carico i servizi…</p>}
+              {servizi?.length === 0 && (
+                <p className="text-lg text-grigio">
+                  Il listino non è ancora online.{' '}
+                  <a href={TELEFONO_SALONE_TEL} className="font-bold text-marrone underline">
+                    Chiamaci
+                  </a>{' '}
+                  e te lo diciamo noi.
+                </p>
+              )}
+            </div>
+          </div>
         </section>
 
-        <section className="mx-auto max-w-3xl border-t-2 border-verde px-5 py-10">
-          <Titolo>Dove siamo</Titolo>
-          <p className="mt-3 flex items-start gap-3 text-lg leading-relaxed">
-            <IconaLuogo />
-            <span>
-              {VIA_SALONE}
-              <br />
-              {CAP_CITTA_SALONE}
-            </span>
-          </p>
-          <Link
-            to="/dove-siamo"
-            className="mt-5 flex min-h-[56px] items-center justify-center gap-2 rounded-lg border-2 border-verde px-5 font-titolo text-lg font-bold uppercase tracking-wide text-verde"
-          >
-            Come arrivare
-            <IconaFreccia />
-          </Link>
+        {/* LA BOTTEGA — fascia chiara, il 1982 grande come un marchio. */}
+        <section className="bg-carta-chiara px-5 py-12 sm:py-16">
+          <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-[auto_1fr] sm:gap-10">
+            <p className="font-titolo text-6xl font-bold leading-none text-verde sm:text-8xl">
+              {ANNO_FONDAZIONE}
+            </p>
+            <div>
+              <Titolo>La bottega</Titolo>
+              <p className="mt-4 text-lg leading-relaxed text-grigio">
+                Abbiamo aperto nel {ANNO_FONDAZIONE} e da allora tagliamo capelli a Solarino, nello
+                stesso quartiere e spesso agli stessi cognomi. Sono passati i figli di chi si sedeva
+                qui il sabato mattina, e adesso passano i loro.
+              </p>
+              <p className="mt-3 text-lg leading-relaxed text-grigio">
+                [DA RISCRIVERE CON LE PAROLE DEL TITOLARE — chi ha aperto, chi ci lavora oggi, cosa
+                non è cambiato in tutti questi anni. Bastano tre righe, purché siano sue.]
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* GALLERIA — di nuovo la pietra, per staccare dalla fascia chiara. */}
+        <section className="bg-pieno px-5 py-12 sm:py-16">
+          <div className="mx-auto max-w-4xl">
+            <Titolo>I nostri tagli</Titolo>
+            <p className="mb-7 mt-2 text-lg text-grigio">Qualche lavoro fatto in bottega.</p>
+            <GalleriaTagli />
+          </div>
+        </section>
+
+        {/* DOVE SIAMO — verde chiaro, l'ultima fascia prima del piede. */}
+        <section className="bg-verde-chiaro px-5 py-12 sm:py-16">
+          <div className="mx-auto flex max-w-4xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <Titolo>Dove siamo</Titolo>
+              <p className="mt-4 flex items-start gap-3 text-xl leading-relaxed text-inchiostro">
+                <IconaLuogo />
+                <span>
+                  {VIA_SALONE}
+                  <br />
+                  {CAP_CITTA_SALONE}
+                </span>
+              </p>
+            </div>
+            <Link
+              to="/dove-siamo"
+              className="flex min-h-[60px] items-center justify-center gap-2 rounded-lg bg-verde px-8 font-titolo text-lg font-bold uppercase tracking-wide text-carta-chiara"
+            >
+              Come arrivare
+              <IconaFreccia />
+            </Link>
+          </div>
           <span className="sr-only">{INDIRIZZO_SALONE}</span>
         </section>
       </main>
@@ -208,30 +206,9 @@ export default function Home() {
 
 function Titolo({ children }: { children: ReactNode }) {
   return (
-    <h2 className="font-titolo text-2xl font-bold uppercase tracking-wide text-inchiostro">
+    <h2 className="font-titolo text-2xl font-bold uppercase tracking-wide text-inchiostro sm:text-3xl">
       {children}
     </h2>
-  );
-}
-
-function MotivoBarbiere() {
-  return (
-    <svg
-      width="70"
-      height="70"
-      viewBox="0 0 48 48"
-      className="text-pieno-testo"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="5" />
-      <circle cx="12" cy="34" r="5" />
-      <path d="M40 6 15.5 30.5M28 28l12 12M15.5 15.5 24 24" />
-    </svg>
   );
 }
 
@@ -256,8 +233,8 @@ function IconaFreccia() {
 function IconaOrologio() {
   return (
     <svg
-      width="24"
-      height="24"
+      width="20"
+      height="20"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -284,7 +261,7 @@ function IconaLuogo() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="mt-1 shrink-0 text-marrone"
+      className="mt-1 shrink-0 text-verde"
       aria-hidden="true"
     >
       <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
