@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "it.solarino.barbiereantonio",
+      "sha256_cert_fingerprints": [
+        "30:CC:5B:9E:EC:8E:93:5E:B9:FC:0A:44:4F:44:CA:EF:93:3B:73:E7:0E:2B:AF:E3:14:84:25:83:BA:99:40:D3"
+      ]
+    }
+  }
+]
