@@ -151,12 +151,12 @@ export default function Home() {
             </p>
             <div>
               <Titolo>La bottega</Titolo>
-              <p className="mt-4 text-lg leading-relaxed text-grigio">
+              <p className="font-lettura mt-4 text-lg leading-relaxed text-grigio">
                 Abbiamo aperto nel {ANNO_FONDAZIONE} e da allora tagliamo capelli a Solarino, nello
                 stesso quartiere e spesso agli stessi cognomi. Sono passati i figli di chi si sedeva
                 qui il sabato mattina, e adesso passano i loro.
               </p>
-              <p className="mt-3 text-lg leading-relaxed text-grigio">
+              <p className="font-lettura mt-3 text-lg leading-relaxed text-grigio">
                 [DA RISCRIVERE CON LE PAROLE DEL TITOLARE — chi ha aperto, chi ci lavora oggi, cosa
                 non è cambiato in tutti questi anni. Bastano tre righe, purché siano sue.]
               </p>

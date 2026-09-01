@@ -9,7 +9,7 @@ export default function Privacy() {
     <>
       <Intestazione />
 
-      <main className="mx-auto max-w-2xl px-5 py-12">
+      <main className="font-lettura mx-auto max-w-2xl px-5 py-12">
         <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Privacy</h1>
 
         <div className="mt-8 flex flex-col gap-6 text-lg leading-relaxed text-inchiostro">

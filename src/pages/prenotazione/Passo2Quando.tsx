@@ -227,7 +227,7 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
           >
             ‹
           </button>
-          <p className="font-titolo text-lg font-bold uppercase tracking-[0.12em] text-inchiostro">
+          <p className="whitespace-nowrap font-titolo text-base font-bold uppercase tracking-[0.06em] text-inchiostro sm:text-lg sm:tracking-[0.12em]">
             {formattaMeseAnno(mese.anno, mese.mese)}
           </p>
           <button

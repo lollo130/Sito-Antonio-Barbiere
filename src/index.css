@@ -14,8 +14,16 @@
    testo rallenta la lettura, e il pubblico anziano viene prima dell'effetto
    (SPECIFICA.md § 6). L'aria da macchina da scrivere si sente lo stesso. */
 @theme {
+  /* Il typewriter è il carattere di tutto il sito: insegna, titoli, bottoni,
+     prezzi, orari, etichette e testo corrente. */
   --font-titolo: 'Courier Prime', 'Courier New', Courier, monospace;
-  --font-sans: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Courier Prime', 'Courier New', Courier, monospace;
+
+  /* Atkinson Hyperlegible resta per i blocchi di testo lungo — la storia
+     della bottega, privacy e cookie. Il monospazio su molte righe di seguito
+     rallenta la lettura, e il pubblico anziano viene prima dell'effetto
+     (SPECIFICA.md § 6). Si applica con la classe "font-lettura". */
+  --font-lettura: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, -apple-system, sans-serif;
 
   /* bianchi caldi, da carta */
   --color-carta: #fbf8f1;

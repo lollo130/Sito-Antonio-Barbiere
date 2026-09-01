@@ -15,7 +15,7 @@ export default function Cookie() {
           Informativa sui cookie
         </h1>
 
-        <p className="mt-5 text-lg leading-relaxed text-grigio">
+        <p className="font-lettura mt-5 text-lg leading-relaxed text-grigio">
           Questo sito usa pochissime cose e le diciamo in chiaro. Non c'è pubblicità, non c'è
           profilazione, non vendiamo dati a nessuno.
         </p>
@@ -108,7 +108,7 @@ function Sezione({ titolo, children }: { titolo: string; children: React.ReactNo
       <h2 className="font-titolo text-xl font-bold uppercase tracking-wide text-inchiostro">
         {titolo}
       </h2>
-      <div className="mt-3 flex flex-col gap-3 text-lg leading-relaxed text-grigio">{children}</div>
+      <div className="font-lettura mt-3 flex flex-col gap-3 text-lg leading-relaxed text-grigio">{children}</div>
     </section>
   );
 }
@@ -119,7 +119,7 @@ function Elenco({ voci }: { voci: [string, string][] }) {
       {voci.map(([nome, testo], i) => (
         <div key={nome} className={`bg-carta-chiara px-4 py-3 ${i > 0 ? 'border-t border-bordo' : ''}`}>
           <dt className="font-titolo text-base font-bold text-inchiostro">{nome}</dt>
-          <dd className="mt-1 text-base leading-relaxed text-grigio">{testo}</dd>
+          <dd className="font-lettura mt-1 text-base leading-relaxed text-grigio">{testo}</dd>
         </div>
       ))}
     </dl>
