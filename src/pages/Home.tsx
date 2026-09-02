@@ -167,8 +167,9 @@ export default function Home() {
         </section>
 
         {/* GALLERIA — di nuovo la pietra, per staccare dalla fascia chiara. */}
-        <section className="bg-pieno px-5 py-12 sm:py-20">
-          <div className="mx-auto max-w-4xl">
+        <section className="relative overflow-hidden bg-pieno px-5 py-12 sm:py-20">
+          <Foglia lato="sinistra" />
+          <div className="relative mx-auto max-w-4xl">
             <Titolo>I nostri tagli</Titolo>
             <p className="mb-7 mt-2 text-lg text-grigio">Qualche lavoro fatto in bottega.</p>
             <GalleriaTagli />

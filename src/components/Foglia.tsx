@@ -8,17 +8,25 @@
 // Sparisce sotto i 768px: su un telefono coprirebbe il testo, e la
 // leggibilità viene prima della decorazione.
 //
-// Illustrazione Freepik (Planolla) — attribuzione nel piede del sito.
-export default function Foglia({ lato }: { lato: 'destra' | 'sinistra' }) {
+// Illustrazioni Freepik (Planolla) — attribuzione nel piede del sito.
+// Le due fronde vengono dallo stesso disegno ma sono piante diverse, così i
+// due lati della pagina non sembrano un doppione.
+export default function Foglia({
+  lato,
+  nome = lato === 'destra' ? 'foglia' : 'foglia-2',
+}: {
+  lato: 'destra' | 'sinistra';
+  nome?: 'foglia' | 'foglia-2';
+}) {
   const posizione =
     lato === 'destra'
       ? 'right-0 translate-x-[34%] rotate-[10deg]'
-      : 'left-0 -translate-x-[34%] -rotate-[10deg] -scale-x-100';
+      : 'left-0 -translate-x-[34%] -rotate-[10deg]';
 
   return (
     <img
-      src="/sfondi/foglia.webp"
-      srcSet="/sfondi/foglia-500.webp 500w, /sfondi/foglia.webp 900w"
+      src={`/sfondi/${nome}.webp`}
+      srcSet={`/sfondi/${nome}-500.webp 500w, /sfondi/${nome}.webp 900w`}
       sizes="26rem"
       alt=""
       aria-hidden="true"
