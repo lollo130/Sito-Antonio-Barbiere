@@ -84,14 +84,14 @@ export default function Home() {
             <div className="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
               <Link
                 to="/prenota"
-                className="flex min-h-[64px] items-center justify-center gap-2 rounded-lg bg-carta-chiara px-10 font-titolo text-xl font-bold uppercase tracking-wide text-verde"
+                className="bottone-cuoio flex min-h-[64px] items-center justify-center gap-2 rounded-lg bg-cuoio px-10 font-titolo text-xl font-bold uppercase tracking-wide text-crema"
               >
                 Prenota ora
                 <IconaFreccia />
               </Link>
               <a
                 href={TELEFONO_SALONE_TEL}
-                className="flex min-h-[64px] items-center justify-center rounded-lg border-2 border-carta-chiara/60 px-8 font-titolo text-lg font-bold uppercase tracking-wide text-carta-chiara"
+                className="flex min-h-[64px] items-center justify-center rounded-lg border-2 border-cuoio-chiaro bg-transparent px-8 font-titolo text-lg font-bold uppercase tracking-wide text-cuoio-chiaro"
               >
                 Chiama
               </a>
