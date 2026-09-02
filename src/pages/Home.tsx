@@ -109,8 +109,11 @@ export default function Home() {
 
         {/* SERVIZI — fascia pietra con schede chiare, due colonne da tablet
             in su, così su schermo grande lo spazio è occupato davvero. */}
-        <section className="bg-pieno px-5 py-12 sm:py-16">
-          <div className="mx-auto max-w-4xl">
+        <section
+          className="sfondo-botanico overflow-hidden bg-pieno px-5 py-12 sm:py-20"
+          style={{ '--sfondo': "url('/sfondi/floreale.webp')" } as React.CSSProperties}
+        >
+          <div className="relative mx-auto max-w-4xl">
             <Titolo>I nostri servizi</Titolo>
             <p className="mt-2 text-lg text-grigio">Prezzi chiari, nessuna sorpresa alla cassa.</p>
 
@@ -118,7 +121,7 @@ export default function Home() {
               {servizi?.map((s) => (
                 <div
                   key={s.id}
-                  className="flex items-center justify-between gap-4 rounded-lg border border-bordo bg-carta-chiara px-5 py-4"
+                  className="scheda-cuoio flex items-center justify-between gap-4 rounded-lg bg-carta-chiara px-5 py-4"
                 >
                   <div>
                     <p className="font-titolo text-lg font-bold text-inchiostro">{s.nome}</p>
@@ -146,7 +149,7 @@ export default function Home() {
         {/* LA BOTTEGA — fascia chiara, il 1982 grande come un marchio. */}
         <section className="bg-carta-chiara px-5 py-12 sm:py-16">
           <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-[auto_1fr] sm:gap-10">
-            <p className="font-titolo text-6xl font-bold leading-none text-verde sm:text-8xl">
+            <p className="font-titolo text-6xl font-bold leading-none text-cuoio-scuro sm:text-8xl">
               {ANNO_FONDAZIONE}
             </p>
             <div>
@@ -165,8 +168,11 @@ export default function Home() {
         </section>
 
         {/* GALLERIA — di nuovo la pietra, per staccare dalla fascia chiara. */}
-        <section className="bg-pieno px-5 py-12 sm:py-16">
-          <div className="mx-auto max-w-4xl">
+        <section
+          className="sfondo-botanico overflow-hidden bg-pieno px-5 py-12 sm:py-20"
+          style={{ '--sfondo': "url('/sfondi/tropicale.webp')" } as React.CSSProperties}
+        >
+          <div className="relative mx-auto max-w-4xl">
             <Titolo>I nostri tagli</Titolo>
             <p className="mb-7 mt-2 text-lg text-grigio">Qualche lavoro fatto in bottega.</p>
             <GalleriaTagli />

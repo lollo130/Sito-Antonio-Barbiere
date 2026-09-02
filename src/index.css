@@ -114,3 +114,41 @@ a:active {
     0 1px 0 var(--color-cuoio-scuro),
     0 2px 5px rgba(30, 20, 10, 0.3);
 }
+
+/* Schede dei servizi: poggiano su una base di cuoio, come un cartoncino
+   appoggiato su una striscia di pelle. Il bordo inferiore spesso fa lo
+   spessore, l'ombra morbida lo stacca dal fondo. */
+.scheda-cuoio {
+  border: 1px solid var(--color-bordo);
+  border-bottom: 6px solid var(--color-cuoio);
+  box-shadow: 0 3px 8px rgba(78, 52, 28, 0.14);
+}
+
+/* Sfondi botanici (illustrazioni Freepik, vedi il piede per l'attribuzione).
+   Sono disegni a linea nera su bianco: con "multiply" il bianco sparisce e
+   restano solo i tratti, virati sul verde e tenuti molto tenui. Il contenuto
+   della fascia sta in un contenitore "relative", quindi resta sempre sopra. */
+.sfondo-botanico {
+  position: relative;
+}
+.sfondo-botanico::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--sfondo);
+  background-size: cover;
+  background-position: center;
+  mix-blend-mode: multiply;
+  filter: sepia(1) hue-rotate(70deg) saturate(1.5);
+  opacity: 0.22;
+}
+
+/* Su schermo stretto la cornice mangia i margini e stringe il testo:
+   meglio spegnerla e lasciare la fascia pulita. */
+@media (max-width: 640px) {
+  .sfondo-botanico::before {
+    opacity: 0.13;
+    background-size: 160% auto;
+  }
+}

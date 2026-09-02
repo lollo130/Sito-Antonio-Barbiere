@@ -35,6 +35,15 @@ export default function Piede() {
         <p className="text-sm leading-relaxed text-bordo">
           [RAGIONE SOCIALE] · P. IVA [NUMERO]
         </p>
+        {/* Licenza Freepik gratuita: l'attribuzione all'autore è obbligatoria.
+            Se il download è stato fatto con un abbonamento Premium si può
+            togliere (vedi "License premium.txt" negli originali). */}
+        <p className="mt-1 text-xs leading-relaxed text-bordo">
+          Illustrazioni botaniche:{' '}
+          <a href="https://www.freepik.com" rel="noopener nofollow" className="underline">
+            Designed by Harryarts / Freepik
+          </a>
+        </p>
         <p className="mt-2 text-sm leading-relaxed">
           <Link to="/privacy" className="underline">
             Privacy
