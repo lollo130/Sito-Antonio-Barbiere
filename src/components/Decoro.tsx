@@ -37,7 +37,6 @@ export default function Decoro({
   disegno,
   angolo,
   larghezza = 'w-[13rem] md:w-[22rem]',
-  chiaro = false,
   specchia = false,
   soloDaTablet = false,
 }: {
@@ -45,14 +44,12 @@ export default function Decoro({
   angolo: Angolo;
   /** classi Tailwind di larghezza, così ogni fascia può avere la sua scala */
   larghezza?: string;
-  /** true sulle fasce scure: usa il disegno invertito, fuso in "screen" */
-  chiaro?: boolean;
   /** ribalta in orizzontale, per far "guardare" il disegno verso l'interno */
   specchia?: boolean;
   /** true quando su telefono coprirebbe il testo */
   soloDaTablet?: boolean;
 }) {
-  const nome = chiaro ? `${disegno}-chiaro` : disegno;
+  const nome = disegno;
   // L'acquerello è già del verde giusto; i disegni a inchiostro nero vanno
   // virati sul verde della palette.
   const inchiostro = disegno === 'monstera' || disegno === 'angolo';
@@ -69,7 +66,7 @@ export default function Decoro({
       decoding="async"
       className={`decoro pointer-events-none absolute select-none ${
         inchiostro ? 'decoro-inchiostro' : ''
-      } ${chiaro ? 'decoro-chiaro' : ''} ${specchia ? '-scale-x-100' : ''} ${
+      } ${specchia ? '-scale-x-100' : ''} ${
         soloDaTablet ? 'hidden md:block' : ''
       } ${larghezza} ${POSIZIONE[angolo]}`}
     />

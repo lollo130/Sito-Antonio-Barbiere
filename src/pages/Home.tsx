@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import GalleriaTagli from '../components/GalleriaTagli';
+import Cornice from '../components/Cornice';
 import Decoro from '../components/Decoro';
 import Intestazione from '../components/layout/Intestazione';
 import Piede from '../components/layout/Piede';
@@ -70,8 +71,7 @@ export default function Home() {
             la toglie dall'aria di foglio bianco. Testo grande e chiaro su
             verde scuro: ben sopra il contrasto richiesto. */}
         <section className="relative overflow-hidden bg-verde px-5 py-14 text-carta-chiara sm:py-20">
-          <Decoro disegno="angolo" angolo="alto-sinistra" chiaro larghezza="w-[14rem] md:w-[24rem]" />
-          <Decoro disegno="angolo" angolo="basso-destra" chiaro specchia larghezza="w-[14rem] md:w-[24rem]" />
+          <Cornice />
           <div className="relative mx-auto max-w-3xl text-center">
             <p className="font-titolo text-[0.7rem] uppercase tracking-[0.28em] text-marrone-chiaro">
               Dal {ANNO_FONDAZIONE} a Solarino

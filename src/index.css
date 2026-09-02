@@ -119,11 +119,6 @@ a:active {
   filter: sepia(1) hue-rotate(70deg) saturate(1.6);
   opacity: 0.22;
 }
-.decoro-chiaro {
-  mix-blend-mode: screen;
-  filter: none;
-  opacity: 0.14;
-}
 
 @media (max-width: 767px) {
   .decoro {
@@ -132,7 +127,19 @@ a:active {
   .decoro-inchiostro {
     opacity: 0.14;
   }
-  .decoro-chiaro {
-    opacity: 0.1;
+}
+
+/* Cornice a tutta fascia sul verde scuro: il disegno è già invertito, la
+   fusione "screen" fa restare solo il tratto chiaro. Deformata a riempire
+   la fascia di proposito: è una filigrana, la proporzione non conta e così
+   le foglie restano lungo tutti e quattro i bordi a ogni larghezza. */
+.cornice {
+  object-fit: fill;
+  mix-blend-mode: screen;
+  opacity: 0.4;
+}
+@media (max-width: 767px) {
+  .cornice {
+    opacity: 0.3;
   }
 }
