@@ -108,36 +108,31 @@ a:active {
   box-shadow: 0 3px 8px rgba(78, 52, 28, 0.14);
 }
 
-/* Foglia decorativa: acquerello su fondo bianco. Con "multiply" il bianco
-   sparisce e resta il verde. Tenuta indietro perché non deve mai competere
-   con quello che c'è scritto sopra. */
-.foglia-decorativa {
+/* Decorazioni botaniche. Il fondo bianco dei disegni sparisce con "multiply";
+   sulle fasce scure serve invece il disegno invertito fuso in "screen".
+   Tenute molto indietro: non devono mai competere col testo. */
+.decoro {
   mix-blend-mode: multiply;
-  opacity: 0.55;
+  opacity: 0.5;
 }
-
-/* Sfondo a foglie: disegno a inchiostro nero su bianco. "Multiply" toglie il
-   bianco, la virata lo porta sul verde. Molto tenue: sta dietro alle foto. */
-.sfondo-foglie {
-  mix-blend-mode: multiply;
-  filter: sepia(1) hue-rotate(70deg) saturate(1.6);
-  opacity: 0.2;
-}
-@media (max-width: 767px) {
-  .sfondo-foglie {
-    opacity: 0.11;
-  }
-}
-
-/* Angolo di foglie: stesso trattamento delle altre decorazioni — via il
-   bianco con "multiply", virata sul verde, tenuto molto indietro. */
-.angolo-foglie {
-  mix-blend-mode: multiply;
+.decoro-inchiostro {
   filter: sepia(1) hue-rotate(70deg) saturate(1.6);
   opacity: 0.22;
 }
+.decoro-chiaro {
+  mix-blend-mode: screen;
+  filter: none;
+  opacity: 0.14;
+}
+
 @media (max-width: 767px) {
-  .angolo-foglie {
+  .decoro {
+    opacity: 0.32;
+  }
+  .decoro-inchiostro {
     opacity: 0.14;
+  }
+  .decoro-chiaro {
+    opacity: 0.1;
   }
 }
