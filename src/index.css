@@ -133,3 +133,16 @@ a:active {
   mix-blend-mode: multiply;
   opacity: 0.55;
 }
+
+/* Sfondo a foglie: disegno a inchiostro nero su bianco. "Multiply" toglie il
+   bianco, la virata lo porta sul verde. Molto tenue: sta dietro alle foto. */
+.sfondo-foglie {
+  mix-blend-mode: multiply;
+  filter: sepia(1) hue-rotate(70deg) saturate(1.6);
+  opacity: 0.18;
+}
+@media (max-width: 767px) {
+  .sfondo-foglie {
+    opacity: 0.12;
+  }
+}

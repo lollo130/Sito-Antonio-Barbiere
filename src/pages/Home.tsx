@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import GalleriaTagli from '../components/GalleriaTagli';
 import Foglia from '../components/Foglia';
+import SfondoFoglie from '../components/SfondoFoglie';
 import Intestazione from '../components/layout/Intestazione';
 import Piede from '../components/layout/Piede';
 import {
@@ -146,8 +147,9 @@ export default function Home() {
         </section>
 
         {/* LA BOTTEGA — fascia chiara, il 1982 grande come un marchio. */}
-        <section className="bg-carta-chiara px-5 py-12 sm:py-16">
-          <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-[auto_1fr] sm:gap-10">
+        <section className="relative overflow-hidden bg-carta-chiara px-5 py-12 sm:py-16">
+          <Foglia lato="sinistra" />
+          <div className="relative mx-auto grid max-w-4xl gap-4 sm:grid-cols-[auto_1fr] sm:gap-10">
             <p className="font-titolo text-6xl font-bold leading-none text-cuoio-scuro sm:text-8xl">
               {ANNO_FONDAZIONE}
             </p>
@@ -168,7 +170,7 @@ export default function Home() {
 
         {/* GALLERIA — di nuovo la pietra, per staccare dalla fascia chiara. */}
         <section className="relative overflow-hidden bg-pieno px-5 py-12 sm:py-20">
-          <Foglia lato="sinistra" />
+          <SfondoFoglie />
           <div className="relative mx-auto max-w-4xl">
             <Titolo>I nostri tagli</Titolo>
             <p className="mb-7 mt-2 text-lg text-grigio">Qualche lavoro fatto in bottega.</p>
