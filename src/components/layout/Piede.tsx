@@ -39,9 +39,9 @@ export default function Piede() {
             Se il download è stato fatto con un abbonamento Premium si può
             togliere (vedi "License premium.txt" negli originali). */}
         <p className="mt-1 text-xs leading-relaxed text-bordo">
-          Illustrazioni botaniche:{' '}
+          Illustrazione botanica:{' '}
           <a href="https://www.freepik.com" rel="noopener nofollow" className="underline">
-            Designed by Harryarts / Freepik
+            Designed by Planolla / Freepik
           </a>
         </p>
         <p className="mt-2 text-sm leading-relaxed">

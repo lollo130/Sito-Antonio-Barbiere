@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import GalleriaTagli from '../components/GalleriaTagli';
+import Foglia from '../components/Foglia';
 import Intestazione from '../components/layout/Intestazione';
 import Piede from '../components/layout/Piede';
 import {
@@ -109,10 +110,8 @@ export default function Home() {
 
         {/* SERVIZI — fascia pietra con schede chiare, due colonne da tablet
             in su, così su schermo grande lo spazio è occupato davvero. */}
-        <section
-          className="sfondo-botanico overflow-hidden bg-pieno px-5 py-12 sm:py-20"
-          style={{ '--sfondo': "url('/sfondi/floreale.webp')" } as React.CSSProperties}
-        >
+        <section className="relative overflow-hidden bg-pieno px-5 py-12 sm:py-20">
+          <Foglia lato="destra" />
           <div className="relative mx-auto max-w-4xl">
             <Titolo>I nostri servizi</Titolo>
             <p className="mt-2 text-lg text-grigio">Prezzi chiari, nessuna sorpresa alla cassa.</p>
@@ -168,11 +167,8 @@ export default function Home() {
         </section>
 
         {/* GALLERIA — di nuovo la pietra, per staccare dalla fascia chiara. */}
-        <section
-          className="sfondo-botanico overflow-hidden bg-pieno px-5 py-12 sm:py-20"
-          style={{ '--sfondo': "url('/sfondi/tropicale.webp')" } as React.CSSProperties}
-        >
-          <div className="relative mx-auto max-w-4xl">
+        <section className="bg-pieno px-5 py-12 sm:py-20">
+          <div className="mx-auto max-w-4xl">
             <Titolo>I nostri tagli</Titolo>
             <p className="mb-7 mt-2 text-lg text-grigio">Qualche lavoro fatto in bottega.</p>
             <GalleriaTagli />

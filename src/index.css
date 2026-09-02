@@ -79,21 +79,23 @@ a:active {
   transform: scale(0.985);
 }
 
-/* Etichettine maiuscole spaziate: il tono da insegna smaltata. */
-.etichetta {
-  font-family: var(--font-titolo);
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
 
-.grana::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.5;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.33 0 0 0 0 0.20 0 0 0 0.055 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23g)'/%3E%3C/svg%3E");
+/* Su schermo stretto la cornice mangia i margini e stringe il testo:
+   meglio spegnerla e lasciare la fascia pulita. */
+
+/* Sfondo botanico: disegno a linea nera su bianco. Con "multiply" il bianco
+   sparisce e restano solo i tratti, virati sul verde e tenuti molto tenui.
+   Il contenuto della fascia sta in un contenitore "relative", quindi resta
+   sempre sopra. */
+
+/* Su schermo stretto la cornice si stringe e invade il testo: si allarga
+   l'inquadratura e si abbassa ancora. */
+@media (max-width: 640px) {
+  .sfondo-botanico {
+    opacity: 0.15;
+    object-position: center;
+    transform: scale(1.35);
+  }
 }
 
 /* Pulsante in cuoio dell'apertura: bordo scuro come il taglio della pelle,
@@ -124,31 +126,10 @@ a:active {
   box-shadow: 0 3px 8px rgba(78, 52, 28, 0.14);
 }
 
-/* Sfondi botanici (illustrazioni Freepik, vedi il piede per l'attribuzione).
-   Sono disegni a linea nera su bianco: con "multiply" il bianco sparisce e
-   restano solo i tratti, virati sul verde e tenuti molto tenui. Il contenuto
-   della fascia sta in un contenitore "relative", quindi resta sempre sopra. */
-.sfondo-botanico {
-  position: relative;
-}
-.sfondo-botanico::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: var(--sfondo);
-  background-size: cover;
-  background-position: center;
+/* Foglia decorativa: acquerello su fondo bianco. Con "multiply" il bianco
+   sparisce e resta il verde. Tenuta indietro perché non deve mai competere
+   con quello che c'è scritto sopra. */
+.foglia-decorativa {
   mix-blend-mode: multiply;
-  filter: sepia(1) hue-rotate(70deg) saturate(1.5);
-  opacity: 0.22;
-}
-
-/* Su schermo stretto la cornice mangia i margini e stringe il testo:
-   meglio spegnerla e lasciare la fascia pulita. */
-@media (max-width: 640px) {
-  .sfondo-botanico::before {
-    opacity: 0.13;
-    background-size: 160% auto;
-  }
+  opacity: 0.55;
 }
