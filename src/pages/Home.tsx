@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import GalleriaTagli from '../components/GalleriaTagli';
 import Cornice from '../components/Cornice';
+import Separatore from '../components/Separatore';
 import Decoro from '../components/Decoro';
 import Intestazione from '../components/layout/Intestazione';
 import Piede from '../components/layout/Piede';
@@ -110,6 +111,8 @@ export default function Home() {
           </div>
         </section>
 
+        <Separatore />
+
         {/* SERVIZI — fascia pietra con schede chiare, due colonne da tablet
             in su, così su schermo grande lo spazio è occupato davvero. */}
         <section className="relative overflow-hidden bg-pieno px-5 py-12 sm:py-20">
@@ -148,6 +151,8 @@ export default function Home() {
           </div>
         </section>
 
+        <Separatore capovolto />
+
         {/* LA BOTTEGA — fascia chiara, il 1982 grande come un marchio. */}
         <section className="relative overflow-hidden bg-carta-chiara px-5 py-12 sm:py-16">
           <Decoro disegno="foglia-2" angolo="basso-sinistra" larghezza="w-[15rem] md:w-[22rem]" soloDaTablet />
@@ -171,6 +176,8 @@ export default function Home() {
           </div>
         </section>
 
+        <Separatore />
+
         {/* GALLERIA — di nuovo la pietra, per staccare dalla fascia chiara. */}
         <section className="relative overflow-hidden bg-pieno px-5 py-12 sm:py-20">
           <Decoro disegno="monstera" angolo="basso-destra" larghezza="w-[18rem] md:w-[30rem]" />
@@ -180,6 +187,8 @@ export default function Home() {
             <GalleriaTagli />
           </div>
         </section>
+
+        <Separatore capovolto />
 
         {/* DOVE SIAMO — verde chiaro, l'ultima fascia prima del piede. */}
         <section className="relative overflow-hidden bg-verde-chiaro px-5 py-12 sm:py-16">

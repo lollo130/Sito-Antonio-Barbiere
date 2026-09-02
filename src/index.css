@@ -143,3 +143,16 @@ a:active {
     opacity: 0.3;
   }
 }
+
+/* Nastro di foglie fra le fasce: via il bianco con "multiply", virata sul
+   verde, tenuto leggero perché è un respiro, non un elemento da guardare. */
+.separatore {
+  mix-blend-mode: multiply;
+  filter: sepia(1) hue-rotate(70deg) saturate(1.6);
+  opacity: 0.3;
+}
+@media (max-width: 767px) {
+  .separatore {
+    opacity: 0.22;
+  }
+}
