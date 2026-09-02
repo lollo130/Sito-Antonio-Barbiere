@@ -80,24 +80,6 @@ a:active {
 }
 
 
-/* Su schermo stretto la cornice mangia i margini e stringe il testo:
-   meglio spegnerla e lasciare la fascia pulita. */
-
-/* Sfondo botanico: disegno a linea nera su bianco. Con "multiply" il bianco
-   sparisce e restano solo i tratti, virati sul verde e tenuti molto tenui.
-   Il contenuto della fascia sta in un contenitore "relative", quindi resta
-   sempre sopra. */
-
-/* Su schermo stretto la cornice si stringe e invade il testo: si allarga
-   l'inquadratura e si abbassa ancora. */
-@media (max-width: 640px) {
-  .sfondo-botanico {
-    opacity: 0.15;
-    object-position: center;
-    transform: scale(1.35);
-  }
-}
-
 /* Pulsante in cuoio dell'apertura: bordo scuro come il taglio della pelle,
    un filo di luce sul bordo superiore e un'ombra sotto, così ha spessore
    invece di essere un rettangolo colorato. */
@@ -144,5 +126,18 @@ a:active {
 @media (max-width: 767px) {
   .sfondo-foglie {
     opacity: 0.11;
+  }
+}
+
+/* Angolo di foglie: stesso trattamento delle altre decorazioni — via il
+   bianco con "multiply", virata sul verde, tenuto molto indietro. */
+.angolo-foglie {
+  mix-blend-mode: multiply;
+  filter: sepia(1) hue-rotate(70deg) saturate(1.6);
+  opacity: 0.22;
+}
+@media (max-width: 767px) {
+  .angolo-foglie {
+    opacity: 0.14;
   }
 }

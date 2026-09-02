@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import GalleriaTagli from '../components/GalleriaTagli';
 import Foglia from '../components/Foglia';
+import AngoloFoglie from '../components/AngoloFoglie';
 import SfondoFoglie from '../components/SfondoFoglie';
 import Intestazione from '../components/layout/Intestazione';
 import Piede from '../components/layout/Piede';
@@ -179,8 +180,9 @@ export default function Home() {
         </section>
 
         {/* DOVE SIAMO — verde chiaro, l'ultima fascia prima del piede. */}
-        <section className="bg-verde-chiaro px-5 py-12 sm:py-16">
-          <div className="mx-auto flex max-w-4xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <section className="relative overflow-hidden bg-verde-chiaro px-5 py-12 sm:py-16">
+          <AngoloFoglie />
+          <div className="relative mx-auto flex max-w-4xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <Titolo>Dove siamo</Titolo>
               <p className="mt-4 flex items-start gap-3 text-xl leading-relaxed text-inchiostro">
