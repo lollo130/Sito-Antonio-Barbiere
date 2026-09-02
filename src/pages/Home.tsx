@@ -70,8 +70,8 @@ export default function Home() {
             la toglie dall'aria di foglio bianco. Testo grande e chiaro su
             verde scuro: ben sopra il contrasto richiesto. */}
         <section className="relative overflow-hidden bg-verde px-5 py-14 text-carta-chiara sm:py-20">
-          <Decoro disegno="angolo" angolo="alto-sinistra" chiaro larghezza="w-[15rem] md:w-[24rem]" />
-          <Decoro disegno="angolo" angolo="basso-destra" chiaro larghezza="w-[15rem] md:w-[24rem]" />
+          <Decoro disegno="angolo" angolo="alto-sinistra" chiaro larghezza="w-[14rem] md:w-[24rem]" />
+          <Decoro disegno="angolo" angolo="basso-destra" chiaro specchia larghezza="w-[14rem] md:w-[24rem]" />
           <div className="relative mx-auto max-w-3xl text-center">
             <p className="font-titolo text-[0.7rem] uppercase tracking-[0.28em] text-marrone-chiaro">
               Dal {ANNO_FONDAZIONE} a Solarino
@@ -113,8 +113,8 @@ export default function Home() {
         {/* SERVIZI — fascia pietra con schede chiare, due colonne da tablet
             in su, così su schermo grande lo spazio è occupato davvero. */}
         <section className="relative overflow-hidden bg-pieno px-5 py-12 sm:py-20">
-          <Decoro disegno="angolo" angolo="alto-sinistra" larghezza="w-[14rem] md:w-[22rem]" />
-          <Decoro disegno="foglia" angolo="destra" larghezza="w-[26rem]" soloDaTablet />
+          <Decoro disegno="angolo" angolo="alto-sinistra" larghezza="w-[13rem] md:w-[21rem]" />
+          <Decoro disegno="foglia" angolo="basso-destra" larghezza="w-[15rem] md:w-[22rem]" soloDaTablet />
           <div className="relative mx-auto max-w-4xl">
             <Titolo>I nostri servizi</Titolo>
             <p className="mt-2 text-lg text-grigio">Prezzi chiari, nessuna sorpresa alla cassa.</p>
@@ -150,8 +150,8 @@ export default function Home() {
 
         {/* LA BOTTEGA — fascia chiara, il 1982 grande come un marchio. */}
         <section className="relative overflow-hidden bg-carta-chiara px-5 py-12 sm:py-16">
-          <Decoro disegno="foglia-2" angolo="sinistra" larghezza="w-[26rem]" soloDaTablet />
-          <Decoro disegno="monstera" angolo="basso-destra" larghezza="w-[16rem] md:w-[24rem]" />
+          <Decoro disegno="foglia-2" angolo="basso-sinistra" larghezza="w-[15rem] md:w-[22rem]" soloDaTablet />
+          <Decoro disegno="monstera" angolo="alto-destra" larghezza="w-[14rem] md:w-[22rem]" />
           <div className="relative mx-auto grid max-w-4xl gap-4 sm:grid-cols-[auto_1fr] sm:gap-10">
             <p className="font-titolo text-6xl font-bold leading-none text-cuoio-scuro sm:text-8xl">
               {ANNO_FONDAZIONE}
@@ -173,7 +173,7 @@ export default function Home() {
 
         {/* GALLERIA — di nuovo la pietra, per staccare dalla fascia chiara. */}
         <section className="relative overflow-hidden bg-pieno px-5 py-12 sm:py-20">
-          <Decoro disegno="monstera" angolo="destra" larghezza="w-[22rem] md:w-[36rem]" />
+          <Decoro disegno="monstera" angolo="basso-destra" larghezza="w-[18rem] md:w-[30rem]" />
           <div className="relative mx-auto max-w-4xl">
             <Titolo>I nostri tagli</Titolo>
             <p className="mb-7 mt-2 text-lg text-grigio">Qualche lavoro fatto in bottega.</p>
@@ -183,7 +183,7 @@ export default function Home() {
 
         {/* DOVE SIAMO — verde chiaro, l'ultima fascia prima del piede. */}
         <section className="relative overflow-hidden bg-verde-chiaro px-5 py-12 sm:py-16">
-          <Decoro disegno="angolo" angolo="basso-sinistra" larghezza="w-[16rem] md:w-[26rem]" />
+          <Decoro disegno="angolo" angolo="basso-sinistra" specchia larghezza="w-[14rem] md:w-[24rem]" />
           <div className="relative mx-auto flex max-w-4xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <Titolo>Dove siamo</Titolo>
