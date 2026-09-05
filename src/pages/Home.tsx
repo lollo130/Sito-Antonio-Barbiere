@@ -70,14 +70,8 @@ export default function Home() {
             la toglie dall'aria di foglio bianco. Testo grande e chiaro su
             verde scuro: ben sopra il contrasto richiesto. */}
         <section className="relative overflow-hidden bg-verde px-5 py-14 text-carta-chiara sm:py-20">
-          <Decoro disegno="palma" angolo="basso-sinistra" suScuro misura="grande" />
-          <Decoro
-            disegno="foglia-sottile"
-            angolo="alto-destra"
-            suScuro
-            ruota
-            misura="media"
-          />
+          <Decoro ciuffo="palmeto" angolo="basso-sinistra" suScuro />
+          <Decoro ciuffo="pendente" angolo="alto-destra" suScuro />
           <div className="relative mx-auto max-w-3xl text-center">
             <p className="font-titolo text-[0.7rem] uppercase tracking-[0.28em] text-marrone-chiaro">
               Dal {ANNO_FONDAZIONE} a Solarino
@@ -121,13 +115,8 @@ export default function Home() {
         {/* SERVIZI — fascia pietra con schede chiare, due colonne da tablet
             in su, così su schermo grande lo spazio è occupato davvero. */}
         <section className="relative overflow-hidden bg-pieno px-3 py-12 sm:px-5 sm:py-20">
-          <Decoro disegno="foglia-lancia" angolo="alto-sinistra" ruota misura="media" />
-          <Decoro
-            disegno="monstera-incisa"
-            angolo="basso-destra"
-            misura="grande"
-            soloDaTablet
-          />
+          <Decoro ciuffo="pendente" angolo="alto-sinistra" />
+          <Decoro ciuffo="sottobosco" angolo="basso-destra" />
           <div className="relative mx-auto max-w-4xl">
             <CorniceVintage>
             <Titolo>I nostri servizi</Titolo>
@@ -167,14 +156,8 @@ export default function Home() {
 
         {/* LA BOTTEGA — fascia chiara, il 1982 grande come un marchio. */}
         <section className="relative overflow-hidden bg-carta-chiara px-3 py-12 sm:px-5 sm:py-16">
-          <Decoro disegno="foglia-larga" angolo="alto-destra" ruota misura="grande" />
-          <Decoro
-            disegno="palma"
-            angolo="basso-sinistra"
-            specchia
-            misura="media"
-            soloDaTablet
-          />
+          <Decoro ciuffo="pendente" angolo="alto-destra" />
+          <Decoro ciuffo="palmeto" angolo="basso-sinistra" />
           <div className="relative mx-auto max-w-4xl">
             <CorniceVintage contenuto="grid gap-4 sm:grid-cols-[auto_1fr] sm:gap-10">
             <p className="font-titolo text-6xl font-bold leading-none text-cuoio-scuro sm:text-8xl">
@@ -200,14 +183,8 @@ export default function Home() {
 
         {/* GALLERIA — di nuovo la pietra, per staccare dalla fascia chiara. */}
         <section className="relative overflow-hidden bg-pieno px-3 py-12 sm:px-5 sm:py-20">
-          <Decoro disegno="monstera-incisa" angolo="basso-destra" misura="grande" />
-          <Decoro
-            disegno="foglia-sottile"
-            angolo="alto-sinistra"
-            ruota
-            misura="media"
-            soloDaTablet
-          />
+          <Decoro ciuffo="sottobosco" angolo="basso-destra" />
+          <Decoro ciuffo="pendente" angolo="alto-sinistra" />
           <div className="relative mx-auto max-w-4xl">
             <CorniceVintage>
               <Titolo>I nostri tagli</Titolo>
@@ -221,14 +198,8 @@ export default function Home() {
 
         {/* DOVE SIAMO — verde chiaro, l'ultima fascia prima del piede. */}
         <section className="relative overflow-hidden bg-verde-chiaro px-3 py-12 sm:px-5 sm:py-16">
-          <Decoro disegno="foglia-lancia" angolo="basso-sinistra" misura="media" />
-          <Decoro
-            disegno="foglia-larga"
-            angolo="alto-destra"
-            ruota
-            misura="media"
-            soloDaTablet
-          />
+          <Decoro ciuffo="palmeto" angolo="basso-sinistra" />
+          <Decoro ciuffo="rado" angolo="basso-destra" />
           <div className="relative mx-auto max-w-4xl">
             <CorniceVintage contenuto="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>

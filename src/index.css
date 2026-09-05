@@ -142,6 +142,18 @@ a:active {
   filter: invert(1) grayscale(1);
 }
 
+/* La larghezza di ogni foglia arriva dal componente come due variabili.
+   Sul telefono la frazione dello schermo e' molto piu' grande: a schermo
+   stretto il 25% di larghezza non si vedrebbe. */
+.decoro img {
+  width: var(--larga-telefono);
+}
+@media (min-width: 768px) {
+  .decoro img {
+    width: var(--larga-schermo);
+  }
+}
+
 /* La sfumatura parte dall'angolo dove sta la pianta e si spegne verso il
    centro della fascia. Serve a due cose: sciogliere il bordo dritto del
    ritaglio, e far sparire il taglio netto quando il disegno è più grande
