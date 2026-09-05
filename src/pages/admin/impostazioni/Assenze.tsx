@@ -3,7 +3,19 @@ import { Link } from 'react-router-dom';
 import BottoneToggle from '../../../components/admin/BottoneToggle';
 import { classeCampo, classeEtichetta } from '../../../components/admin/campi';
 import { formattaGiornoEsteso, dataRomaDi } from '../../../lib/data';
-import { supabase } from '../../../lib/supabase';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  Timestamp,
+  where,
+} from 'firebase/firestore';
+import { seFallisce } from '../../../lib/admin';
+import { db } from '../../../lib/firebase';
 
 // SPECIFICA.md § 7.3 — Assenze per operatore (ferie, permessi, malattia).
 
@@ -21,26 +33,28 @@ export default function Assenze() {
   const [motivo, setMotivo] = useState('');
 
   useEffect(() => {
-    supabase
-      .from('operatori')
-      .select('id, nome')
-      .order('ordine')
-      .then(({ data }) => {
-        setOperatori(data ?? []);
-        if (data && data.length > 0) setOperatoreId(data[0].id);
-      });
+    getDocs(query(collection(db, 'operatori'), orderBy('ordine')))
+      .then((r) => {
+        const righe = r.docs.map((d) => ({ id: d.id, nome: d.get('nome') as string }));
+        setOperatori(righe);
+        if (righe.length > 0) setOperatoreId(righe[0].id);
+      })
+      .catch(() => setOperatori([]));
   }, []);
 
   function caricaAssenze(id: string) {
-    supabase
-      .from('assenze')
-      .select('id, inizio, fine, motivo')
-      .eq('operatore_id', id)
-      .order('inizio')
-      .then(({ data, error }) => {
-        if (error) setErrore('Non riesco a caricare le assenze.');
-        else setAssenze(data ?? []);
-      });
+    getDocs(query(collection(db, 'assenze'), where('operatore_id', '==', id), orderBy('inizio')))
+      .then((r) =>
+        setAssenze(
+          r.docs.map((d) => ({
+            id: d.id,
+            inizio: (d.get('inizio') as Timestamp).toDate().toISOString(),
+            fine: (d.get('fine') as Timestamp).toDate().toISOString(),
+            motivo: d.get('motivo') ?? null,
+          })),
+        ),
+      )
+      .catch(() => setErrore('Non riesco a caricare le assenze.'));
   }
 
   useEffect(() => {
@@ -58,11 +72,14 @@ export default function Assenze() {
       return;
     }
     setErrore(null);
-    const inizio = new Date(`${dataInizio}T00:00:00`).toISOString();
-    const fine = new Date(`${dataFine}T23:59:59`).toISOString();
-    const { error } = await supabase
-      .from('assenze')
-      .insert({ operatore_id: operatoreId, inizio, fine, motivo: motivo.trim() || null });
+    const error = await seFallisce(
+      addDoc(collection(db, 'assenze'), {
+        operatore_id: operatoreId,
+        inizio: Timestamp.fromDate(new Date(`${dataInizio}T00:00:00`)),
+        fine: Timestamp.fromDate(new Date(`${dataFine}T23:59:59`)),
+        motivo: motivo.trim() || null,
+      }),
+    );
     if (error) {
       setErrore('Non sono riuscito a salvare l\'assenza.');
       return;
@@ -76,7 +93,7 @@ export default function Assenze() {
   async function rimuoviAssenza(a: Assenza) {
     const etichetta = a.motivo || `dal ${formattaGiornoEsteso(dataRomaDi(a.inizio))}`;
     if (!window.confirm(`Rimuovere l'assenza "${etichetta}"?`)) return;
-    const { error } = await supabase.from('assenze').delete().eq('id', a.id);
+    const error = await seFallisce(deleteDoc(doc(db, 'assenze', a.id)));
     if (error) {
       setErrore('Non sono riuscito a rimuovere l\'assenza.');
       return;

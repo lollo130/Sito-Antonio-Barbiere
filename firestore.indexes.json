@@ -1,0 +1,65 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "operatori",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "attivo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ordine",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "servizi",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "attivo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ordine",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "prenotazioni",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "operatore_id",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "inizio",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "prenotazioni",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "cliente_telefono",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "stato",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "inizio",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

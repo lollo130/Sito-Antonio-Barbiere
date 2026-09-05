@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import GalleriaTagli from '../components/GalleriaTagli';
 import Cornice from '../components/Cornice';
+import CorniceVintage from '../components/CorniceVintage';
 import Separatore from '../components/Separatore';
 import Decoro from '../components/Decoro';
 import Intestazione from '../components/layout/Intestazione';
@@ -18,7 +19,7 @@ import {
   TELEFONO_SALONE_TEL,
   VIA_SALONE,
 } from '../lib/salone';
-import { supabase } from '../lib/supabase';
+import { serviziAttivi } from '../lib/db';
 
 // SPECIFICA.md § 10 — Home: chi siamo, foto, servizi con prezzi, Prenota
 // sempre visibile. Più la storia della bottega dal 1982 e la galleria.
@@ -52,11 +53,9 @@ export default function Home() {
   const [servizi, setServizi] = useState<Servizio[] | null>(null);
 
   useEffect(() => {
-    supabase
-      .from('servizi')
-      .select('id, nome, durata_minuti, prezzo_cent')
-      .order('ordine')
-      .then(({ data }) => setServizi(data ?? []));
+    serviziAttivi()
+      .then(setServizi)
+      .catch(() => setServizi([]));
   }, []);
 
   return (
@@ -115,10 +114,9 @@ export default function Home() {
 
         {/* SERVIZI — fascia pietra con schede chiare, due colonne da tablet
             in su, così su schermo grande lo spazio è occupato davvero. */}
-        <section className="relative overflow-hidden bg-pieno px-5 py-12 sm:py-20">
-          <Decoro disegno="angolo" angolo="alto-sinistra" larghezza="w-[13rem] md:w-[21rem]" />
-          <Decoro disegno="foglia" angolo="basso-destra" larghezza="w-[15rem] md:w-[22rem]" soloDaTablet />
+        <section className="relative overflow-hidden bg-pieno px-3 py-12 sm:px-5 sm:py-20">
           <div className="relative mx-auto max-w-4xl">
+            <CorniceVintage>
             <Titolo>I nostri servizi</Titolo>
             <p className="mt-2 text-lg text-grigio">Prezzi chiari, nessuna sorpresa alla cassa.</p>
 
@@ -126,7 +124,7 @@ export default function Home() {
               {servizi?.map((s) => (
                 <div
                   key={s.id}
-                  className="scheda-cuoio flex items-center justify-between gap-4 rounded-lg bg-carta-chiara px-5 py-4"
+                  className="scheda-cuoio flex items-center justify-between gap-3 rounded-lg bg-carta-chiara px-4 py-4 sm:gap-4 sm:px-5"
                 >
                   <div>
                     <p className="font-titolo text-lg font-bold text-inchiostro">{s.nome}</p>
@@ -148,16 +146,16 @@ export default function Home() {
                 </p>
               )}
             </div>
+            </CorniceVintage>
           </div>
         </section>
 
-        <Separatore capovolto />
+        <Separatore />
 
         {/* LA BOTTEGA — fascia chiara, il 1982 grande come un marchio. */}
-        <section className="relative overflow-hidden bg-carta-chiara px-5 py-12 sm:py-16">
-          <Decoro disegno="foglia-2" angolo="basso-sinistra" larghezza="w-[15rem] md:w-[22rem]" soloDaTablet />
-          <Decoro disegno="monstera" angolo="alto-destra" larghezza="w-[14rem] md:w-[22rem]" />
-          <div className="relative mx-auto grid max-w-4xl gap-4 sm:grid-cols-[auto_1fr] sm:gap-10">
+        <section className="relative overflow-hidden bg-carta-chiara px-3 py-12 sm:px-5 sm:py-16">
+          <div className="relative mx-auto max-w-4xl">
+            <CorniceVintage contenuto="grid gap-4 sm:grid-cols-[auto_1fr] sm:gap-10">
             <p className="font-titolo text-6xl font-bold leading-none text-cuoio-scuro sm:text-8xl">
               {ANNO_FONDAZIONE}
             </p>
@@ -173,27 +171,31 @@ export default function Home() {
                 non è cambiato in tutti questi anni. Bastano tre righe, purché siano sue.]
               </p>
             </div>
+            </CorniceVintage>
           </div>
         </section>
 
         <Separatore />
 
         {/* GALLERIA — di nuovo la pietra, per staccare dalla fascia chiara. */}
-        <section className="relative overflow-hidden bg-pieno px-5 py-12 sm:py-20">
-          <Decoro disegno="monstera" angolo="basso-destra" larghezza="w-[18rem] md:w-[30rem]" />
+        <section className="relative overflow-hidden bg-pieno px-3 py-12 sm:px-5 sm:py-20">
+          <Decoro disegno="monstera" angolo="basso-destra" larghezza="w-[22rem] md:w-[34rem]" />
           <div className="relative mx-auto max-w-4xl">
-            <Titolo>I nostri tagli</Titolo>
-            <p className="mb-7 mt-2 text-lg text-grigio">Qualche lavoro fatto in bottega.</p>
-            <GalleriaTagli />
+            <CorniceVintage>
+              <Titolo>I nostri tagli</Titolo>
+              <p className="mb-7 mt-2 text-lg text-grigio">Qualche lavoro fatto in bottega.</p>
+              <GalleriaTagli />
+            </CorniceVintage>
           </div>
         </section>
 
-        <Separatore capovolto />
+        <Separatore />
 
         {/* DOVE SIAMO — verde chiaro, l'ultima fascia prima del piede. */}
-        <section className="relative overflow-hidden bg-verde-chiaro px-5 py-12 sm:py-16">
-          <Decoro disegno="angolo" angolo="basso-sinistra" specchia larghezza="w-[14rem] md:w-[24rem]" />
-          <div className="relative mx-auto flex max-w-4xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <section className="relative overflow-hidden bg-verde-chiaro px-3 py-12 sm:px-5 sm:py-16">
+          <Decoro disegno="angolo" angolo="basso-sinistra" specchia larghezza="w-[18rem] md:w-[28rem]" />
+          <div className="relative mx-auto max-w-4xl">
+            <CorniceVintage contenuto="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <Titolo>Dove siamo</Titolo>
               <p className="mt-4 flex items-start gap-3 text-xl leading-relaxed text-inchiostro">
@@ -212,6 +214,7 @@ export default function Home() {
               Come arrivare
               <IconaFreccia />
             </Link>
+            </CorniceVintage>
           </div>
           <span className="sr-only">{INDIRIZZO_SALONE}</span>
         </section>

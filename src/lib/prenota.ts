@@ -1,10 +1,14 @@
-// Chiamata diretta (fetch) alla edge function `prenota`, invece di
-// supabase.functions.invoke(): vogliamo leggere noi il corpo JSON anche
-// sulle risposte non-2xx (validazione, limite telefono, slot sparito),
-// senza dipendere da come supabase-js impacchetta l'errore.
+// Chiamata alla Cloud Function `prenota`, l'unico punto da cui il sito
+// scrive una prenotazione.
+//
+// Prima era una fetch a mano verso la edge function, per poter leggere il
+// corpo JSON anche sulle risposte non-2xx. Con le funzioni `onCall` il
+// problema non si pone: gli esiti previsti (orario appena preso, limite per
+// telefono) tornano come risposta normale con `ok: false`, non come
+// eccezione. Restano eccezioni solo i guasti veri — rete giù, funzione non
+// raggiungibile — che qui diventano un messaggio in italiano.
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+import { chiama } from './firebase';
 
 export type CorpoPrenota = {
   servizio_id: string;
@@ -31,14 +35,13 @@ export type RispostaPrenota =
   | { ok: false; codice: string; errore: string; alternative?: SlotAlternativo[] };
 
 export async function chiamaPrenota(corpo: CorpoPrenota): Promise<RispostaPrenota> {
-  const risposta = await fetch(`${url}/functions/v1/prenota`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${anonKey}`,
-      apikey: anonKey,
-    },
-    body: JSON.stringify(corpo),
-  });
-  return risposta.json();
+  try {
+    return await chiama<CorpoPrenota, RispostaPrenota>('prenota', corpo);
+  } catch {
+    return {
+      ok: false,
+      codice: 'rete',
+      errore: 'Non riesco a parlare col server. Controlla la connessione e riprova.',
+    };
+  }
 }

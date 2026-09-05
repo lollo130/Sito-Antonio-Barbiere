@@ -40,3 +40,18 @@ android/*
 # aggiornamenti a nome tuo. Tienila nel gestore di password e su Drive.
 *.keystore
 *.jks
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+functions/lib
+functions/.env
+
+# La chiave del service account NON va MAI nel repository: chi ce l'ha
+# scrive su tutto il database senza passare dalle regole. Tienila nel
+# gestore di password.
+chiave-servizio.json
+serviceAccount*.json
+*-firebase-adminsdk-*.json

@@ -15,9 +15,9 @@ Documento di specifica per l'implementazione. Lo schema del database è in `sche
 ## 2. Stack
 
 - **Frontend**: React + Vite + TypeScript, Tailwind.
-- **Backend**: Supabase (Postgres + Auth + Edge Functions).
-- **Email**: Resend, chiamato dentro l'edge function.
-- **Hosting**: Netlify, deploy automatico da Git.
+- **Backend**: Firebase (Firestore + Auth + Cloud Functions).
+- **Email**: Resend, chiamato dentro la Cloud Function `prenota`.
+- **Hosting**: Firebase Hosting.
 - **Fuso orario**: `Europe/Rome` ovunque. Timestamp salvati come `timestamptz`.
 
 ---
@@ -30,19 +30,21 @@ Vedi `schema.sql`. Punti da non reinterpretare:
 - Gli operatori si **disattivano** (`attivo = false`), non si cancellano: lo storico deve restare leggibile.
 - Ogni operatore ha **orari propri** (`orari_operatore`), che possono differire da quelli del salone.
 - Prezzi in **centesimi interi**, mai float.
-- Vincolo di esclusione `no_overlap`: impedisce due prenotazioni sovrapposte sullo stesso operatore. Le righe con `forzata = true` sono escluse dal vincolo, così il titolare può inserire a mano un cliente in uno slot pieno.
+- **Fermi degli slot** (collezione `blocchi`): impediscono due prenotazioni sovrapposte sullo stesso operatore. Ogni prenotazione crea, nella stessa transazione, un documento ogni 5 minuti con ID `{operatore_id}_{istante}`; il secondo che ci prova trova l'ID occupato e la transazione salta. A imporlo è Firestore con l'unicità dell'ID, non il codice. Le prenotazioni con `forzata = true` non scrivono fermi, così il titolare può inserire a mano un cliente in uno slot pieno.
+  *Storia*: fino alla migrazione a Firebase lo stesso lavoro lo faceva il vincolo di esclusione Postgres `no_overlap`. Il meccanismo è cambiato, la regola no.
 
 ---
 
-## 4. Sicurezza (RLS)
+## 4. Sicurezza (regole Firestore)
 
-Regola centrale: **il pubblico non legge mai la tabella `prenotazioni`.** Contiene nomi e numeri di telefono.
+Regola centrale: **il pubblico non legge mai la collezione `prenotazioni`.** Contiene nomi e numeri di telefono. Vale anche per `blocchi`: messi in fila raccontano l'agenda.
 
-- `anon` legge in sola lettura solo `operatori`, `servizi`, `operatori_servizi` (righe attive).
-- La disponibilità si ottiene **esclusivamente** dalla funzione `slot_disponibili()`, che restituisce orari liberi e nient'altro.
-- Le scritture su `prenotazioni` passano **solo dall'edge function**, che usa la `service_role` key lato server. Il client non ha permessi di insert.
-- La `service_role` key non compare mai nel bundle frontend. Nel client solo `anon` key e URL.
-- Il pannello admin richiede Supabase Auth + riga in `profili`.
+- Chi non ha fatto l'accesso legge solo `operatori`, `servizi` (righe attive), `operatori_servizi` e `orari_salone`.
+- Le regole **non filtrano le righe** come facevano le RLS: una query pubblica senza `where('attivo','==',true)` non torna meno documenti, viene rifiutata tutta. Per questo le letture pubbliche stanno tutte in `src/lib/db.ts`.
+- La disponibilità si ottiene **esclusivamente** dalle Cloud Functions `agendaGiorno` e `agendaMese`, che restituiscono istanti liberi/occupati e nient'altro.
+- Le scritture su `prenotazioni` passano **solo dalle Cloud Functions**, che usano l'Admin SDK lato server. Nessun client può scrivere, nemmeno l'admin: prenotazione e fermi devono nascere insieme.
+- La chiave del service account non compare mai nel bundle frontend. Nel client solo le `VITE_FIREBASE_*`, che sono pubbliche per progetto e non proteggono niente da sole.
+- Il pannello admin richiede Firebase Auth + riga in `profili`. `profili` non è scrivibile da nessun client: si popola con `scripts/crea-admin.mjs`.
 
 ---
 
@@ -119,14 +121,14 @@ Statistiche, incassi, report, storico clienti, programma fedeltà, pagamenti onl
 
 ---
 
-## 8. Edge function `prenota`
+## 8. Cloud Function `prenota`
 
 Unico punto di scrittura. In ordine, nella stessa invocazione:
 
 1. Valida l'input (nome, telefono con regex, servizio esistente e attivo).
 2. Verifica il limite di una prenotazione attiva per telefono.
 3. **Rilegge la disponibilità** e sceglie/verifica l'operatore. Se lo slot è sparito nel frattempo, risponde con i 3 slot alternativi più vicini.
-4. Inserisce la riga. Se il vincolo `no_overlap` scatta (race condition), gestisce l'errore `23P01` ripetendo il punto 3 anziché restituire un errore generico.
+4. Scrive prenotazione e fermi in una transazione. Se un fermo esiste già (race condition), ripete il punto 3 anziché restituire un errore generico.
 5. Invia le email via Resend:
    - **al titolare**, sempre: servizio, giorno, ora, operatore, nome e **telefono** del cliente;
    - **al cliente**, solo se ha lasciato l'email: conferma con giorno, ora, operatore, indirizzo e numero del salone.

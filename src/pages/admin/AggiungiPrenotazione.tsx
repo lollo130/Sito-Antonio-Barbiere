@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { aggiungiGiorni, dataRomaDi, formattaGiornoEsteso, formattaOra } from '../../lib/data';
-import { supabase } from '../../lib/supabase';
+import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { agendaDelGiorno, type RigaAgenda } from '../../lib/agenda';
+import { aggiungiPrenotazione } from '../../lib/admin';
+import { db } from '../../lib/firebase';
 
 // SPECIFICA.md § 7.2 — "Aggiungi prenotazione a mano". Copre chi prenota per
 // telefono o entra dalla porta. Senza questa schermata il calendario diventa
@@ -9,13 +12,12 @@ import { supabase } from '../../lib/supabase';
 //
 // § 7.4 — Il pannello NON impone i propri vincoli: se il titolare vuole
 // infilare un cliente in uno slot già pieno deve poterlo fare. Si prova
-// l'inserimento normale, e se il vincolo `no_overlap` scatta (23P01) si
-// mostra l'avviso e si offre il salvataggio con `forzata = true`, che il
-// vincolo esclude di proposito.
+// l'inserimento normale, e se lo slot è già fermato la funzione risponde
+// `slot_occupato`: si mostra l'avviso e si offre il salvataggio con
+// `forzata = true`, che i fermi non li scrive affatto.
 
 type Servizio = { id: string; nome: string; durata_minuti: number };
 type Operatore = { id: string; nome: string };
-type RigaAgenda = { inizio: string; libero: boolean; operatore_nome: string | null };
 
 // Stesso vincolo del database, così l'errore arriva prima e in italiano.
 const REGEX_TELEFONO = /^[0-9+ ]{8,20}$/;
@@ -40,18 +42,24 @@ export default function AggiungiPrenotazione() {
   const [salvando, setSalvando] = useState(false);
 
   useEffect(() => {
-    supabase
-      .from('servizi')
-      .select('id, nome, durata_minuti')
-      .eq('attivo', true)
-      .order('ordine')
-      .then(({ data }) => setServizi(data ?? []));
-    supabase
-      .from('operatori')
-      .select('id, nome')
-      .eq('attivo', true)
-      .order('ordine')
-      .then(({ data }) => setOperatori(data ?? []));
+    const attivi = (nome: string) =>
+      query(collection(db, nome), where('attivo', '==', true), orderBy('ordine'));
+
+    getDocs(attivi('servizi'))
+      .then((r) =>
+        setServizi(
+          r.docs.map((d) => ({
+            id: d.id,
+            nome: d.get('nome'),
+            durata_minuti: d.get('durata_minuti'),
+          })),
+        ),
+      )
+      .catch(() => setServizi([]));
+
+    getDocs(attivi('operatori'))
+      .then((r) => setOperatori(r.docs.map((d) => ({ id: d.id, nome: d.get('nome') }))))
+      .catch(() => setOperatori([]));
   }, []);
 
   // Gli orari della giornata dipendono dal servizio (la durata cambia la griglia).
@@ -62,10 +70,12 @@ export default function AggiungiPrenotazione() {
     }
     let attivo = true;
     setOrari(null);
-    supabase
-      .rpc('agenda_giorno', { p_servizio_id: servizioId, p_data: giorno })
-      .then(({ data }) => {
-        if (attivo) setOrari((data as RigaAgenda[]) ?? []);
+    agendaDelGiorno(servizioId, giorno)
+      .then((righe) => {
+        if (attivo) setOrari(righe);
+      })
+      .catch(() => {
+        if (attivo) setOrari([]);
       });
     return () => {
       attivo = false;
@@ -85,29 +95,32 @@ export default function AggiungiPrenotazione() {
     setSalvando(true);
     setErrore(null);
 
-    const fine = new Date(new Date(inizio).getTime() + servizio.durata_minuti * 60000).toISOString();
-
-    const { error } = await supabase.from('prenotazioni').insert({
-      operatore_id: operatoreId,
-      servizio_id: servizio.id,
-      cliente_nome: nome.trim(),
-      cliente_telefono: telefono.trim(),
-      inizio,
-      fine,
-      origine: 'manuale',
-      forzata: forza,
-    });
+    let esito;
+    try {
+      esito = await aggiungiPrenotazione({
+        servizio_id: servizio.id,
+        operatore_id: operatoreId,
+        inizio,
+        cliente_nome: nome.trim(),
+        cliente_telefono: telefono.trim(),
+        forzata: forza,
+      });
+    } catch {
+      setSalvando(false);
+      setErrore('Non sono riuscito a salvare. Riprova.');
+      return;
+    }
 
     setSalvando(false);
 
-    if (error) {
-      // 23P01 = exclusion_violation: c'è già qualcuno su quell'operatore a quell'ora.
-      if (error.code === '23P01') {
+    if (!esito.ok) {
+      // Lo slot è già fermato: si chiede al titolare se forzare.
+      if (esito.codice === 'slot_occupato') {
         setSovrapposta(true);
         setErrore(null);
         return;
       }
-      setErrore('Non sono riuscito a salvare. Riprova.');
+      setErrore(esito.errore);
       return;
     }
 

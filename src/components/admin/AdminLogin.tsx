@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
-import { supabase } from '../../lib/supabase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../lib/firebase';
 
 const classeCampo =
   'min-h-[56px] w-full rounded-2xl border-2 border-bordo px-4 text-lg text-inchiostro focus:border-inchiostro focus:outline-none';
@@ -15,9 +16,13 @@ export default function AdminLogin() {
     e.preventDefault();
     setErrore(null);
     setInviando(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    setInviando(false);
-    if (error) setErrore('Email o password non corretti.');
+    try {
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+    } catch {
+      setErrore('Email o password non corretti.');
+    } finally {
+      setInviando(false);
+    }
   }
 
   return (

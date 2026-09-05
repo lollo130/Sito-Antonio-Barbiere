@@ -2,7 +2,17 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import BottoneToggle from '../../../components/admin/BottoneToggle';
 import { classeCampo, classeEtichetta } from '../../../components/admin/campi';
-import { supabase } from '../../../lib/supabase';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  updateDoc,
+} from 'firebase/firestore';
+import { seFallisce } from '../../../lib/admin';
+import { db } from '../../../lib/firebase';
 
 // SPECIFICA.md § 7.3 — Servizi: nome, durata, prezzo, categoria, attivo.
 // Niente cancellazione: solo attivo/disattivo (uno storico di prenotazioni
@@ -44,14 +54,21 @@ export default function Servizi() {
   const [salvando, setSalvando] = useState(false);
 
   function carica() {
-    supabase
-      .from('servizi')
-      .select('id, nome, durata_minuti, prezzo_cent, categoria, attivo, ordine')
-      .order('ordine')
-      .then(({ data, error }) => {
-        if (error) setErrore('Non riesco a caricare i servizi.');
-        else setServizi(data ?? []);
-      });
+    getDocs(query(collection(db, 'servizi'), orderBy('ordine')))
+      .then((r) =>
+        setServizi(
+          r.docs.map((d) => ({
+            id: d.id,
+            nome: d.get('nome'),
+            durata_minuti: d.get('durata_minuti'),
+            prezzo_cent: d.get('prezzo_cent'),
+            categoria: d.get('categoria'),
+            attivo: d.get('attivo'),
+            ordine: d.get('ordine') ?? 0,
+          })),
+        ),
+      )
+      .catch(() => setErrore('Non riesco a caricare i servizi.'));
   }
 
   useEffect(carica, []);
@@ -86,25 +103,29 @@ export default function Servizi() {
 
     if (editando === 'nuovo') {
       const prossimoOrdine = Math.max(0, ...(servizi ?? []).map((s) => s.ordine)) + 1;
-      const { error } = await supabase.from('servizi').insert({
-        nome: form.nome.trim(),
-        durata_minuti: durata,
-        prezzo_cent: prezzoCent,
-        categoria: form.categoria,
-        ordine: prossimoOrdine,
-      });
-      setSalvando(false);
-      if (error) return setErrore('Non sono riuscito a salvare il servizio.');
-    } else if (editando) {
-      const { error } = await supabase
-        .from('servizi')
-        .update({
+      // `attivo` va scritto sempre: le regole lo pretendono, e senza le
+      // query pubbliche (where attivo == true) non vedrebbero il servizio.
+      const error = await seFallisce(
+        addDoc(collection(db, 'servizi'), {
           nome: form.nome.trim(),
           durata_minuti: durata,
           prezzo_cent: prezzoCent,
           categoria: form.categoria,
-        })
-        .eq('id', editando.id);
+          ordine: prossimoOrdine,
+          attivo: true,
+        }),
+      );
+      setSalvando(false);
+      if (error) return setErrore('Non sono riuscito a salvare il servizio.');
+    } else if (editando) {
+      const error = await seFallisce(
+        updateDoc(doc(db, 'servizi', editando.id), {
+          nome: form.nome.trim(),
+          durata_minuti: durata,
+          prezzo_cent: prezzoCent,
+          categoria: form.categoria,
+        }),
+      );
       setSalvando(false);
       if (error) return setErrore('Non sono riuscito a salvare il servizio.');
     }
@@ -118,7 +139,7 @@ export default function Servizi() {
       ? `Disattivare "${s.nome}"? Non sarà più prenotabile dal sito.`
       : `Riattivare "${s.nome}"?`;
     if (!window.confirm(messaggio)) return;
-    const { error } = await supabase.from('servizi').update({ attivo: !s.attivo }).eq('id', s.id);
+    const error = await seFallisce(updateDoc(doc(db, 'servizi', s.id), { attivo: !s.attivo }));
     if (error) {
       setErrore('Non sono riuscito a salvare la modifica.');
       return;

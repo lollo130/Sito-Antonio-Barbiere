@@ -1,22 +1,48 @@
 # Istruzioni per Claude Code
 
 Progetto: sito + sistema di prenotazioni per un salone di barbiere a Solarino (SR).
-La specifica completa è in `SPECIFICA.md`, lo schema del database in `schema.sql`.
-Leggi entrambi prima di scrivere codice.
+La specifica completa è in `SPECIFICA.md`.
+
+Il backend è **Firebase** (Firestore, Cloud Functions, Firebase Auth, Hosting).
+Il modello dei dati sta in `firestore.rules` e in `functions/src/`; `schema.sql`
+resta come documento di partenza — descrive il vecchio backend Supabase e serve
+solo a capire da dove viene il progetto e a rifare il travaso dei dati.
+Leggi `SPECIFICA.md`, `firestore.rules` e `functions/src/blocchi.ts` prima di
+scrivere codice.
 
 ## Decisioni già prese — non reinterpretare
 
 Queste non sono preferenze, sono vincoli discussi col cliente:
 
-1. **Il vincolo `no_overlap` in Postgres è l'unica vera difesa contro la doppia prenotazione.**
-   Non sostituirlo con un controllo applicativo, non rimuoverlo perché "complica gli insert".
-   Le righe con `forzata = true` ne restano fuori di proposito.
+1. **La difesa contro la doppia prenotazione la fa il database, mai il codice applicativo.**
+   In Postgres era il vincolo `no_overlap` (exclude constraint). Firestore non ha
+   vincoli di esclusione, quindi il ruolo è passato ai **fermi** in `blocchi`:
+   documenti con ID prevedibile `{operatore_id}_{istante}`, uno ogni 5 minuti,
+   creati con `create` dentro la stessa transazione della prenotazione. Se un
+   fermo esiste già la transazione salta per intero.
+   Quello che regge è **l'unicità dell'ID imposta da Firestore**, non un
+   controllo "prima leggo poi scrivo": quello sarebbe una difesa finta.
+   Non sostituirlo con una lettura di controllo, non toglierlo perché
+   "complica le scritture". Le righe con `forzata = true` restano fuori dai
+   fermi, di proposito, come restavano fuori dal vincolo.
+   Il ragionamento per esteso sta in `functions/src/blocchi.ts`.
 
-2. **Il client non ha mai `select` sulla tabella `prenotazioni`.** Contiene nomi e numeri di
-   telefono. La disponibilità pubblica passa solo da `slot_disponibili()`.
+2. **Il client non legge mai la collezione `prenotazioni`.** Contiene nomi e numeri
+   di telefono. La disponibilità pubblica passa solo dalle Cloud Functions
+   `agendaGiorno` e `agendaMese`, che restituiscono istanti liberi/occupati e
+   mai una riga. Stessa cosa per `blocchi`: messi in fila raccontano l'agenda.
+   Attenzione: le regole Firestore **non filtrano le righe** come facevano le
+   RLS. Una query pubblica senza `where('attivo','==',true)` non torna meno
+   documenti, viene rifiutata tutta. Per questo le letture pubbliche stanno in
+   `src/lib/db.ts` e non sparse nelle pagine.
 
-3. **Le scritture su `prenotazioni` passano solo dall'edge function** con `service_role` key
-   lato server. La `service_role` key non deve mai finire nel bundle frontend.
+3. **Le scritture su `prenotazioni` passano solo dalle Cloud Functions**, che usano
+   l'Admin SDK lato server. Le regole vietano la scrittura a chiunque, admin
+   compreso: prenotazione e fermi devono nascere e morire nella stessa
+   transazione (vedi § 1), e una regola non sa guardare altri documenti.
+   La chiave del service account non deve mai finire nel bundle frontend.
+   Le chiavi `VITE_FIREBASE_*` invece sono pubbliche per progetto: nel bundle
+   ci vanno, e non proteggono niente.
 
 4. **La categoria uomo/donna è un attributo del servizio, non dell'operatore.**
    Chi fa cosa sta in `operatori_servizi`.
@@ -49,7 +75,11 @@ Requisiti, non suggerimenti:
 ## Convenzioni tecniche
 
 - React + Vite + TypeScript, Tailwind. Niente librerie UI pesanti.
-- Fuso `Europe/Rome` ovunque. Timestamp come `timestamptz`. Mai date "naive".
+- Firebase SDK modulare (`firebase/firestore`, non i bundle "compat".)
+- Fuso `Europe/Rome` ovunque. Sul database istanti come `Timestamp`, mai
+  stringhe e mai date "naive". Le conversioni da e per l'ora di Roma stanno in
+  `functions/src/roma.ts` e in `src/lib/data.ts`: sono due copie della stessa
+  logica, in due runtime diversi, ed è voluto.
 - Prezzi in centesimi interi, mai float.
 - Nomi di tabelle, colonne, variabili e testi dell'interfaccia **in italiano**
   (il cliente e chi manterrà il codice sono italiani).
@@ -57,9 +87,11 @@ Requisiti, non suggerimenti:
 
 ## Ordine di lavoro suggerito
 
-1. Migration da `schema.sql` + verifica che le RLS blocchino davvero l'accesso anon
-   a `prenotazioni` (provare a leggerla con la anon key: deve fallire).
-2. Edge function `prenota` con la gestione dell'errore `23P01` (race condition).
+1. Regole Firestore + verifica che blocchino davvero l'accesso pubblico a
+   `prenotazioni` (`npm run verifica:regole`: prova a leggerla senza account,
+   deve fallire).
+2. Cloud Function `prenota`, con la gestione della corsa sullo stesso slot
+   (`npm run test:prenota`: cinque richieste insieme, una sola deve passare).
 3. Flusso pubblico di prenotazione, quattro schermate.
 4. Pannello `/admin`, partendo dalla schermata "Oggi".
 5. PWA: manifest, service worker, pagina `/installa`.

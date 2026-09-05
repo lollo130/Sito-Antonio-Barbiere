@@ -3,13 +3,13 @@ import ChiamaSalone from '../components/prenotazione/ChiamaSalone';
 import Intestazione from '../components/layout/Intestazione';
 import Piede from '../components/layout/Piede';
 import { INDIRIZZO_SALONE } from '../lib/salone';
-import { supabase } from '../lib/supabase';
+import { orariSalone, type FasciaSalone } from '../lib/db';
 
 // SPECIFICA.md § 10 — Dove siamo: indirizzo, mappa, orari, chiama,
 // Google Maps e social. Mappa e link social: segnaposto finché non c'è
 // un indirizzo reale (§ 11). Gli orari sono quelli veri in orari_salone.
 
-type Fascia = { giorno: number; ora_inizio: string; ora_fine: string };
+type Fascia = FasciaSalone;
 
 const NOMI_GIORNI = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
 const ORDINE_SETTIMANA = [1, 2, 3, 4, 5, 6, 0];
@@ -18,10 +18,9 @@ export default function DoveSiamo() {
   const [orari, setOrari] = useState<Fascia[] | null>(null);
 
   useEffect(() => {
-    supabase
-      .from('orari_salone')
-      .select('giorno, ora_inizio, ora_fine')
-      .then(({ data }) => setOrari(data ?? []));
+    orariSalone()
+      .then(setOrari)
+      .catch(() => setOrari([]));
   }, []);
 
   return (

@@ -8,12 +8,18 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "verifica:rls": "node --env-file=.env scripts/verifica-rls.mjs",
+    "test:disponibilita": "npm --prefix functions run build && node scripts/test-disponibilita.mjs",
+    "emulatori": "firebase emulators:start",
+    "semina": "node --env-file=.env scripts/semina-firestore.mjs",
+    "crea:admin": "node --env-file=.env scripts/crea-admin.mjs",
+    "migra": "node --env-file=.env scripts/migra-a-firestore.mjs",
+    "verifica:regole": "node --env-file=.env scripts/verifica-regole.mjs",
+    "verifica:agenda": "node --env-file=.env scripts/verifica-agenda-giorno.mjs",
     "test:prenota": "node --env-file=.env scripts/test-prenota.mjs",
-    "verifica:agenda": "node --env-file=.env scripts/verifica-agenda-giorno.mjs"
+    "deploy": "npm run build && firebase deploy"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.112.4",
+    "firebase": "^12.18.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -29,6 +35,7 @@
     "sharp": "^0.35.4",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "firebase-admin": "^13.6.0"
   }
 }

@@ -1,14 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import BottoneScelta from '../../components/prenotazione/BottoneScelta';
-import { supabase } from '../../lib/supabase';
+import { serviziAttivi, type Servizio as ServizioDb } from '../../lib/db';
 
-export type Servizio = {
-  id: string;
-  nome: string;
-  durata_minuti: number;
-  prezzo_cent: number;
-  categoria: 'uomo' | 'donna' | 'entrambi';
-};
+export type Servizio = ServizioDb;
 
 const formattatorePrezzo = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' });
 
@@ -23,17 +17,12 @@ export default function Passo1Servizio({ onScelto }: Props) {
 
   useEffect(() => {
     let attivo = true;
-    supabase
-      .from('servizi')
-      .select('id, nome, durata_minuti, prezzo_cent, categoria')
-      .order('ordine')
-      .then(({ data, error }) => {
-        if (!attivo) return;
-        if (error) {
-          setErrore('Non riesco a caricare i servizi. Riprova tra poco.');
-          return;
-        }
-        setServizi(data ?? []);
+    serviziAttivi()
+      .then((righe) => {
+        if (attivo) setServizi(righe);
+      })
+      .catch(() => {
+        if (attivo) setErrore('Non riesco a caricare i servizi. Riprova tra poco.');
       });
     return () => {
       attivo = false;

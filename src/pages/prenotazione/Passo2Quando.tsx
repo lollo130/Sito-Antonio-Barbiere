@@ -14,7 +14,7 @@ import {
   meseSuccessivo,
   type AnnoMese,
 } from '../../lib/data';
-import { supabase } from '../../lib/supabase';
+import { agendaDelGiorno, agendaDelMese, type RigaAgenda, type RigaGiorno } from '../../lib/agenda';
 import type { Servizio } from './Passo1Servizio';
 
 // Calendario mensile pubblico (SPECIFICA.md § 5): un mese alla volta a
@@ -26,30 +26,8 @@ import type { Servizio } from './Passo1Servizio';
 // in alto a sinistra, fascia in fondo. La settimana comincia di lunedì come
 // da specifica, non di domenica.
 
-type RigaGiorno = { giorno: string; libero: boolean };
-type RigaAgenda = { inizio: string; libero: boolean; operatore_nome: string | null };
-
 const FINESTRA_MASSIMA_GIORNI = 60;
 const NOMI_GIORNI = ['LUN', 'MAR', 'MER', 'GIO', 'VEN', 'SAB', 'DOM'];
-
-async function agendaDelMese(servizioId: string, { anno, mese }: AnnoMese): Promise<RigaGiorno[]> {
-  const { data, error } = await supabase.rpc('agenda_mese', {
-    p_servizio_id: servizioId,
-    p_anno: anno,
-    p_mese: mese,
-  });
-  if (error) throw new Error(error.message);
-  return (data as RigaGiorno[]) ?? [];
-}
-
-async function agendaDelGiorno(servizioId: string, dataStr: string): Promise<RigaAgenda[]> {
-  const { data, error } = await supabase.rpc('agenda_giorno', {
-    p_servizio_id: servizioId,
-    p_data: dataStr,
-  });
-  if (error) throw new Error(error.message);
-  return (data as RigaAgenda[]) ?? [];
-}
 
 type Props = {
   servizio: Servizio;

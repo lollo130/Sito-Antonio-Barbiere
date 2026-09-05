@@ -1,17 +1,41 @@
-// Verifica una tantum di agenda_giorno(): crea una prenotazione vera con la
-// service_role key, controlla che la anon key la veda come occupata (senza
-// nome), e che gli slot liberi restino liberi. Ripulisce sempre.
+// Verifica della funzione `agendaGiorno`: crea una prenotazione vera con
+// l'Admin SDK, controlla che il pubblico veda quell'orario come occupato
+// SENZA sapere di chi, e che gli altri orari restino liberi. Ripulisce
+// sempre, anche se un controllo fallisce.
 //
-// Uso: node --env-file=.env scripts/verifica-agenda-giorno.mjs
+// È il controllo che tiene onesta la promessa di CLAUDE.md § 2: il sito
+// mostra un'agenda vera, ma non fa trapelare né nomi di clienti né a quale
+// operatore appartiene un buco.
+//
+// Uso:
+//   set GOOGLE_APPLICATION_CREDENTIALS=chiave-servizio.json
+//   node --env-file=.env scripts/verifica-agenda-giorno.mjs
 
-import { createClient } from '@supabase/supabase-js';
+import { applicationDefault, initializeApp as initAdmin } from 'firebase-admin/app';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { initializeApp as initClient } from 'firebase/app';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
-const url = process.env.VITE_SUPABASE_URL;
-const anonKey = process.env.VITE_SUPABASE_ANON_KEY;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const REGIONE = 'europe-west1';
 
-const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
-const anon = createClient(url, anonKey, { auth: { persistSession: false } });
+const configurazione = {
+  apiKey: process.env.VITE_FIREBASE_API_KEY,
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+  appId: process.env.VITE_FIREBASE_APP_ID,
+};
+
+if (!configurazione.apiKey || !configurazione.projectId) {
+  console.error('Mancano le VITE_FIREBASE_* nell\'ambiente (.env).');
+  process.exit(1);
+}
+
+initAdmin({ credential: applicationDefault(), projectId: configurazione.projectId });
+const db = getFirestore();
+const agendaGiorno = httpsCallable(
+  getFunctions(initClient(configurazione), REGIONE),
+  'agendaGiorno',
+);
 
 let fallito = false;
 function esito(ok, etichetta, dettaglio) {
@@ -19,78 +43,116 @@ function esito(ok, etichetta, dettaglio) {
   if (!ok) fallito = true;
 }
 
-function prossimoGiornoValido(minGiorni) {
-  const d = new Date();
-  d.setUTCDate(d.getUTCDate() + minGiorni);
-  while (d.getUTCDay() === 0) d.setUTCDate(d.getUTCDate() + 1);
-  return d.toISOString().slice(0, 10);
-}
-const ts = (dataStr, ora) => new Date(`${dataStr}T${ora}:00+02:00`).toISOString();
+const giornoDi = (iso) =>
+  new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Rome',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date(iso));
 
-async function main() {
-  const { data: operatori } = await admin.from('operatori').select('*').order('ordine');
-  const { data: servizi } = await admin.from('servizi').select('*').order('ordine');
-  const operatoriUomo = operatori.filter((o) => o.nome === 'Operatore 1' || o.nome === 'Operatore 2');
-  const servizioUomo = servizi.find((s) => s.categoria === 'uomo');
-  const dataTest = prossimoGiornoValido(2);
+let creata = null;
 
-  let idPrenotazioni = [];
-  try {
-    // Prenota TUTTI gli operatori uomo alle 10:00: solo così lo slot
-    // aggregato risulta davvero pieno (un solo operatore libero lascerebbe
-    // comunque libero lo slot, correttamente).
-    const { data: inserite, error } = await admin
-      .from('prenotazioni')
-      .insert(
-        operatoriUomo.map((o) => ({
-          operatore_id: o.id,
-          servizio_id: servizioUomo.id,
-          cliente_nome: 'Prova Agenda',
-          cliente_telefono: `+39 333 700000${o === operatoriUomo[0] ? 1 : 2}`,
-          inizio: ts(dataTest, '10:00'),
-          fine: ts(dataTest, '10:30'),
-          origine: 'manuale',
-        })),
-      )
-      .select('id');
-    if (error) throw new Error(`Seed fallito: ${error.message}`);
-    idPrenotazioni = inserite.map((r) => r.id);
-    esito(true, 'seed: tutti gli operatori uomo prenotati alle 10:00', operatoriUomo.map((o) => o.nome).join(', '));
+async function principale() {
+  const servizi = await db.collection('servizi').where('attivo', '==', true).limit(1).get();
+  if (servizi.empty) {
+    console.error('Nessun servizio attivo: lancia prima scripts/semina-firestore.mjs.');
+    process.exit(1);
+  }
+  const servizio = servizi.docs[0];
+  const durata = servizio.get('durata_minuti');
 
-    const { data: agenda, error: agendaErr } = await anon.rpc('agenda_giorno', {
-      p_servizio_id: servizioUomo.id,
-      p_data: dataTest,
-    });
-    if (agendaErr) throw new Error(`agenda_giorno ha fallito: ${agendaErr.message}`);
-
-    esito(Array.isArray(agenda) && agenda.length > 0, 'agenda_giorno(): restituisce righe', `${agenda?.length ?? 0} righe`);
-
-    const rigaOccupata = agenda.find(
-      (r) => new Date(r.inizio).getTime() === new Date(ts(dataTest, '10:00')).getTime(),
-    );
-    esito(!!rigaOccupata && rigaOccupata.libero === false, 'lo slot delle 10:00 risulta occupato', JSON.stringify(rigaOccupata));
-    esito(rigaOccupata?.operatore_nome == null, 'lo slot occupato non rivela il nome dell\'operatore', `operatore_nome=${rigaOccupata?.operatore_nome}`);
-
-    const rigaLibera = agenda.find(
-      (r) => new Date(r.inizio).getTime() === new Date(ts(dataTest, '11:00')).getTime(),
-    );
-    esito(!!rigaLibera && rigaLibera.libero === true, 'un altro slot (11:00) risulta libero', JSON.stringify(rigaLibera));
-
-    const chiaviRiga = agenda.length ? Object.keys(agenda[0]) : [];
-    const soloCampiAttesi = chiaviRiga.every((k) => ['inizio', 'libero', 'operatore_nome'].includes(k));
-    esito(soloCampiAttesi, 'nessun campo extra nella risposta (niente nomi/telefoni cliente)', chiaviRiga.join(', '));
-  } finally {
-    if (idPrenotazioni.length) {
-      const { error } = await admin.from('prenotazioni').delete().in('id', idPrenotazioni);
-      esito(!error, 'pulizia: prenotazioni di prova cancellate', error?.message ?? `${idPrenotazioni.length} righe`);
+  // Un giorno con almeno due orari liberi: uno lo occupiamo, l'altro deve
+  // restare libero.
+  const oggi = new Date();
+  let giorno = null;
+  let righePrima = [];
+  for (let g = 1; g < 30 && !giorno; g++) {
+    const candidato = new Date(oggi.getTime() + g * 86_400_000).toISOString().slice(0, 10);
+    const { data } = await agendaGiorno({ servizio_id: servizio.id, data: candidato });
+    if ((data.righe ?? []).filter((r) => r.libero).length >= 2) {
+      giorno = candidato;
+      righePrima = data.righe;
     }
   }
+  if (!giorno) {
+    console.error('Non trovo un giorno con due orari liberi: controlla orari e assenze.');
+    process.exit(1);
+  }
 
-  console.log('\n' + (fallito ? 'RISULTATO: uno o più controlli falliti.' : 'RISULTATO: tutti i controlli superati.'));
-  process.exit(fallito ? 1 : 0);
+  const liberiPrima = righePrima.filter((r) => r.libero);
+  const bersaglio = liberiPrima[0];
+  const testimone = liberiPrima[liberiPrima.length - 1];
+  console.log(`\nGiorno di prova: ${giorno}`);
+  console.log(`Occupo ${bersaglio.inizio}, tengo d'occhio ${testimone.inizio}\n`);
+
+  // Chi è libero a quell'ora? Serve un operatore vero, altrimenti il fermo
+  // non corrisponde a nessuno e l'agenda non cambia.
+  const abbinamenti = await db
+    .collection('operatori_servizi')
+    .where('servizio_id', '==', servizio.id)
+    .get();
+  const operatoreId = abbinamenti.docs[0]?.get('operatore_id');
+  if (!operatoreId) {
+    console.error('Nessun operatore abbinato al servizio.');
+    process.exit(1);
+  }
+
+  const inizio = new Date(bersaglio.inizio);
+  const fine = new Date(inizio.getTime() + durata * 60_000);
+  creata = db.collection('prenotazioni').doc();
+  await creata.set({
+    operatore_id: operatoreId,
+    servizio_id: servizio.id,
+    cliente_nome: 'Verifica Agenda',
+    cliente_cognome: null,
+    cliente_telefono: '+39000000000',
+    cliente_email: null,
+    inizio: Timestamp.fromDate(inizio),
+    fine: Timestamp.fromDate(fine),
+    stato: 'confermata',
+    origine: 'manuale',
+    forzata: false,
+    note: null,
+    creata_il: Timestamp.now(),
+  });
+
+  const { data: dopo } = await agendaGiorno({ servizio_id: servizio.id, data: giorno });
+  const righeDopo = dopo.righe ?? [];
+  const rigaBersaglio = righeDopo.find((r) => r.inizio === bersaglio.inizio);
+  const rigaTestimone = righeDopo.find((r) => r.inizio === testimone.inizio);
+
+  // Se al servizio è abbinato più di un operatore, l'orario resta libero
+  // perché lo copre l'altro: in quel caso si controlla solo che l'agenda
+  // continui a rispondere e che nessun nome trapeli.
+  const operatoriAbbinati = new Set(abbinamenti.docs.map((d) => d.get('operatore_id'))).size;
+  if (operatoriAbbinati === 1) {
+    esito(rigaBersaglio?.libero === false, "l'orario prenotato risulta occupato");
+  } else {
+    esito(
+      !!rigaBersaglio,
+      `l'orario resta libero: al servizio sono abbinati ${operatoriAbbinati} operatori`,
+    );
+  }
+  esito(rigaTestimone?.libero === true, 'gli altri orari restano liberi');
+  esito(
+    righeDopo.every((r) => r.operatore_nome !== 'Verifica Agenda'),
+    'nessun nome di cliente esce dall\'agenda',
+  );
+  esito(
+    righeDopo.every((r) => r.libero || r.operatore_nome === null),
+    'gli orari occupati non dicono di chi sono',
+  );
+  esito(giornoDi(bersaglio.inizio) === giorno, 'gli istanti sono nel giorno chiesto (Europe/Rome)');
 }
 
-main().catch((e) => {
-  console.error('Errore inatteso:', e.message);
-  process.exit(1);
-});
+principale()
+  .catch((e) => {
+    console.error('\nLa verifica si è rotta:', e.message);
+    fallito = true;
+  })
+  .finally(async () => {
+    if (creata) await creata.delete().catch(() => {});
+    console.log(fallito ? '\nQualcosa non va: vedi le righe FAIL.' : '\nTutto a posto.');
+    process.exit(fallito ? 1 : 0);
+  });

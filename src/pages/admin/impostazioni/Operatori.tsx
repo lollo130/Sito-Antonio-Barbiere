@@ -3,7 +3,27 @@ import { Link } from 'react-router-dom';
 import EditorOrariSettimanali, { type Fascia } from '../../../components/admin/EditorOrariSettimanali';
 import { classeCampo, classeEtichetta } from '../../../components/admin/campi';
 import { formattaGiornoEsteso, formattaOra, dataRomaDi } from '../../../lib/data';
-import { supabase } from '../../../lib/supabase';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  setDoc,
+  Timestamp,
+  updateDoc,
+  where,
+} from 'firebase/firestore';
+import { seFallisce } from '../../../lib/admin';
+import { db } from '../../../lib/firebase';
+
+// L'abbinamento operatore↔servizio ha un ID prevedibile invece che
+// automatico: così "chi fa cosa" non può finire scritto due volte, e
+// toglierlo è una cancellazione secca senza doverlo prima cercare.
+const idAbbinamento = (operatoreId: string, servizioId: string) =>
+  `${operatoreId}_${servizioId}`;
 
 // SPECIFICA.md § 7.3 — Operatori: aggiungi, disattiva (mai cancella),
 // servizi che sa fare, orari settimanali. Se disattivo un operatore con
@@ -20,14 +40,18 @@ export default function Operatori() {
   const [nomeNuovo, setNomeNuovo] = useState('');
 
   function caricaOperatori() {
-    supabase
-      .from('operatori')
-      .select('id, nome, attivo, ordine')
-      .order('ordine')
-      .then(({ data, error }) => {
-        if (error) setErrore('Non riesco a caricare gli operatori.');
-        else setOperatori(data ?? []);
-      });
+    getDocs(query(collection(db, 'operatori'), orderBy('ordine')))
+      .then((r) =>
+        setOperatori(
+          r.docs.map((d) => ({
+            id: d.id,
+            nome: d.get('nome'),
+            attivo: d.get('attivo'),
+            ordine: d.get('ordine') ?? 0,
+          })),
+        ),
+      )
+      .catch(() => setErrore('Non riesco a caricare gli operatori.'));
   }
 
   useEffect(caricaOperatori, []);
@@ -38,7 +62,15 @@ export default function Operatori() {
       return;
     }
     const prossimoOrdine = Math.max(0, ...(operatori ?? []).map((o) => o.ordine)) + 1;
-    const { error } = await supabase.from('operatori').insert({ nome: nomeNuovo.trim(), ordine: prossimoOrdine });
+    const error = await seFallisce(
+      addDoc(collection(db, 'operatori'), {
+        nome: nomeNuovo.trim(),
+        ordine: prossimoOrdine,
+        colore: '#888888',
+        attivo: true,
+        creato_il: Timestamp.now(),
+      }),
+    );
     if (error) {
       setErrore('Non sono riuscito ad aggiungere l\'operatore.');
       return;
@@ -118,31 +150,39 @@ function DettaglioOperatore({ operatore, onIndietro }: { operatore: Operatore; o
   const [fasce, setFasce] = useState<Fascia[]>([]);
 
   useEffect(() => {
-    supabase
-      .from('servizi')
-      .select('id, nome')
-      .order('ordine')
-      .then(({ data }) => setServizi(data ?? []));
+    getDocs(query(collection(db, 'servizi'), orderBy('ordine')))
+      .then((r) => setServizi(r.docs.map((d) => ({ id: d.id, nome: d.get('nome') }))))
+      .catch(() => setServizi([]));
 
-    supabase
-      .from('operatori_servizi')
-      .select('servizio_id')
-      .eq('operatore_id', operatore.id)
-      .then(({ data }) => setServiziAssegnati(new Set((data ?? []).map((r) => r.servizio_id))));
+    getDocs(
+      query(collection(db, 'operatori_servizi'), where('operatore_id', '==', operatore.id)),
+    )
+      .then((r) => setServiziAssegnati(new Set(r.docs.map((d) => d.get('servizio_id') as string))))
+      .catch(() => setServiziAssegnati(new Set()));
 
-    supabase
-      .from('orari_operatore')
-      .select('id, giorno, ora_inizio, ora_fine')
-      .eq('operatore_id', operatore.id)
-      .then(({ data }) => setFasce(data ?? []));
+    getDocs(query(collection(db, 'orari_operatore'), where('operatore_id', '==', operatore.id)))
+      .then((r) =>
+        setFasce(
+          r.docs.map((d) => ({
+            id: d.id,
+            giorno: d.get('giorno'),
+            ora_inizio: d.get('ora_inizio'),
+            ora_fine: d.get('ora_fine'),
+          })),
+        ),
+      )
+      .catch(() => setFasce([]));
   }, [operatore.id]);
 
   async function toggleServizio(servizioId: string) {
     const assegnato = serviziAssegnati.has(servizioId);
+    const riferimento = doc(db, 'operatori_servizi', idAbbinamento(operatore.id, servizioId));
     if (assegnato) {
-      await supabase.from('operatori_servizi').delete().match({ operatore_id: operatore.id, servizio_id: servizioId });
+      await seFallisce(deleteDoc(riferimento));
     } else {
-      await supabase.from('operatori_servizi').insert({ operatore_id: operatore.id, servizio_id: servizioId });
+      await seFallisce(
+        setDoc(riferimento, { operatore_id: operatore.id, servizio_id: servizioId }),
+      );
     }
     setServiziAssegnati((s) => {
       const nuovo = new Set(s);
@@ -153,21 +193,28 @@ function DettaglioOperatore({ operatore, onIndietro }: { operatore: Operatore; o
   }
 
   async function aggiungiFascia(giorno: number, oraInizio: string, oraFine: string) {
-    const { data, error } = await supabase
-      .from('orari_operatore')
-      .insert({ operatore_id: operatore.id, giorno, ora_inizio: oraInizio, ora_fine: oraFine })
-      .select('id, giorno, ora_inizio, ora_fine')
-      .single();
-    if (!error && data) setFasce((f) => [...f, data]);
+    try {
+      const creata = await addDoc(collection(db, 'orari_operatore'), {
+        operatore_id: operatore.id,
+        giorno,
+        ora_inizio: oraInizio,
+        ora_fine: oraFine,
+      });
+      setFasce((f) => [...f, { id: creata.id, giorno, ora_inizio: oraInizio, ora_fine: oraFine }]);
+    } catch {
+      setErrore('Non sono riuscito a salvare la fascia oraria.');
+    }
   }
 
   async function rimuoviFascia(id: string) {
-    const { error } = await supabase.from('orari_operatore').delete().eq('id', id);
+    const error = await seFallisce(deleteDoc(doc(db, 'orari_operatore', id)));
     if (!error) setFasce((f) => f.filter((x) => x.id !== id));
   }
 
   async function salvaAttivo(nuovoAttivo: boolean) {
-    const { error } = await supabase.from('operatori').update({ attivo: nuovoAttivo }).eq('id', operatore.id);
+    const error = await seFallisce(
+      updateDoc(doc(db, 'operatori', operatore.id), { attivo: nuovoAttivo }),
+    );
     if (error) {
       setErrore('Non sono riuscito a salvare la modifica.');
       return;
@@ -178,21 +225,33 @@ function DettaglioOperatore({ operatore, onIndietro }: { operatore: Operatore; o
 
   async function disattiva() {
     setErrore(null);
-    const { data, error } = await supabase
-      .from('prenotazioni')
-      .select('id, inizio, cliente_nome, cliente_cognome')
-      .eq('operatore_id', operatore.id)
-      .eq('stato', 'confermata')
-      .gt('inizio', new Date().toISOString())
-      .order('inizio');
-
-    if (error) {
+    let future: PrenotazioneFutura[];
+    try {
+      const righe = await getDocs(
+        query(
+          collection(db, 'prenotazioni'),
+          where('operatore_id', '==', operatore.id),
+          where('inizio', '>', Timestamp.now()),
+          orderBy('inizio'),
+        ),
+      );
+      // Lo stato si filtra qui: metterlo nella query costringerebbe a un
+      // altro indice composito per una manciata di documenti.
+      future = righe.docs
+        .filter((d) => d.get('stato') === 'confermata')
+        .map((d) => ({
+          id: d.id,
+          inizio: (d.get('inizio') as Timestamp).toDate().toISOString(),
+          cliente_nome: d.get('cliente_nome'),
+          cliente_cognome: d.get('cliente_cognome') ?? null,
+        }));
+    } catch {
       setErrore('Non riesco a controllare le prenotazioni future.');
       return;
     }
 
-    if (data && data.length > 0) {
-      setPrenotazioniFuture(data);
+    if (future.length > 0) {
+      setPrenotazioniFuture(future);
       return;
     }
 

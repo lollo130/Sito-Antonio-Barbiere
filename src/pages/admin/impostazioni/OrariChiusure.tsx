@@ -3,7 +3,18 @@ import { Link } from 'react-router-dom';
 import EditorOrariSettimanali, { type Fascia } from '../../../components/admin/EditorOrariSettimanali';
 import { classeCampo, classeEtichetta } from '../../../components/admin/campi';
 import { formattaGiornoEsteso, dataRomaDi } from '../../../lib/data';
-import { supabase } from '../../../lib/supabase';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  Timestamp,
+} from 'firebase/firestore';
+import { seFallisce } from '../../../lib/admin';
+import { db } from '../../../lib/firebase';
 
 // SPECIFICA.md § 7.3 — Orari salone e chiusure.
 // Nota: orari_salone è informativo, non tocca la disponibilità delle
@@ -22,21 +33,33 @@ export default function OrariChiusure() {
   const [motivo, setMotivo] = useState('');
 
   function caricaOrari() {
-    supabase
-      .from('orari_salone')
-      .select('id, giorno, ora_inizio, ora_fine')
-      .then(({ data }) => setFasce(data ?? []));
+    getDocs(query(collection(db, 'orari_salone'), orderBy('giorno')))
+      .then((r) =>
+        setFasce(
+          r.docs.map((d) => ({
+            id: d.id,
+            giorno: d.get('giorno'),
+            ora_inizio: d.get('ora_inizio'),
+            ora_fine: d.get('ora_fine'),
+          })),
+        ),
+      )
+      .catch(() => setFasce([]));
   }
 
   function caricaChiusure() {
-    supabase
-      .from('chiusure_salone')
-      .select('id, inizio, fine, motivo')
-      .order('inizio')
-      .then(({ data, error }) => {
-        if (error) setErrore('Non riesco a caricare le chiusure.');
-        else setChiusure(data ?? []);
-      });
+    getDocs(query(collection(db, 'chiusure_salone'), orderBy('inizio')))
+      .then((r) =>
+        setChiusure(
+          r.docs.map((d) => ({
+            id: d.id,
+            inizio: (d.get('inizio') as Timestamp).toDate().toISOString(),
+            fine: (d.get('fine') as Timestamp).toDate().toISOString(),
+            motivo: d.get('motivo') ?? null,
+          })),
+        ),
+      )
+      .catch(() => setErrore('Non riesco a caricare le chiusure.'));
   }
 
   useEffect(() => {
@@ -45,16 +68,20 @@ export default function OrariChiusure() {
   }, []);
 
   async function aggiungiFascia(giorno: number, oraInizio: string, oraFine: string) {
-    const { data, error } = await supabase
-      .from('orari_salone')
-      .insert({ giorno, ora_inizio: oraInizio, ora_fine: oraFine })
-      .select('id, giorno, ora_inizio, ora_fine')
-      .single();
-    if (!error && data) setFasce((f) => [...f, data]);
+    try {
+      const creata = await addDoc(collection(db, 'orari_salone'), {
+        giorno,
+        ora_inizio: oraInizio,
+        ora_fine: oraFine,
+      });
+      setFasce((f) => [...f, { id: creata.id, giorno, ora_inizio: oraInizio, ora_fine: oraFine }]);
+    } catch {
+      setErrore('Non sono riuscito a salvare la fascia oraria.');
+    }
   }
 
   async function rimuoviFascia(id: string) {
-    const { error } = await supabase.from('orari_salone').delete().eq('id', id);
+    const error = await seFallisce(deleteDoc(doc(db, 'orari_salone', id)));
     if (!error) setFasce((f) => f.filter((x) => x.id !== id));
   }
 
@@ -68,11 +95,13 @@ export default function OrariChiusure() {
       return;
     }
     setErrore(null);
-    const inizio = new Date(`${dataInizio}T00:00:00`).toISOString();
-    const fine = new Date(`${dataFine}T23:59:59`).toISOString();
-    const { error } = await supabase
-      .from('chiusure_salone')
-      .insert({ inizio, fine, motivo: motivo.trim() || null });
+    const error = await seFallisce(
+      addDoc(collection(db, 'chiusure_salone'), {
+        inizio: Timestamp.fromDate(new Date(`${dataInizio}T00:00:00`)),
+        fine: Timestamp.fromDate(new Date(`${dataFine}T23:59:59`)),
+        motivo: motivo.trim() || null,
+      }),
+    );
     if (error) {
       setErrore('Non sono riuscito a salvare la chiusura.');
       return;
@@ -86,7 +115,7 @@ export default function OrariChiusure() {
   async function rimuoviChiusura(c: Chiusura) {
     const etichetta = c.motivo || `dal ${formattaGiornoEsteso(dataRomaDi(c.inizio))}`;
     if (!window.confirm(`Rimuovere la chiusura "${etichetta}"?`)) return;
-    const { error } = await supabase.from('chiusure_salone').delete().eq('id', c.id);
+    const error = await seFallisce(deleteDoc(doc(db, 'chiusure_salone', c.id)));
     if (error) {
       setErrore('Non sono riuscito a rimuovere la chiusura.');
       return;

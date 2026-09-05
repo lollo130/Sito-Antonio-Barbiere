@@ -5,7 +5,7 @@
 
 // Alzare questo numero a ogni modifica del guscio: al primo caricamento
 // successivo le cache vecchie vengono cancellate (vedi 'activate').
-const CACHE = 'salone-v2';
+const CACHE = 'salone-v3';
 
 // manifest.json NON sta qui di proposito. Serviva dalla cache, e chi aveva
 // già visitato il sito continuava a ricevere il manifest vecchio: installava
@@ -30,9 +30,18 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
 
-  // Mai intercettare le API: dati sempre freschi.
+  // Mai intercettare le API: dati sempre freschi. Una disponibilità servita
+  // dalla cache mostra orari liberi che liberi non sono.
+  const API = [
+    'firestore.googleapis.com',      // lettura del catalogo
+    'cloudfunctions.net',            // prenota, agendaGiorno, agendaMese
+    'run.app',                       // stesse funzioni, dominio di 2ª generazione
+    'identitytoolkit.googleapis.com', // accesso al pannello
+    'securetoken.googleapis.com',    // rinnovo del token admin
+    'firebaseinstallations.googleapis.com',
+  ];
   if (
-    url.hostname.includes('supabase.co') ||
+    API.some((dominio) => url.hostname.endsWith(dominio)) ||
     url.pathname.startsWith('/api/') ||
     e.request.method !== 'GET'
   ) {

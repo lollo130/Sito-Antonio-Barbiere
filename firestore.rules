@@ -1,0 +1,178 @@
+rules_version = '2';
+
+// =====================================================================
+// SALONE — REGOLE FIRESTORE
+//
+// Traduzione delle RLS Postgres (schema.sql § 9). Due differenze di
+// meccanica che vanno capite, non sono dettagli:
+//
+//  1. Le RLS filtravano le righe da sole: chiedevi `select * from servizi`
+//     e Postgres ti restituiva solo le attive. Firestore NON filtra: o la
+//     query dimostra da sé di stare dentro la regola, o viene rifiutata
+//     tutta. Perciò il client pubblico DEVE scrivere sempre
+//     where('attivo','==',true). Se lo dimentica non vede meno righe:
+//     riceve "permission-denied".
+//
+//  2. In Postgres i CHECK valevano per chiunque scrivesse. Qui i vincoli
+//     di forma stanno qui sotto, perché il pannello admin scrive sul
+//     database direttamente dal browser.
+//
+// Le prenotazioni non sono leggibili né scrivibili da nessun client:
+// contengono nomi e numeri di telefono (CLAUDE.md § 2). Le Cloud Functions
+// usano l'Admin SDK, che passa sopra a queste regole: è l'unico punto da
+// cui si scrive su `prenotazioni` (CLAUDE.md § 3).
+// =====================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function autenticato() {
+      return request.auth != null;
+    }
+
+    // Equivalente di is_admin(): esiste una riga in `profili` col mio uid.
+    function admin() {
+      return autenticato()
+        && exists(/databases/$(database)/documents/profili/$(request.auth.uid));
+    }
+
+    function nuovo() {
+      return request.resource.data;
+    }
+
+    function stringaPiena(campo, minimo, massimo) {
+      return campo is string
+        && campo.trim().size() >= minimo
+        && campo.trim().size() <= massimo;
+    }
+
+    // "HH:MM" in 24 ore.
+    function oraValida(v) {
+      return v is string && v.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$');
+    }
+
+    // -----------------------------------------------------------------
+    // CATALOGO PUBBLICO
+    // -----------------------------------------------------------------
+
+    match /operatori/{id} {
+      allow read: if resource.data.attivo == true || admin();
+      allow create, update: if admin()
+        && stringaPiena(nuovo().nome, 1, 60)
+        && nuovo().colore is string
+        && nuovo().ordine is int
+        && nuovo().attivo is bool;
+      // Gli operatori si disattivano, non si cancellano (CLAUDE.md § 5).
+      allow delete: if false;
+    }
+
+    match /servizi/{id} {
+      allow read: if resource.data.attivo == true || admin();
+      allow create, update: if admin()
+        && stringaPiena(nuovo().nome, 1, 80)
+        && nuovo().durata_minuti is int
+        && nuovo().durata_minuti > 0
+        && nuovo().durata_minuti % 5 == 0
+        && nuovo().prezzo_cent is int
+        && nuovo().prezzo_cent >= 0
+        && nuovo().categoria in ['uomo', 'donna', 'entrambi']
+        && nuovo().ordine is int
+        && nuovo().attivo is bool;
+      allow delete: if false;
+    }
+
+    // Chi fa cosa. Il genere è del servizio, non dell'operatore
+    // (CLAUDE.md § 4): qui c'è solo l'abbinamento.
+    match /operatori_servizi/{id} {
+      allow read: if true;
+      allow create: if admin()
+        && nuovo().operatore_id is string
+        && nuovo().servizio_id is string;
+      allow update: if false;
+      allow delete: if admin();
+    }
+
+    // Informativi, nessun dato personale: pubblici come in Postgres.
+    match /orari_salone/{id} {
+      allow read: if true;
+      allow create, update: if admin()
+        && nuovo().giorno is int
+        && nuovo().giorno >= 0 && nuovo().giorno <= 6
+        && oraValida(nuovo().ora_inizio)
+        && oraValida(nuovo().ora_fine)
+        && nuovo().ora_fine > nuovo().ora_inizio;
+      allow delete: if admin();
+    }
+
+    // -----------------------------------------------------------------
+    // DATI DI SERVIZIO — mai pubblici. La disponibilità del sito passa
+    // solo dalle Cloud Functions `agendaGiorno` / `agendaMese`.
+    // -----------------------------------------------------------------
+
+    match /orari_operatore/{id} {
+      allow read: if admin();
+      allow create, update: if admin()
+        && nuovo().operatore_id is string
+        && nuovo().giorno is int
+        && nuovo().giorno >= 0 && nuovo().giorno <= 6
+        && oraValida(nuovo().ora_inizio)
+        && oraValida(nuovo().ora_fine)
+        && nuovo().ora_fine > nuovo().ora_inizio;
+      allow delete: if admin();
+    }
+
+    match /assenze/{id} {
+      allow read: if admin();
+      allow create, update: if admin()
+        && nuovo().operatore_id is string
+        && nuovo().inizio is timestamp
+        && nuovo().fine is timestamp
+        && nuovo().fine > nuovo().inizio;
+      allow delete: if admin();
+    }
+
+    match /chiusure_salone/{id} {
+      allow read: if admin();
+      allow create, update: if admin()
+        && nuovo().inizio is timestamp
+        && nuovo().fine is timestamp
+        && nuovo().fine > nuovo().inizio;
+      allow delete: if admin();
+    }
+
+    // -----------------------------------------------------------------
+    // PRENOTAZIONI — nomi e numeri di telefono.
+    //
+    // Lettura: solo il pannello. Scrittura: NESSUNO, nemmeno l'admin.
+    // Ogni scrittura passa dalle Cloud Functions, perché insieme alla
+    // prenotazione va scritto in modo atomico il fermo dello slot
+    // (collezione `blocchi`): è quello che tiene il posto della vecchia
+    // exclude constraint di Postgres, e una regola non sa guardare altri
+    // documenti in modo transazionale.
+    // -----------------------------------------------------------------
+    match /prenotazioni/{id} {
+      allow read: if admin();
+      allow write: if false;
+    }
+
+    // I fermi degli slot. Nessun client li tocca né li legge: dicono
+    // quando un operatore è occupato, e messi in fila raccontano l'agenda.
+    match /blocchi/{id} {
+      allow read, write: if false;
+    }
+
+    // -----------------------------------------------------------------
+    // PROFILI ADMIN — si leggono solo da soli, si scrivono solo dalla
+    // console Firebase o da uno script con l'Admin SDK.
+    // -----------------------------------------------------------------
+    match /profili/{uid} {
+      allow read: if autenticato() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Tutto il resto è chiuso.
+    match /{documento=**} {
+      allow read, write: if false;
+    }
+  }
+}

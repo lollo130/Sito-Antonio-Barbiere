@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 import BottoneScelta from '../../components/prenotazione/BottoneScelta';
-import { supabase } from '../../lib/supabase';
+import { operatoriPerServizio, type Operatore } from '../../lib/db';
 import type { Servizio } from './Passo1Servizio';
 
 // SPECIFICA.md § 5, passo 3: facoltativo, si salta da solo se c'è un solo
 // operatore abilitato al servizio scelto.
-
-type Operatore = { id: string; nome: string; ordine: number };
 
 type Props = {
   servizio: Servizio;
@@ -20,19 +18,12 @@ export default function Passo3Operatore({ servizio, onScelto, onIndietro }: Prop
 
   useEffect(() => {
     let attivo = true;
-    supabase
-      .from('operatori')
-      .select('id, nome, ordine, operatori_servizi!inner(servizio_id)')
-      .eq('attivo', true)
-      .eq('operatori_servizi.servizio_id', servizio.id)
-      .order('ordine')
-      .then(({ data, error }) => {
-        if (!attivo) return;
-        if (error) {
-          setErrore('Non riesco a controllare gli operatori. Riprova tra poco.');
-          return;
-        }
-        setOperatori((data ?? []) as Operatore[]);
+    operatoriPerServizio(servizio.id)
+      .then((righe) => {
+        if (attivo) setOperatori(righe);
+      })
+      .catch(() => {
+        if (attivo) setErrore('Non riesco a controllare gli operatori. Riprova tra poco.');
       });
     return () => {
       attivo = false;

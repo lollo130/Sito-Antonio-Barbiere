@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import type { Session } from '@supabase/supabase-js';
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import AdminLogin from '../components/admin/AdminLogin';
-import { supabase } from '../lib/supabase';
+import { auth, db } from '../lib/firebase';
 import AggiungiPrenotazione from './admin/AggiungiPrenotazione';
 import Oggi from './admin/Oggi';
 import Assenze from './admin/impostazioni/Assenze';
@@ -11,39 +12,37 @@ import Operatori from './admin/impostazioni/Operatori';
 import OrariChiusure from './admin/impostazioni/OrariChiusure';
 import Servizi from './admin/impostazioni/Servizi';
 
-// SPECIFICA.md § 7: richiede Supabase Auth + riga in `profili`.
+// SPECIFICA.md § 7: richiede Firebase Auth + riga in `profili`.
 export default function Admin() {
-  const [sessione, setSessione] = useState<Session | null | undefined>(undefined);
+  const [utente, setUtente] = useState<User | null | undefined>(undefined);
   const [autorizzato, setAutorizzato] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSessione(data.session));
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_evento, s) => setSessione(s));
-    return () => subscription.unsubscribe();
-  }, []);
+  // onAuthStateChanged scatta subito con la sessione ricordata, poi a ogni
+  // entrata e uscita. Restituisce la funzione per smettere di ascoltare.
+  useEffect(() => onAuthStateChanged(auth, setUtente), []);
 
+  // L'equivalente di is_admin(): esiste una riga in `profili` col mio uid.
+  // Le regole lasciano leggere solo il proprio documento, quindi un account
+  // senza profilo riceve un errore: vale come "non autorizzato".
   useEffect(() => {
-    if (!sessione) {
+    if (!utente) {
       setAutorizzato(null);
       return;
     }
     let attivo = true;
-    supabase
-      .from('profili')
-      .select('id')
-      .eq('id', sessione.user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (attivo) setAutorizzato(!!data);
+    getDoc(doc(db, 'profili', utente.uid))
+      .then((d) => {
+        if (attivo) setAutorizzato(d.exists());
+      })
+      .catch(() => {
+        if (attivo) setAutorizzato(false);
       });
     return () => {
       attivo = false;
     };
-  }, [sessione]);
+  }, [utente]);
 
-  if (sessione === undefined || (sessione && autorizzato === null)) {
+  if (utente === undefined || (utente && autorizzato === null)) {
     return (
       <main className="mx-auto flex min-h-svh max-w-md items-center justify-center px-5">
         <p className="text-lg text-grigio">Un attimo…</p>
@@ -51,7 +50,7 @@ export default function Admin() {
     );
   }
 
-  if (!sessione) {
+  if (!utente) {
     return <AdminLogin />;
   }
 
@@ -64,7 +63,7 @@ export default function Admin() {
         </p>
         <button
           type="button"
-          onClick={() => supabase.auth.signOut()}
+          onClick={() => signOut(auth)}
           className="text-lg font-semibold text-grigio underline"
         >
           Esci

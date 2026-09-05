@@ -11,7 +11,16 @@ import {
   giorniDelMese,
   giornoSettimanaLunediPrimo,
 } from '../../lib/data';
-import { supabase } from '../../lib/supabase';
+import {
+  collection,
+  getDocs,
+  orderBy,
+  query,
+  Timestamp,
+  where,
+} from 'firebase/firestore';
+import { cambiaStatoPrenotazione } from '../../lib/admin';
+import { db } from '../../lib/firebase';
 
 // SPECIFICA.md § 7.1 — l'agenda del titolare.
 //
@@ -36,6 +45,9 @@ type Prenotazione = {
 
 type Operatore = { id: string; nome: string };
 
+/** Nomi di servizi e operatori, al posto della join di Postgres. */
+type Nomi = { servizi: Map<string, string>; operatori: Map<string, string> };
+
 const ETICHETTA_STATO: Record<Stato, string> = {
   confermata: '',
   completata: 'Fatto',
@@ -59,6 +71,7 @@ export default function Oggi() {
   const [filtroOperatore, setFiltroOperatore] = useState<string | null>(null);
   const [prenotazioni, setPrenotazioni] = useState<Prenotazione[] | null>(null);
   const [errore, setErrore] = useState<string | null>(null);
+  const [nomi, setNomi] = useState<Nomi | null>(null);
 
   // I giorni che la vista corrente deve coprire.
   const giorniVisti = useMemo(() => {
@@ -74,12 +87,33 @@ export default function Oggi() {
   const primoGiorno = giorniVisti[0];
   const ultimoGiorno = giorniVisti[giorniVisti.length - 1];
 
+  // Il pannello legge anche gli operatori disattivati: servono a capire di
+  // chi erano le prenotazioni vecchie.
   useEffect(() => {
-    supabase
-      .from('operatori')
-      .select('id, nome')
-      .order('ordine')
-      .then(({ data }) => setOperatori(data ?? []));
+    getDocs(query(collection(db, 'operatori'), orderBy('ordine')))
+      .then((r) => setOperatori(r.docs.map((d) => ({ id: d.id, nome: d.get('nome') }))))
+      .catch(() => setOperatori([]));
+  }, []);
+
+  // Nomi di servizi e operatori, per rimpiazzare la join che faceva Postgres.
+  // Sono due elenchi corti e non cambiano mentre si sfoglia l'agenda: si
+  // leggono una volta.
+  useEffect(() => {
+    let attivo = true;
+    Promise.all([getDocs(collection(db, 'servizi')), getDocs(collection(db, 'operatori'))])
+      .then(([servizi, operatori]) => {
+        if (!attivo) return;
+        setNomi({
+          servizi: new Map(servizi.docs.map((d) => [d.id, d.get('nome') as string])),
+          operatori: new Map(operatori.docs.map((d) => [d.id, d.get('nome') as string])),
+        });
+      })
+      .catch(() => {
+        if (attivo) setNomi({ servizi: new Map(), operatori: new Map() });
+      });
+    return () => {
+      attivo = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -87,36 +121,54 @@ export default function Oggi() {
     setPrenotazioni(null);
     setErrore(null);
 
+    if (!nomi) return;
+
     const { inizio } = confiniGiornoRoma(primoGiorno);
     const { fine } = confiniGiornoRoma(ultimoGiorno);
 
-    let query = supabase
-      .from('prenotazioni')
-      .select(
-        'id, inizio, cliente_nome, cliente_cognome, cliente_telefono, stato, servizi(nome), operatori(nome)',
-      )
-      .gte('inizio', inizio)
-      .lt('inizio', fine)
-      .order('inizio');
-    if (filtroOperatore) query = query.eq('operatore_id', filtroOperatore);
+    const vincoli = [
+      where('inizio', '>=', Timestamp.fromDate(new Date(inizio))),
+      where('inizio', '<', Timestamp.fromDate(new Date(fine))),
+      ...(filtroOperatore ? [where('operatore_id', '==', filtroOperatore)] : []),
+      orderBy('inizio'),
+    ];
 
-    query.then(({ data, error }) => {
-      if (!attivo) return;
-      if (error) {
-        setErrore('Non riesco a caricare le prenotazioni. Riprova tra poco.');
-        return;
-      }
-      setPrenotazioni((data ?? []) as unknown as Prenotazione[]);
-    });
+    getDocs(query(collection(db, 'prenotazioni'), ...vincoli))
+      .then((r) => {
+        if (!attivo) return;
+        setPrenotazioni(
+          r.docs.map((d) => ({
+            id: d.id,
+            inizio: (d.get('inizio') as Timestamp).toDate().toISOString(),
+            cliente_nome: d.get('cliente_nome'),
+            cliente_cognome: d.get('cliente_cognome') ?? null,
+            cliente_telefono: d.get('cliente_telefono'),
+            stato: d.get('stato'),
+            servizi: { nome: nomi.servizi.get(d.get('servizio_id')) ?? '—' },
+            operatori: { nome: nomi.operatori.get(d.get('operatore_id')) ?? '—' },
+          })),
+        );
+      })
+      .catch(() => {
+        if (attivo) setErrore('Non riesco a caricare le prenotazioni. Riprova tra poco.');
+      });
 
     return () => {
       attivo = false;
     };
-  }, [primoGiorno, ultimoGiorno, filtroOperatore]);
+  }, [primoGiorno, ultimoGiorno, filtroOperatore, nomi]);
 
+  // Lo stato passa dalla Cloud Function: cambiarlo vuol dire anche liberare
+  // o riprendere i fermi dello slot, e quella è roba da transazione.
   async function aggiornaStato(id: string, stato: Stato) {
-    const { error } = await supabase.from('prenotazioni').update({ stato }).eq('id', id);
-    if (error) {
+    setErrore(null);
+    try {
+      const esito = await cambiaStatoPrenotazione(id, stato);
+      if (!esito.ok) {
+        setErrore(esito.errore);
+        return;
+      }
+    } catch {
       setErrore('Non sono riuscito a salvare la modifica. Riprova.');
       return;
     }
