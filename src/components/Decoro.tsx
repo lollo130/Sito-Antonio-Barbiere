@@ -85,7 +85,14 @@ type Foglia = {
   fuori: number;
   /** di quanto scivola lungo il lato, in percentuale della fascia */
   scorre: number;
-  /** quanto scende (o sale) rispetto all'angolo, sempre in percentuale */
+  /**
+   * Di quanto la foglia rientra verso il centro della fascia.
+   *
+   * SEMPRE POSITIVO: si somma a `fuori` col segno opposto, quindi un valore
+   * negativo non "varia" la posizione, la spinge ancora piu' fuori. Con
+   * `scende: -5` una foglia data al 42% usciva in realta' al 57%, e di lei
+   * restava dentro il solo picciolo.
+   */
   scende: number;
   specchia?: boolean;
   /** le foglie di contorno: sul telefono coprirebbero il testo */
@@ -111,6 +118,10 @@ type Foglia = {
  * togliere l'aria di griglia, e piega la foglia verso il centro della
  * fascia: da sinistra si inclina a destra, da destra a sinistra.
  *
+ * QUANTO esce conta quanto il verso. Oltre il 45% di `fuori` resta fuori la
+ * lamina e dentro il solo picciolo: si vede un bastoncino che entra dal
+ * bordo, che e' persino peggio della foglia girata al contrario.
+ *
  * Due foglie per ciuffo, non quattro: una principale e una di
  * accompagnamento piu' piccola, che sul telefono sparisce. Con quattro
  * diventava un cespuglio e non si capiva piu' niente.
@@ -118,40 +129,40 @@ type Foglia = {
 const CIUFFI = {
   // Palma dominante e una foglia piu' piccola accanto. Angoli BASSI.
   palmeto: [
-    { disegno: 'palma', misura: 'grande', ruota: 9, fuori: 46, scorre: 0, scende: 4 },
+    { disegno: 'palma', misura: 'grande', ruota: 9, fuori: 30, scorre: 0, scende: 4 },
     {
       disegno: 'foglia-lancia',
       misura: 'piccola',
       ruota: -13,
-      fuori: 62,
-      scorre: 13,
-      scende: -3,
+      fuori: 40,
+      scorre: 10,
+      scende: 4,
       soloDaTablet: true,
     },
   ],
   // Foglie che pendono dall'alto: picciolo in su', fuori dalla fascia.
   // Angoli ALTI.
   pendente: [
-    { disegno: 'foglia-larga', misura: 'grande', ruota: 172, fuori: 44, scorre: 0, scende: 3 },
+    { disegno: 'foglia-larga', misura: 'grande', ruota: 172, fuori: 30, scorre: 0, scende: 3 },
     {
       disegno: 'foglia-sottile',
       misura: 'piccola',
       ruota: 193,
-      fuori: 60,
-      scorre: 14,
-      scende: -4,
+      fuori: 42,
+      scorre: 11,
+      scende: 5,
       soloDaTablet: true,
     },
   ],
   // Monstera e una palma dietro. Angoli BASSI.
   sottobosco: [
-    { disegno: 'monstera-incisa', misura: 'grande', ruota: -7, fuori: 42, scorre: 0, scende: 0 },
+    { disegno: 'monstera-incisa', misura: 'grande', ruota: -7, fuori: 28, scorre: 0, scende: 2 },
     {
       disegno: 'palma',
       misura: 'piccola',
       ruota: 16,
-      fuori: 64,
-      scorre: 15,
+      fuori: 42,
+      scorre: 12,
       scende: 6,
       specchia: true,
       soloDaTablet: true,
@@ -159,27 +170,27 @@ const CIUFFI = {
   ],
   // Due foglie sottili: per le fasce basse, dove non c'e' spazio.
   rado: [
-    { disegno: 'foglia-lancia', misura: 'media', ruota: 11, fuori: 50, scorre: 0, scende: 2 },
+    { disegno: 'foglia-lancia', misura: 'media', ruota: 11, fuori: 32, scorre: 0, scende: 2 },
     {
       disegno: 'foglia-sottile',
       misura: 'piccola',
       ruota: -15,
-      fuori: 66,
-      scorre: 16,
-      scende: -5,
+      fuori: 44,
+      scorre: 12,
+      scende: 5,
       soloDaTablet: true,
     },
   ],
   // Come "rado" ma capovolto, per gli angoli ALTI.
   radoAlto: [
-    { disegno: 'foglia-sottile', misura: 'media', ruota: 187, fuori: 50, scorre: 0, scende: 2 },
+    { disegno: 'foglia-sottile', misura: 'media', ruota: 187, fuori: 32, scorre: 0, scende: 2 },
     {
       disegno: 'foglia-lancia',
       misura: 'piccola',
       ruota: 166,
-      fuori: 66,
-      scorre: 16,
-      scende: -5,
+      fuori: 44,
+      scorre: 12,
+      scende: 5,
       soloDaTablet: true,
     },
   ],
