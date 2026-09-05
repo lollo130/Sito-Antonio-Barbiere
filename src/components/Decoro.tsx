@@ -6,12 +6,14 @@
 // di misure diverse, ruotate storte, che si accavallano invece di stare
 // ciascuna al suo posto.
 //
-// Quindi l'unità non è più la foglia singola ma il CIUFFO: tre o quattro
-// foglie attorno a uno stesso angolo, ognuna con la sua misura, la sua
-// inclinazione e la sua distanza dal bordo. Il disordine è scritto a mano
-// una volta e resta sempre quello — non è casuale a ogni caricamento,
-// altrimenti la pagina ballerebbe a ogni visita e non si potrebbe più
-// correggere un ciuffo venuto male.
+// Quindi l'unità non è la foglia singola ma il CIUFFO: due foglie attorno a
+// uno stesso angolo, una principale e una di accompagnamento. Il disordine
+// è scritto a mano una volta e resta sempre quello — non è casuale a ogni
+// caricamento, altrimenti la pagina ballerebbe a ogni visita e non si
+// potrebbe più correggere un ciuffo venuto male.
+//
+// Ma è un disordine con un vincolo preciso: vedi la regola del picciolo,
+// sotto. Le rotazioni non sono libere.
 //
 // Come è fatto un ciuffo:
 //
@@ -91,33 +93,95 @@ type Foglia = {
 };
 
 /**
- * I ciuffi. Ognuno è pensato per un angolo preciso e ha il suo carattere,
- * così due fasce vicine non si somigliano.
+ * I ciuffi.
+ *
+ * LA REGOLA CHE COMANDA TUTTO: una pianta entra dal PICCIOLO, mai dalla
+ * punta della foglia. In natura il gambo viene da fuori — dal vaso, dal
+ * terreno, dal ramo — e la foglia si apre verso l'interno. Una foglia che
+ * entra di punta col picciolo nascosto non sembra una pianta che sconfina:
+ * sembra un ritaglio appiccicato al bordo.
+ *
+ * In tutti e cinque i disegni il picciolo sta in BASSO. Quindi la
+ * rotazione non e' libera:
+ *   - angolo in basso  -> vicino a 0°   (picciolo in giu', fuori dalla
+ *                          fascia; la foglia si apre verso l'alto)
+ *   - angolo in alto   -> vicino a 180° (picciolo in su', fuori; la foglia
+ *                          pende verso il basso)
+ * Lo scarto e' al massimo una ventina di gradi, quel tanto che basta a
+ * togliere l'aria di griglia, e piega la foglia verso il centro della
+ * fascia: da sinistra si inclina a destra, da destra a sinistra.
+ *
+ * Due foglie per ciuffo, non quattro: una principale e una di
+ * accompagnamento piu' piccola, che sul telefono sparisce. Con quattro
+ * diventava un cespuglio e non si capiva piu' niente.
  */
 const CIUFFI = {
-  // Palma dominante e due foglie che le crescono attorno.
+  // Palma dominante e una foglia piu' piccola accanto. Angoli BASSI.
   palmeto: [
-    { disegno: 'palma', misura: 'grande', ruota: -12, fuori: 48, scorre: 0, scende: 6 },
-    { disegno: 'foglia-lancia', misura: 'media', ruota: 24, fuori: 60, scorre: 16, scende: -4, soloDaTablet: true },
-    { disegno: 'foglia-sottile', misura: 'piccola', ruota: -46, fuori: 72, scorre: 26, scende: 12, soloDaTablet: true },
+    { disegno: 'palma', misura: 'grande', ruota: 9, fuori: 46, scorre: 0, scende: 4 },
+    {
+      disegno: 'foglia-lancia',
+      misura: 'piccola',
+      ruota: -13,
+      fuori: 62,
+      scorre: 13,
+      scende: -3,
+      soloDaTablet: true,
+    },
   ],
-  // Foglie larghe che pendono, per gli angoli alti.
+  // Foglie che pendono dall'alto: picciolo in su', fuori dalla fascia.
+  // Angoli ALTI.
   pendente: [
-    { disegno: 'foglia-larga', misura: 'grande', ruota: 168, fuori: 46, scorre: 0, scende: 4 },
-    { disegno: 'monstera-incisa', misura: 'media', ruota: 205, fuori: 58, scorre: 15, scende: -6, soloDaTablet: true },
-    { disegno: 'foglia-sottile', misura: 'piccola', ruota: 145, fuori: 66, scorre: 28, scende: 10, soloDaTablet: true },
+    { disegno: 'foglia-larga', misura: 'grande', ruota: 172, fuori: 44, scorre: 0, scende: 3 },
+    {
+      disegno: 'foglia-sottile',
+      misura: 'piccola',
+      ruota: 193,
+      fuori: 60,
+      scorre: 14,
+      scende: -4,
+      soloDaTablet: true,
+    },
   ],
-  // Monstera grande e sottobosco: fitto, per le fasce alte.
+  // Monstera e una palma dietro. Angoli BASSI.
   sottobosco: [
-    { disegno: 'monstera-incisa', misura: 'grande', ruota: 14, fuori: 44, scorre: 0, scende: 0 },
-    { disegno: 'foglia-larga', misura: 'media', ruota: -28, fuori: 62, scorre: 18, scende: 14, specchia: true, soloDaTablet: true },
-    { disegno: 'palma', misura: 'piccola', ruota: 40, fuori: 74, scorre: 30, scende: -8, soloDaTablet: true },
-    { disegno: 'foglia-sottile', misura: 'minuta', ruota: -8, fuori: 80, scorre: 12, scende: 22, soloDaTablet: true },
+    { disegno: 'monstera-incisa', misura: 'grande', ruota: -7, fuori: 42, scorre: 0, scende: 0 },
+    {
+      disegno: 'palma',
+      misura: 'piccola',
+      ruota: 16,
+      fuori: 64,
+      scorre: 15,
+      scende: 6,
+      specchia: true,
+      soloDaTablet: true,
+    },
   ],
-  // Leggero: due foglie sottili, per le fasce basse dove non c'è spazio.
+  // Due foglie sottili: per le fasce basse, dove non c'e' spazio.
   rado: [
-    { disegno: 'foglia-lancia', misura: 'media', ruota: 18, fuori: 50, scorre: 0, scende: 4 },
-    { disegno: 'foglia-sottile', misura: 'piccola', ruota: -30, fuori: 64, scorre: 20, scende: -6, soloDaTablet: true },
+    { disegno: 'foglia-lancia', misura: 'media', ruota: 11, fuori: 50, scorre: 0, scende: 2 },
+    {
+      disegno: 'foglia-sottile',
+      misura: 'piccola',
+      ruota: -15,
+      fuori: 66,
+      scorre: 16,
+      scende: -5,
+      soloDaTablet: true,
+    },
+  ],
+  // Come "rado" ma capovolto, per gli angoli ALTI.
+  radoAlto: [
+    { disegno: 'foglia-sottile', misura: 'media', ruota: 187, fuori: 50, scorre: 0, scende: 2 },
+    {
+      disegno: 'foglia-lancia',
+      misura: 'piccola',
+      ruota: 166,
+      fuori: 66,
+      scorre: 16,
+      scende: -5,
+      soloDaTablet: true,
+    },
   ],
 } satisfies Record<string, Foglia[]>;
 

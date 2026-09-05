@@ -115,7 +115,6 @@ export default function Home() {
         {/* SERVIZI — fascia pietra con schede chiare, due colonne da tablet
             in su, così su schermo grande lo spazio è occupato davvero. */}
         <section className="relative overflow-hidden bg-pieno px-3 py-12 sm:px-5 sm:py-20">
-          <Decoro ciuffo="pendente" angolo="alto-sinistra" />
           <Decoro ciuffo="sottobosco" angolo="basso-destra" />
           <div className="relative mx-auto max-w-4xl">
             <CorniceVintage>
@@ -199,7 +198,6 @@ export default function Home() {
         {/* DOVE SIAMO — verde chiaro, l'ultima fascia prima del piede. */}
         <section className="relative overflow-hidden bg-verde-chiaro px-3 py-12 sm:px-5 sm:py-16">
           <Decoro ciuffo="palmeto" angolo="basso-sinistra" />
-          <Decoro ciuffo="rado" angolo="basso-destra" />
           <div className="relative mx-auto max-w-4xl">
             <CorniceVintage contenuto="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
