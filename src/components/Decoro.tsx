@@ -20,9 +20,14 @@
 //    ritaglio in mezzo al colore;
 //  - il tratto si dissolve prima di arrivare al centro della fascia, così
 //    non litiga mai col testo;
-//  - una fascia sola, una foglia sola. Sulla pagina ce ne sono quattro in
-//    tutto: prima erano undici elementi decorativi e il listino finiva
-//    dentro un cespuglio.
+//  - due per fascia, in angoli opposti, e la seconda sparisce sul telefono.
+//    Su schermo grande c'è spazio e la pagina vuole essere popolata; su un
+//    telefono le stesse due si accavallerebbero sul testo.
+//
+// Il fogliame può permettersi di essere abbondante perché il contenuto sta
+// dentro una cornice: è la cornice a tenere il testo al sicuro, non la
+// timidezza delle foglie. Quando le decorazioni galleggiavano libere sulla
+// pagina bastava molto meno per fare confusione.
 //
 // Sono SVG, non fotografie: pesano 20-34 kB compressi e restano nitide a
 // qualunque misura, su qualunque schermo. È il motivo per cui la vecchia
@@ -55,6 +60,23 @@ const RAPPORTO: Record<Disegno, string> = {
   palma: 'aspect-[1584/2041]',
 };
 
+/**
+ * Le misure sono in vw, non in rem.
+ *
+ * Con una misura fissa la stessa foglia era un dettaglio su un monitor da
+ * 2000 px e mezza pagina su un portatile da 800: 36 rem sono il 32% della
+ * fascia nel primo caso e l'81% nel secondo. In vw la proporzione resta
+ * quella voluta su qualunque schermo.
+ *
+ * Sul telefono la frazione e' molto piu' grande perche' lo schermo e'
+ * stretto: al 30% di 375 px una foglia non si vedrebbe.
+ */
+const MISURA: Record<'grande' | 'media' | 'piccola', string> = {
+  grande: 'w-[78vw] md:w-[38vw]',
+  media: 'w-[66vw] md:w-[31vw]',
+  piccola: 'w-[54vw] md:w-[25vw]',
+};
+
 // Aggancio all'angolo e spinta fuori del 35% su tutt'e due gli assi.
 const POSIZIONE: Record<Angolo, string> = {
   'alto-sinistra': 'top-0 left-0 -translate-x-[35%] -translate-y-[35%]',
@@ -74,7 +96,7 @@ const MASCHERA: Record<Angolo, string> = {
 export default function Decoro({
   disegno,
   angolo,
-  larghezza = 'w-[18rem] md:w-[28rem]',
+  misura = 'media',
   specchia = false,
   ruota = false,
   suScuro = false,
@@ -82,8 +104,8 @@ export default function Decoro({
 }: {
   disegno: Disegno;
   angolo: Angolo;
-  /** classi Tailwind di larghezza, così ogni fascia può avere la sua scala */
-  larghezza?: string;
+  /** quanto è grande rispetto alla larghezza dello schermo */
+  misura?: 'grande' | 'media' | 'piccola';
   /** ribalta in orizzontale, per far "guardare" il disegno verso l'interno */
   specchia?: boolean;
   /** capovolge il disegno: serve alle foglie dritte in un angolo alto */
@@ -105,7 +127,7 @@ export default function Decoro({
         alt=""
         loading="lazy"
         decoding="async"
-        className={`absolute max-w-none select-none ${larghezza} ${RAPPORTO[disegno]} ${
+        className={`absolute max-w-none select-none ${MISURA[misura]} ${RAPPORTO[disegno]} ${
           POSIZIONE[angolo]
         } ${specchia ? '-scale-x-100' : ''} ${ruota ? 'rotate-180' : ''}`}
       />
