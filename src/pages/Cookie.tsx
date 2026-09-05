@@ -1,7 +1,14 @@
 import Intestazione from '../components/layout/Intestazione';
 import Piede from '../components/layout/Piede';
 import { CATEGORIE_IN_USO, apriPreferenze } from '../lib/consenso';
-import { EMAIL_SALONE, NOME_SALONE } from '../lib/salone';
+import {
+  AGGIORNAMENTO_INFORMATIVA,
+  EMAIL_SALONE,
+  INDIRIZZO_SALONE,
+  NOME_SALONE,
+  PARTITA_IVA,
+  RAGIONE_SOCIALE,
+} from '../lib/salone';
 
 // Informativa cookie, separata dalla privacy policy come chiedono le
 // Linee guida del Garante del 10 giugno 2021.
@@ -14,6 +21,10 @@ export default function Cookie() {
         <h1 className="font-titolo text-3xl font-bold uppercase text-inchiostro">
           Informativa sui cookie
         </h1>
+
+        <p className="mt-3 text-base text-grigio">
+          Ultimo aggiornamento: {AGGIORNAMENTO_INFORMATIVA}
+        </p>
 
         <p className="font-lettura mt-5 text-lg leading-relaxed text-grigio">
           Questo sito usa pochissime cose e le diciamo in chiaro. Non c'è pubblicità, non c'è
@@ -39,6 +50,10 @@ export default function Cookie() {
               [
                 'Scelta sui cookie',
                 'Se scegli cosa accettare, ci ricordiamo la tua scelta per non richiedertela ogni volta.',
+              ],
+              [
+                'I tuoi dati per prenotare',
+                "Nome, cognome e numero restano dentro questo dispositivo per non farteli riscrivere ogni volta. Non partono da qui se non quando prenoti davvero. Puoi cancellarli quando vuoi dalla pagina Privacy.",
               ],
             ]}
           />
@@ -85,8 +100,8 @@ export default function Cookie() {
 
         <Sezione titolo="Chi tratta i dati">
           <p>
-            Il titolare del trattamento è {NOME_SALONE}, [RAGIONE SOCIALE], con sede a Solarino (SR),
-            P. IVA [NUMERO]. Per qualsiasi richiesta puoi scrivere a{' '}
+            Il titolare del trattamento è {RAGIONE_SOCIALE} ({NOME_SALONE}), {INDIRIZZO_SALONE},
+            P. IVA {PARTITA_IVA}. Per qualsiasi richiesta puoi scrivere a{' '}
             <a href={`mailto:${EMAIL_SALONE}`} className="font-bold text-marrone underline">
               {EMAIL_SALONE}
             </a>{' '}

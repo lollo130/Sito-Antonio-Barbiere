@@ -3,6 +3,8 @@ import { apriPreferenze } from '../../lib/consenso';
 import {
   CAP_CITTA_SALONE,
   NOME_SALONE,
+  PARTITA_IVA,
+  RAGIONE_SOCIALE,
   SOTTOTITOLO_SALONE,
   TELEFONO_SALONE,
   TELEFONO_SALONE_TEL,
@@ -33,7 +35,7 @@ export default function Piede() {
         {/* Dati identificativi obbligatori per legge (D.Lgs. 70/2003):
             segnaposto finché non arrivano ragione sociale e P. IVA. */}
         <p className="text-sm leading-relaxed text-bordo">
-          [RAGIONE SOCIALE] · P. IVA [NUMERO]
+          {RAGIONE_SOCIALE} · P. IVA {PARTITA_IVA}
         </p>
         {/* Licenza Freepik gratuita: l'attribuzione all'autore è obbligatoria.
             Se il download è stato fatto con un abbonamento Premium si può
