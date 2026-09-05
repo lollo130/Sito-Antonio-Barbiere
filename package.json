@@ -15,6 +15,7 @@
     "migra": "node --env-file=.env scripts/migra-a-firestore.mjs",
     "verifica:regole": "node --env-file=.env scripts/verifica-regole.mjs",
     "verifica:agenda": "node --env-file=.env scripts/verifica-agenda-giorno.mjs",
+    "prova:pulizia": "npm --prefix functions run build && node --env-file=.env scripts/prova-pulizia.mjs",
     "test:prenota": "node --env-file=.env scripts/test-prenota.mjs",
     "deploy": "npm run build && firebase deploy"
   },

@@ -16,6 +16,7 @@ import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { setGlobalOptions } from 'firebase-functions/v2';
 import { HttpsError, onCall, type CallableRequest } from 'firebase-functions/v2/https';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 import {
   agendaDaProposte,
   caricaContesto,
@@ -36,6 +37,7 @@ import {
   giorniDelMese,
   istanteRoma,
 } from './roma';
+import { cancellaPrenotazioniScadute, MESI_CONSERVAZIONE } from './pulizia';
 import { cambiaStato, creaPrenotazione, type Stato } from './scrivi';
 
 initializeApp();
@@ -397,3 +399,30 @@ export const adminCambiaStato = onCall(async (richiesta) => {
   }
   return { ok: true as const };
 });
+
+// =====================================================================
+// MANUTENZIONE — la promessa dell'informativa, mantenuta dal codice
+// =====================================================================
+
+/**
+ * Cancella prenotazioni e fermi piu' vecchi del termine di conservazione.
+ *
+ * L'informativa privacy dice che le prenotazioni restano in archivio per
+ * un tempo preciso e poi spariscono. Senza questa funzione quella riga
+ * sarebbe una dichiarazione a vuoto: i nomi e i numeri di telefono
+ * resterebbero li' per sempre.
+ *
+ * Gira il primo del mese alle 4 del mattino, ora di Roma: il salone e'
+ * chiuso e nessuno sta prenotando.
+ */
+export const pulisciArchivio = onSchedule(
+  { schedule: '0 4 1 * *', timeZone: 'Europe/Rome' },
+  async () => {
+    const esito = await cancellaPrenotazioniScadute(db);
+    console.log(
+      `[pulizia] termine ${MESI_CONSERVAZIONE} mesi (prima del ${esito.soglia}): ` +
+        `cancellate ${esito.prenotazioniCancellate} prenotazioni e ${esito.fermiCancellati} fermi` +
+        (esito.altreDaFare ? ' — raggiunto il tetto, il resto al giro dopo' : ''),
+    );
+  },
+);
