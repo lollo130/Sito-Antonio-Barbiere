@@ -160,24 +160,6 @@ a:active {
   }
 }
 
-/* Cornice a tutta fascia sul verde scuro: il disegno è già invertito, la
-   fusione "screen" fa restare solo il tratto chiaro.
-
-   "cover" e non "fill": deformare un disegno di foglie si vede subito, le
-   nervature si allungano e il fogliame sembra storto. Sull'apertura del
-   telefono, alta e stretta, lo stiramento arrivava a tre volte. Con "cover"
-   il disegno resta in proporzione e semmai si perde qualcosa ai lati. */
-.cornice {
-  object-fit: cover;
-  mix-blend-mode: screen;
-  opacity: 0.4;
-}
-@media (max-width: 767px) {
-  .cornice {
-    opacity: 0.3;
-  }
-}
-
 /* Cornice vintage intorno al contenuto di una fascia.
    Filetto grosso fuori, filetto sottile dentro, un rombo a ogni angolo: è la
    cornice delle insegne smaltate e dei listini di tipografia. Disegnata col
