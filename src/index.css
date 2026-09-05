@@ -108,30 +108,38 @@ a:active {
   box-shadow: 0 3px 8px rgba(78, 52, 28, 0.14);
 }
 
-/* Decorazioni botaniche. Il fondo bianco dei disegni sparisce con "multiply";
-   sulle fasce scure serve invece il disegno invertito fuso in "screen".
-   Tenute molto indietro: non devono mai competere col testo.
+/* Le foglie incise.
+   Il disegno è tratto verde scuro su fondo quasi bianco. Su una fascia
+   chiara il bianco sparisce con "multiply" e resta il tratto: nessun
+   filtro, il verde è già quello giusto.
 
    Fusione, opacità e maschera stanno sul contenitore che copre tutta la
-   fascia, non sul disegno. Così la sfumatura è misurata sulla fascia e non
-   sul disegno: parte piena all'angolo e finisce a zero prima del centro,
-   qualunque misura abbia la pianta. Una maschera crea un contesto di
-   composizione a sé, quindi il "multiply" deve stare sullo stesso elemento
-   della maschera: sul figlio si fonderebbe col nulla invece che col colore
+   fascia, non sul disegno. Così la sfumatura è misurata sulla fascia:
+   parte piena all'angolo e finisce a zero prima del centro, qualunque
+   misura abbia la foglia. Una maschera crea un contesto di composizione a
+   sé, quindi il "multiply" deve stare sullo stesso elemento della
+   maschera: sul figlio si fonderebbe col nulla invece che col colore
    della fascia. */
 .decoro {
   mix-blend-mode: multiply;
-  opacity: 0.34;
+  opacity: 0.2;
   -webkit-mask-image: var(--sfuma);
   mask-image: var(--sfuma);
 }
-.decoro-inchiostro {
-  opacity: 0.16;
+
+/* Sull'apertura verde scura il ragionamento si rovescia: serve un tratto
+   CHIARO su fondo scuro. `invert` schiarisce il tratto e annerisce il
+   fondo, `grayscale` toglie il viola che l'inversione tira fuori dal
+   verde, e "screen" fa sparire il nero lasciando solo il disegno. */
+.decoro-su-scuro {
+  mix-blend-mode: screen;
+  /* Piu' alta della gemella su fondo chiaro: "screen" su un verde scuro
+     rende meno di quanto "multiply" renda sulla carta, e allo stesso
+     numero il disegno si perdeva. */
+  opacity: 0.22;
 }
-/* La virata sul verde va sull'immagine: un filtro sul contenitore
-   spegnerebbe la fusione. */
-.decoro-tinta {
-  filter: sepia(1) hue-rotate(70deg) saturate(1.6);
+.decoro-su-scuro img {
+  filter: invert(1) grayscale(1);
 }
 
 /* La sfumatura parte dall'angolo dove sta la pianta e si spegne verso il
@@ -153,10 +161,10 @@ a:active {
 
 @media (max-width: 767px) {
   .decoro {
-    opacity: 0.24;
+    opacity: 0.15;
   }
-  .decoro-inchiostro {
-    opacity: 0.1;
+  .decoro-su-scuro {
+    opacity: 0.18;
   }
 }
 
