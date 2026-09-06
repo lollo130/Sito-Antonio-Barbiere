@@ -241,18 +241,29 @@ a:active {
 .separatore-vintage {
   position: relative;
   display: flex;
-  height: 5rem;
+  height: 7rem;
   align-items: center;
   justify-content: center;
-  /* Dal colore della fascia di sopra a quello della fascia di sotto: i due
-     arrivano dal componente. Le fermate non sono agli estremi ma al 12% e
-     all'88%, cosi' il gradiente attacca esattamente sul colore del vicino e
-     non lascia una riga di stacco dove le due superfici si toccano. */
-  background: linear-gradient(to bottom, var(--da) 12%, var(--a) 88%);
+  /* Dal colore della fascia di sopra a quello della fascia di sotto.
+     Le fermate intermedie disegnano una curva addolcita invece della retta:
+     un gradiente lineare ha due spigoli invisibili ma percepibili, uno dove
+     comincia a cambiare e uno dove smette, e l'occhio li legge come due
+     righe. Con la curva il colore parte fermo, cambia in mezzo e si
+     riappoggia piano sul colore del vicino. */
+  background: linear-gradient(
+    to bottom,
+    var(--da) 0%,
+    color-mix(in srgb, var(--da) 94%, var(--a)) 14%,
+    color-mix(in srgb, var(--da) 78%, var(--a)) 28%,
+    color-mix(in srgb, var(--da) 50%, var(--a)) 50%,
+    color-mix(in srgb, var(--da) 22%, var(--a)) 72%,
+    color-mix(in srgb, var(--da) 6%, var(--a)) 86%,
+    var(--a) 100%
+  );
 }
 @media (min-width: 768px) {
   .separatore-vintage {
-    height: 7rem;
+    height: 11rem;
   }
 }
 .separatore-vintage::before {
