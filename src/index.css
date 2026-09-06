@@ -154,21 +154,16 @@ a:active {
   }
 }
 
-/* La sfumatura parte dall'angolo dove sta la pianta e si spegne verso il
-   centro della fascia. Serve a due cose: sciogliere il bordo dritto del
-   ritaglio, e far sparire il taglio netto quando il disegno è più grande
-   della fascia che lo contiene. */
-.sfuma-da-alto-sinistra {
-  --sfuma: radial-gradient(105% 105% at 0% 0%, #000 28%, transparent 100%);
+/* La sfumatura parte dal bordo da cui crescono le piante e si spegne prima
+   di arrivare al testo. Prima erano quattro sfumature radiali, una per
+   angolo; adesso che le piante crescono lungo un bordo intero ne bastano
+   due, ed e' anche piu' onesto: il fogliame si diradare allontanandosi dal
+   terreno, non da un angolo. */
+.sfuma-dal-fondo {
+  --sfuma: linear-gradient(to top, #000 0%, #000 24%, transparent 74%);
 }
-.sfuma-da-alto-destra {
-  --sfuma: radial-gradient(105% 105% at 100% 0%, #000 28%, transparent 100%);
-}
-.sfuma-da-basso-sinistra {
-  --sfuma: radial-gradient(105% 105% at 0% 100%, #000 28%, transparent 100%);
-}
-.sfuma-da-basso-destra {
-  --sfuma: radial-gradient(105% 105% at 100% 100%, #000 28%, transparent 100%);
+.sfuma-dalla-cima {
+  --sfuma: linear-gradient(to bottom, #000 0%, #000 24%, transparent 74%);
 }
 
 @media (max-width: 767px) {

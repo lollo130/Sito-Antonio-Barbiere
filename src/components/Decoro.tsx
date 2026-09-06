@@ -1,44 +1,39 @@
 // Il fogliame che invade le fasce della pagina.
 //
-// Prima era una foglia per angolo: due per fascia, stessa misura, angoli
-// opposti. Ordinatissimo e per niente vegetale — una griglia, non una
-// giungla. Quello che fa sembrare vera la vegetazione è il disordine: foglie
-// di misure diverse, ruotate storte, che si accavallano invece di stare
-// ciascuna al suo posto.
+// STORIA DEI DUE ERRORI, perché spiegano com'è fatto adesso.
 //
-// Quindi l'unità non è la foglia singola ma il CIUFFO: due foglie attorno a
-// uno stesso angolo, una principale e una di accompagnamento. Il disordine
-// è scritto a mano una volta e resta sempre quello — non è casuale a ogni
-// caricamento, altrimenti la pagina ballerebbe a ogni visita e non si
-// potrebbe più correggere un ciuffo venuto male.
+// 1. Prima le foglie potevano stare solo NEGLI ANGOLI. Con quattro posizioni
+//    possibili la simmetria non era un difetto di gusto, era obbligata: una
+//    a sinistra, una a destra, sempre. Adesso crescono lungo un BORDO, in
+//    punti scelti a mano e volutamente irregolari — 7%, 24%, 46%, 63%…
+//    Una pianta che spunta a metà del bordo inferiore non sembra appiccicata:
+//    sembra una pianta che sta sotto la pagina, che è esattamente l'effetto.
 //
-// Ma è un disordine con un vincolo preciso: vedi la regola del picciolo,
-// sotto. Le rotazioni non sono libere.
+// 2. Le foglie uscivano dal bordo di una percentuale messa a occhio — 30, 44,
+//    in un caso 80 — e di alcune restava dentro il solo picciolo. Misurando
+//    l'inchiostro riga per riga si scopre che il gambo è il 9-20% del
+//    disegno, a seconda di quale: oltre quella soglia si comincia a tagliare
+//    la lamina. Ora ogni disegno ha il suo PICCIOLO misurato, e quanto esce
+//    si conta a partire da lì.
 //
-// Come è fatto un ciuffo:
+// LA REGOLA CHE COMANDA TUTTO: una pianta entra dal picciolo, mai dalla
+// punta. In natura il gambo viene da fuori — dal vaso, dal terreno — e la
+// foglia si apre verso l'interno. In tutti e cinque i disegni il picciolo sta
+// in basso, quindi:
+//   - bordo basso -> rotazione vicino a 0°, il gambo esce in giù;
+//   - bordo alto  -> vicino a 180°, il gambo esce in su e la foglia pende.
+// Lo scarto è una ventina di gradi, quel tanto che toglie l'aria di griglia.
 //
-//   <span>   copre TUTTA la fascia, ritaglia quel che esce e porta la
-//            maschera che sfuma verso il centro. Sta qui e non sulle foglie
-//            perché così la sfumatura è misurata sulla fascia: parte piena
-//            all'angolo e finisce a zero prima del testo, qualunque misura
-//            abbiano le foglie dentro.
-//   <img>    le foglie, piazzate in percentuale rispetto all'angolo.
+// Il disordine è scritto a mano una volta e resta sempre quello. Non è
+// casuale a ogni caricamento: la pagina ballerebbe a ogni visita e non si
+// potrebbe più correggere una pianta venuta male.
 //
-// Le regole che restano:
-//  - i ciuffi stanno negli ANGOLI e sconfinano oltre il bordo. Una foglia
-//    isolata a metà lato sembra un ritaglio appoggiato lì per sbaglio;
-//  - il tratto si dissolve prima di arrivare al testo. È la maschera a
-//    permettere tutta questa abbondanza: senza, sarebbe illeggibile;
-//  - le foglie in più di ogni ciuffo spariscono sul telefono, dove lo
-//    schermo è stretto e finirebbero addosso alle parole.
+// Il fogliame può permettersi di essere fitto perché il contenuto sta dentro
+// una cornice, ed è la cornice a tenere il testo al sicuro. La maschera sfuma
+// comunque il tratto prima che arrivi alle parole.
 //
-// Il fogliame può permettersi di essere fitto perché il contenuto sta
-// dentro una cornice: è la cornice a tenere il testo al sicuro. Quando le
-// decorazioni galleggiavano libere sulla pagina bastava molto meno per fare
-// confusione.
-//
-// Sono SVG: pesano 18-34 kB compressi, restano nitidi a qualunque misura, e
-// le stesse cinque immagini ripetute venti volte restano cinque scaricamenti.
+// Sono SVG: 18-34 kB compressi, nitidi a qualunque misura, e le stesse cinque
+// immagini ripetute trenta volte restano cinque scaricamenti.
 //
 // Incisioni botaniche — attribuzione nel piede del sito.
 
@@ -48,8 +43,6 @@ type Disegno =
   | 'foglia-sottile'
   | 'monstera-incisa'
   | 'palma';
-
-type Angolo = 'alto-sinistra' | 'alto-destra' | 'basso-sinistra' | 'basso-destra';
 
 /** Proporzione di ogni disegno, dal suo viewBox. */
 const RAPPORTO: Record<Disegno, number> = {
@@ -61,213 +54,146 @@ const RAPPORTO: Record<Disegno, number> = {
 };
 
 /**
- * Le misure sono in vw, non in rem.
+ * Quanta parte del disegno, dal basso, è picciolo o spazio vuoto.
  *
- * Con una misura fissa la stessa foglia era un dettaglio su un monitor da
- * 2000 px e mezza pagina su un portatile da 800. In vw la proporzione resta
- * quella voluta ovunque. Sul telefono la frazione è molto più grande perché
- * lo schermo è stretto: al 30% di 375 px una foglia non si vedrebbe.
+ * Misurato sull'inchiostro riga per riga, non a occhio: si guarda da sotto
+ * quante righe hanno un tratto stretto — meno del 18% della larghezza
+ * massima — prima che cominci la lamina. È la quota che può uscire dal bordo
+ * senza perdere niente di quello che si deve vedere.
+ */
+const PICCIOLO: Record<Disegno, number> = {
+  'foglia-lancia': 9,
+  'foglia-larga': 20,
+  'foglia-sottile': 11,
+  'monstera-incisa': 9,
+  palma: 9,
+};
+
+/**
+ * Le misure sono in vw, non in rem: con una misura fissa la stessa foglia era
+ * un dettaglio su un monitor da 2000 px e mezza pagina su un portatile da
+ * 800. Sul telefono la frazione è molto più grande perché lo schermo è
+ * stretto.
  */
 type Misura = 'grande' | 'media' | 'piccola' | 'minuta';
 const LARGHEZZA: Record<Misura, [telefono: number, schermo: number]> = {
-  grande: [76, 25],
-  media: [58, 19],
-  piccola: [44, 14],
-  minuta: [32, 10],
+  grande: [64, 22],
+  media: [50, 17],
+  piccola: [38, 13],
+  minuta: [28, 9],
 };
 
-type Foglia = {
+type Pianta = {
   disegno: Disegno;
   misura: Misura;
-  /** gradi di rotazione: è quello che toglie l'aria di griglia */
+  /** dove sta lungo il bordo, in percentuale della fascia */
+  x: number;
+  /** gradi: è quello che toglie l'aria di griglia */
   ruota: number;
-  /** quanto esce dal bordo, in percentuale della propria larghezza */
-  fuori: number;
-  /** di quanto scivola lungo il lato, in percentuale della fascia */
-  scorre: number;
   /**
-   * Di quanto la foglia rientra verso il centro della fascia.
-   *
-   * SEMPRE POSITIVO: si somma a `fuori` col segno opposto, quindi un valore
-   * negativo non "varia" la posizione, la spinge ancora piu' fuori. Con
-   * `scende: -5` una foglia data al 42% usciva in realta' al 57%, e di lei
-   * restava dentro il solo picciolo.
+   * Quanto esce OLTRE il picciolo, in punti percentuali dell'altezza.
+   * Assente significa "fuori esattamente il gambo". Serve solo a variare:
+   * già a 10 si comincia a mangiare la lamina.
    */
-  scende: number;
+  extra?: number;
   specchia?: boolean;
-  /** le foglie di contorno: sul telefono coprirebbero il testo */
+  /** le piante di contorno: sul telefono coprirebbero il testo */
   soloDaTablet?: boolean;
 };
 
-/**
- * I ciuffi.
- *
- * LA REGOLA CHE COMANDA TUTTO: una pianta entra dal PICCIOLO, mai dalla
- * punta della foglia. In natura il gambo viene da fuori — dal vaso, dal
- * terreno, dal ramo — e la foglia si apre verso l'interno. Una foglia che
- * entra di punta col picciolo nascosto non sembra una pianta che sconfina:
- * sembra un ritaglio appiccicato al bordo.
- *
- * In tutti e cinque i disegni il picciolo sta in BASSO. Quindi la
- * rotazione non e' libera:
- *   - angolo in basso  -> vicino a 0°   (picciolo in giu', fuori dalla
- *                          fascia; la foglia si apre verso l'alto)
- *   - angolo in alto   -> vicino a 180° (picciolo in su', fuori; la foglia
- *                          pende verso il basso)
- * Lo scarto e' al massimo una ventina di gradi, quel tanto che basta a
- * togliere l'aria di griglia, e piega la foglia verso il centro della
- * fascia: da sinistra si inclina a destra, da destra a sinistra.
- *
- * QUANTO esce conta quanto il verso. Oltre il 45% di `fuori` resta fuori la
- * lamina e dentro il solo picciolo: si vede un bastoncino che entra dal
- * bordo, che e' persino peggio della foglia girata al contrario.
- *
- * Due foglie per ciuffo, non quattro: una principale e una di
- * accompagnamento piu' piccola, che sul telefono sparisce. Con quattro
- * diventava un cespuglio e non si capiva piu' niente.
- */
-const CIUFFI = {
-  // Palma dominante e una foglia piu' piccola accanto. Angoli BASSI.
-  palmeto: [
-    { disegno: 'palma', misura: 'grande', ruota: 9, fuori: 30, scorre: 0, scende: 4 },
-    {
-      disegno: 'foglia-lancia',
-      misura: 'piccola',
-      ruota: -13,
-      fuori: 40,
-      scorre: 10,
-      scende: 4,
-      soloDaTablet: true,
-    },
-  ],
-  // Foglie che pendono dall'alto: picciolo in su', fuori dalla fascia.
-  // Angoli ALTI.
-  pendente: [
-    { disegno: 'foglia-larga', misura: 'grande', ruota: 172, fuori: 30, scorre: 0, scende: 3 },
-    {
-      disegno: 'foglia-sottile',
-      misura: 'piccola',
-      ruota: 193,
-      fuori: 42,
-      scorre: 11,
-      scende: 5,
-      soloDaTablet: true,
-    },
-  ],
-  // Monstera e una palma dietro. Angoli BASSI.
-  sottobosco: [
-    { disegno: 'monstera-incisa', misura: 'grande', ruota: -7, fuori: 28, scorre: 0, scende: 2 },
-    {
-      disegno: 'palma',
-      misura: 'piccola',
-      ruota: 16,
-      fuori: 42,
-      scorre: 12,
-      scende: 6,
-      specchia: true,
-      soloDaTablet: true,
-    },
-  ],
-  // Due foglie sottili: per le fasce basse, dove non c'e' spazio.
-  rado: [
-    { disegno: 'foglia-lancia', misura: 'media', ruota: 11, fuori: 32, scorre: 0, scende: 2 },
-    {
-      disegno: 'foglia-sottile',
-      misura: 'piccola',
-      ruota: -15,
-      fuori: 44,
-      scorre: 12,
-      scende: 5,
-      soloDaTablet: true,
-    },
-  ],
-  // Come "rado" ma capovolto, per gli angoli ALTI.
-  radoAlto: [
-    { disegno: 'foglia-sottile', misura: 'media', ruota: 187, fuori: 32, scorre: 0, scende: 2 },
-    {
-      disegno: 'foglia-lancia',
-      misura: 'piccola',
-      ruota: 166,
-      fuori: 44,
-      scorre: 12,
-      scende: 5,
-      soloDaTablet: true,
-    },
-  ],
-} satisfies Record<string, Foglia[]>;
-
-export type Ciuffo = keyof typeof CIUFFI;
-
-// Da quale angolo della fascia parte la sfumatura (classi in index.css).
-const MASCHERA: Record<Angolo, string> = {
-  'alto-sinistra': 'sfuma-da-alto-sinistra',
-  'alto-destra': 'sfuma-da-alto-destra',
-  'basso-sinistra': 'sfuma-da-basso-sinistra',
-  'basso-destra': 'sfuma-da-basso-destra',
-};
+type Macchia = { bordo: 'alto' | 'basso'; piante: Pianta[] };
 
 /**
- * Posizione di una foglia dentro il ciuffo.
- *
- * `fuori` la spinge oltre il bordo di una frazione della PROPRIA larghezza
- * (così vale uguale per una foglia grande e per una piccola), `scorre` e
- * `scende` la spostano lungo i due lati in percentuale della fascia.
+ * Le macchie di vegetazione. Le `x` non sono mai equidistanti e non si
+ * specchiano fra loro: bastano due piante alla stessa distanza dai due bordi
+ * per far tornare l'aria di aiuola.
  */
-function posizione(angolo: Angolo, f: Foglia): React.CSSProperties {
-  const alto = angolo.startsWith('alto');
-  const sinistra = angolo.endsWith('sinistra');
-  const orizzontale = `calc(${sinistra ? '-' : ''}${f.fuori}% ${sinistra ? '+' : '-'} ${f.scorre}vw)`;
-  const verticale = `calc(${alto ? '-' : ''}${f.fuori}% ${alto ? '+' : '-'} ${f.scende}vw)`;
+const MACCHIE = {
+  // Sottobosco fitto: cinque piante lungo tutto il bordo inferiore.
+  fondoFitto: {
+    bordo: 'basso',
+    piante: [
+      { disegno: 'palma', misura: 'grande', x: 7, ruota: 8 },
+      { disegno: 'foglia-sottile', misura: 'piccola', x: 24, ruota: -14, extra: 4, soloDaTablet: true },
+      { disegno: 'monstera-incisa', misura: 'media', x: 46, ruota: 5, extra: 2, soloDaTablet: true },
+      { disegno: 'foglia-lancia', misura: 'piccola', x: 63, ruota: 17, soloDaTablet: true },
+      { disegno: 'palma', misura: 'media', x: 88, ruota: -11, extra: 3, specchia: true },
+    ],
+  },
+  // Poche piante basse, per le fasce dove il contenuto arriva in fondo.
+  fondoRado: {
+    bordo: 'basso',
+    piante: [
+      { disegno: 'monstera-incisa', misura: 'media', x: 11, ruota: -9 },
+      { disegno: 'foglia-lancia', misura: 'piccola', x: 39, ruota: 13, extra: 5, soloDaTablet: true },
+      { disegno: 'palma', misura: 'grande', x: 82, ruota: 6, extra: 2 },
+    ],
+  },
+  // Foglie che pendono dall'alto: gambo in su, fuori dalla fascia.
+  cimaFitta: {
+    bordo: 'alto',
+    piante: [
+      { disegno: 'foglia-larga', misura: 'media', x: 15, ruota: 174 },
+      { disegno: 'foglia-sottile', misura: 'piccola', x: 34, ruota: 192, extra: 4, soloDaTablet: true },
+      { disegno: 'palma', misura: 'grande', x: 72, ruota: 185, extra: 2 },
+      { disegno: 'foglia-lancia', misura: 'minuta', x: 93, ruota: 168, soloDaTablet: true },
+    ],
+  },
+  cimaRada: {
+    bordo: 'alto',
+    piante: [
+      { disegno: 'monstera-incisa', misura: 'media', x: 28, ruota: 187, extra: 3 },
+      { disegno: 'foglia-sottile', misura: 'piccola', x: 67, ruota: 171, soloDaTablet: true },
+    ],
+  },
+} satisfies Record<string, Macchia>;
 
-  return {
-    [alto ? 'top' : 'bottom']: 0,
-    [sinistra ? 'left' : 'right']: 0,
-    transform: `translate(${orizzontale}, ${verticale}) rotate(${f.ruota}deg)${
-      f.specchia ? ' scaleX(-1)' : ''
-    }`,
-  };
-}
+export type NomeMacchia = keyof typeof MACCHIE;
 
 export default function Decoro({
-  ciuffo,
-  angolo,
+  macchia,
   suScuro = false,
 }: {
-  ciuffo: Ciuffo;
-  angolo: Angolo;
+  macchia: NomeMacchia;
   /** true sulle fasce scure: il tratto va schiarito invece che scurito */
   suScuro?: boolean;
 }) {
+  const { bordo, piante } = MACCHIE[macchia] as Macchia;
+  const dallAlto = bordo === 'alto';
+
   return (
     <span
       aria-hidden="true"
       className={`decoro ${suScuro ? 'decoro-su-scuro' : ''} pointer-events-none absolute inset-0 block overflow-hidden ${
-        MASCHERA[angolo]
+        dallAlto ? 'sfuma-dalla-cima' : 'sfuma-dal-fondo'
       }`}
     >
-      {CIUFFI[ciuffo].map((f: Foglia, i) => {
-        const [telefono, schermo] = LARGHEZZA[f.misura];
+      {piante.map((p: Pianta, i) => {
+        const [telefono, schermo] = LARGHEZZA[p.misura];
+        const fuori = PICCIOLO[p.disegno] + (p.extra ?? 0);
         return (
           <img
-            key={`${f.disegno}-${i}`}
-            src={`/sfondi/${f.disegno}.svg`}
+            key={`${p.disegno}-${i}`}
+            src={`/sfondi/${p.disegno}.svg`}
             alt=""
             loading="lazy"
             decoding="async"
             style={
               {
-                ...posizione(angolo, f),
-                // Le due larghezze viaggiano come variabili: a scegliere fra
-                // telefono e schermo grande e' la media query in index.css.
-                // Un min()/max() qui non saprebbe distinguerli, perche' non
-                // conosce il punto in cui cambia l'impaginazione.
+                left: `${p.x}%`,
+                [dallAlto ? 'top' : 'bottom']: 0,
+                // -50% centra la pianta sulla sua x, poi la spinta oltre il
+                // bordo, poi la rotazione.
+                transform: `translate(-50%, ${dallAlto ? '-' : ''}${fuori}%) rotate(${p.ruota}deg)${
+                  p.specchia ? ' scaleX(-1)' : ''
+                }`,
                 '--larga-telefono': `${telefono}vw`,
                 '--larga-schermo': `${schermo}vw`,
-                aspectRatio: String(RAPPORTO[f.disegno]),
+                aspectRatio: String(RAPPORTO[p.disegno]),
               } as React.CSSProperties
             }
             className={`absolute max-w-none select-none ${
-              f.soloDaTablet ? 'hidden md:block' : 'block'
+              p.soloDaTablet ? 'hidden md:block' : 'block'
             }`}
           />
         );
