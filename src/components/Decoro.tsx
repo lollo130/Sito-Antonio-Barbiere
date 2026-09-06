@@ -32,8 +32,14 @@
 // una cornice, ed è la cornice a tenere il testo al sicuro. La maschera sfuma
 // comunque il tratto prima che arrivi alle parole.
 //
+// LA PROFONDITA': una foresta non e' una fila di piante, sono piani. Le
+// piccole stanno piu' su e piu' lontane dal bordo, e la maschera le sbiadisce
+// come la foschia fa con gli alberi in fondo; le grandi stanno sul bordo e
+// coprono le altre. Nell'elenco di ogni macchia il fondale viene per primo,
+// perche' chi e' disegnato prima finisce sotto.
+//
 // Sono SVG: 18-34 kB compressi, nitidi a qualunque misura, e le stesse cinque
-// immagini ripetute trenta volte restano cinque scaricamenti.
+// immagini ripetute quaranta volte restano cinque scaricamenti.
 //
 // Incisioni botaniche — attribuzione nel piede del sito.
 
@@ -96,6 +102,15 @@ type Pianta = {
    * già a 10 si comincia a mangiare la lamina.
    */
   extra?: number;
+  /**
+   * Quanto la pianta si alza dal bordo, in percentuale dell'altezza della
+   * fascia. È quello che dà la profondità: le piante del fondale stanno più
+   * su e più piccole, e la maschera — che si spegne andando verso il centro
+   * — le sbiadisce da sola, come la foschia fa con gli alberi lontani. Il
+   * loro picciolo non resta appeso a mezz'aria proprio perché lassù la
+   * maschera l'ha già portato a zero.
+   */
+  alza?: number;
   specchia?: boolean;
   /** le piante di contorno: sul telefono coprirebbero il testo */
   soloDaTablet?: boolean;
@@ -109,41 +124,61 @@ type Macchia = { bordo: 'alto' | 'basso'; piante: Pianta[] };
  * per far tornare l'aria di aiuola.
  */
 const MACCHIE = {
-  // Sottobosco fitto: cinque piante lungo tutto il bordo inferiore.
+  // Il sottobosco dell'apertura. Nove piante su tre piani: prima il
+  // fondale, che finisce dietro perche' disegnato per primo, poi la
+  // fascia di mezzo, poi il primo piano.
   fondoFitto: {
     bordo: 'basso',
     piante: [
+      // fondale — piccole, staccate dal bordo, sbiadite dalla maschera
+      { disegno: 'foglia-larga', misura: 'minuta', x: 16, ruota: -6, alza: 9, soloDaTablet: true },
+      { disegno: 'palma', misura: 'piccola', x: 34, ruota: 12, alza: 13, soloDaTablet: true },
+      { disegno: 'foglia-sottile', misura: 'minuta', x: 57, ruota: -17, alza: 7, soloDaTablet: true },
+      { disegno: 'monstera-incisa', misura: 'piccola', x: 79, ruota: 9, alza: 11, soloDaTablet: true },
+      // mezzo
+      { disegno: 'foglia-sottile', misura: 'piccola', x: 24, ruota: -14, extra: 4, alza: 3, soloDaTablet: true },
+      { disegno: 'foglia-lancia', misura: 'piccola', x: 63, ruota: 17, alza: 4, soloDaTablet: true },
+      // primo piano
       { disegno: 'palma', misura: 'grande', x: 7, ruota: 8 },
-      { disegno: 'foglia-sottile', misura: 'piccola', x: 24, ruota: -14, extra: 4, soloDaTablet: true },
       { disegno: 'monstera-incisa', misura: 'media', x: 46, ruota: 5, extra: 2, soloDaTablet: true },
-      { disegno: 'foglia-lancia', misura: 'piccola', x: 63, ruota: 17, soloDaTablet: true },
       { disegno: 'palma', misura: 'media', x: 88, ruota: -11, extra: 3, specchia: true },
     ],
   },
-  // Poche piante basse, per le fasce dove il contenuto arriva in fondo.
+  // Piu' rado, per le fasce dove il contenuto arriva in fondo.
   fondoRado: {
     bordo: 'basso',
     piante: [
+      { disegno: 'foglia-sottile', misura: 'minuta', x: 26, ruota: 14, alza: 10, soloDaTablet: true },
+      { disegno: 'palma', misura: 'piccola', x: 57, ruota: -8, alza: 12, soloDaTablet: true },
+      { disegno: 'foglia-larga', misura: 'minuta', x: 93, ruota: 5, alza: 8, soloDaTablet: true },
+      { disegno: 'foglia-lancia', misura: 'piccola', x: 39, ruota: 13, extra: 5, alza: 2, soloDaTablet: true },
       { disegno: 'monstera-incisa', misura: 'media', x: 11, ruota: -9 },
-      { disegno: 'foglia-lancia', misura: 'piccola', x: 39, ruota: 13, extra: 5, soloDaTablet: true },
       { disegno: 'palma', misura: 'grande', x: 82, ruota: 6, extra: 2 },
     ],
   },
-  // Foglie che pendono dall'alto: gambo in su, fuori dalla fascia.
+  // Chioma fitta che pende dall'alto.
   cimaFitta: {
     bordo: 'alto',
     piante: [
-      { disegno: 'foglia-larga', misura: 'media', x: 15, ruota: 174 },
-      { disegno: 'foglia-sottile', misura: 'piccola', x: 34, ruota: 192, extra: 4, soloDaTablet: true },
-      { disegno: 'palma', misura: 'grande', x: 72, ruota: 185, extra: 2 },
+      { disegno: 'foglia-sottile', misura: 'minuta', x: 8, ruota: 178, alza: 8, soloDaTablet: true },
+      { disegno: 'monstera-incisa', misura: 'piccola', x: 44, ruota: 195, alza: 11, soloDaTablet: true },
+      { disegno: 'foglia-larga', misura: 'minuta', x: 61, ruota: 166, alza: 7, soloDaTablet: true },
+      { disegno: 'palma', misura: 'piccola', x: 86, ruota: 183, alza: 12, soloDaTablet: true },
+      { disegno: 'foglia-sottile', misura: 'piccola', x: 34, ruota: 192, extra: 4, alza: 3, soloDaTablet: true },
       { disegno: 'foglia-lancia', misura: 'minuta', x: 93, ruota: 168, soloDaTablet: true },
+      { disegno: 'foglia-larga', misura: 'media', x: 15, ruota: 174 },
+      { disegno: 'palma', misura: 'grande', x: 72, ruota: 185, extra: 2 },
     ],
   },
+  // Poche foglie in alto, per le fasce basse.
   cimaRada: {
     bordo: 'alto',
     piante: [
-      { disegno: 'monstera-incisa', misura: 'media', x: 28, ruota: 187, extra: 3 },
+      { disegno: 'foglia-lancia', misura: 'minuta', x: 12, ruota: 172, alza: 9, soloDaTablet: true },
+      { disegno: 'palma', misura: 'piccola', x: 52, ruota: 189, alza: 12, soloDaTablet: true },
       { disegno: 'foglia-sottile', misura: 'piccola', x: 67, ruota: 171, soloDaTablet: true },
+      { disegno: 'monstera-incisa', misura: 'media', x: 28, ruota: 187, extra: 3 },
+      { disegno: 'foglia-larga', misura: 'piccola', x: 89, ruota: 181, alza: 4, soloDaTablet: true },
     ],
   },
 } satisfies Record<string, Macchia>;
@@ -199,7 +234,7 @@ export default function Decoro({
               style={
                 {
                   left: `${p.x}%`,
-                  [dallAlto ? 'top' : 'bottom']: 0,
+                  [dallAlto ? 'top' : 'bottom']: `${p.alza ?? 0}%`,
                   // -50% centra la pianta sulla sua x, poi la spinta oltre
                   // il bordo, poi la rotazione.
                   transform: `translate(-50%, ${dallAlto ? '-' : ''}${fuori}%) rotate(${p.ruota}deg)${
