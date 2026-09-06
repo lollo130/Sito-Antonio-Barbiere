@@ -11,9 +11,14 @@ import {
   VIA_SALONE,
 } from '../../lib/salone';
 
-export default function Piede() {
+export default function Piede({ attaccato = false }: { attaccato?: boolean }) {
   return (
-    <footer className="mt-16 bg-inchiostro px-5 py-9 text-carta">
+    // `attaccato` toglie lo stacco sopra: serve alla home, dove al piede
+    // arriva un separatore che sfuma dal verde chiaro all'inchiostro. Le
+    // altre pagine finiscono su carta e lo stacco lo vogliono.
+    <footer
+      className={`${attaccato ? '' : 'mt-16'} bg-inchiostro px-5 py-9 text-carta`}
+    >
       <div className="mx-auto max-w-3xl">
         <p className="font-titolo text-2xl leading-tight text-carta-chiara">{NOME_SALONE}</p>
         <p className="mt-px text-[0.62rem] uppercase tracking-[0.14em] text-marrone-chiaro">

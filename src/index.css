@@ -223,14 +223,18 @@ a:active {
 .separatore-vintage {
   position: relative;
   display: flex;
-  height: 3.5rem;
+  height: 5rem;
   align-items: center;
   justify-content: center;
-  background: var(--color-carta);
+  /* Dal colore della fascia di sopra a quello della fascia di sotto: i due
+     arrivano dal componente. Le fermate non sono agli estremi ma al 12% e
+     all'88%, cosi' il gradiente attacca esattamente sul colore del vicino e
+     non lascia una riga di stacco dove le due superfici si toccano. */
+  background: linear-gradient(to bottom, var(--da) 12%, var(--a) 88%);
 }
 @media (min-width: 768px) {
   .separatore-vintage {
-    height: 4.5rem;
+    height: 7rem;
   }
 }
 .separatore-vintage::before {
@@ -239,14 +243,19 @@ a:active {
   left: 8%;
   right: 8%;
   height: 5px;
-  border-top: 1px solid var(--color-bordo);
-  border-bottom: 1px solid var(--color-bordo);
+  border-top: 1px solid var(--color-cuoio);
+  border-bottom: 1px solid var(--color-cuoio);
+  /* Marrone pieno e non una fusione: il filetto cade a meta' gradiente, e
+     li' il fondo puo' essere tanto la pietra chiara quanto il verde scuro.
+     Con "overlay" spariva proprio sul verde, che e' il passaggio dove il
+     separatore serve di piu'. */
+  opacity: 0.45;
 }
 .separatore-vintage-rombo {
   position: relative;
   width: 11px;
   height: 11px;
   background: var(--color-cuoio);
-  box-shadow: 0 0 0 7px var(--color-carta);
+  box-shadow: 0 0 0 7px color-mix(in srgb, var(--da) 50%, var(--a));
   transform: rotate(45deg);
 }

@@ -110,7 +110,7 @@ export default function Home() {
           </div>
         </section>
 
-        <Separatore />
+        <Separatore da="verde" a="pieno" />
 
         {/* SERVIZI — fascia pietra con schede chiare, due colonne da tablet
             in su, così su schermo grande lo spazio è occupato davvero. */}
@@ -151,7 +151,7 @@ export default function Home() {
           </div>
         </section>
 
-        <Separatore />
+        <Separatore da="pieno" a="carta-chiara" />
 
         {/* LA BOTTEGA — fascia chiara, il 1982 grande come un marchio. */}
         <section className="relative overflow-hidden bg-carta-chiara px-3 py-12 sm:px-5 sm:py-16">
@@ -177,7 +177,7 @@ export default function Home() {
           </div>
         </section>
 
-        <Separatore />
+        <Separatore da="carta-chiara" a="pieno" />
 
         {/* GALLERIA — di nuovo la pietra, per staccare dalla fascia chiara. */}
         <section className="relative overflow-hidden bg-pieno px-3 py-12 sm:px-5 sm:py-20">
@@ -191,7 +191,7 @@ export default function Home() {
           </div>
         </section>
 
-        <Separatore />
+        <Separatore da="pieno" a="verde-chiaro" />
 
         {/* DOVE SIAMO — verde chiaro, l'ultima fascia prima del piede. */}
         <section className="relative overflow-hidden bg-verde-chiaro px-3 py-12 sm:px-5 sm:py-16">
@@ -222,7 +222,8 @@ export default function Home() {
         </section>
       </main>
 
-      <Piede />
+      <Separatore da="verde-chiaro" a="inchiostro" />
+      <Piede attaccato />
     </>
   );
 }
