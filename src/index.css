@@ -125,6 +125,8 @@ a:active {
   opacity: 0.26;
   -webkit-mask-image: var(--sfuma);
   mask-image: var(--sfuma);
+  -webkit-mask-composite: source-over;
+  mask-composite: add;
 }
 
 /* Sull'apertura verde scura il ragionamento si rovescia: serve un tratto
@@ -164,6 +166,14 @@ a:active {
 }
 .sfuma-dalla-cima {
   --sfuma: linear-gradient(to bottom, #000 0%, #000 24%, transparent 74%);
+}
+/* Quando la fascia ha piante sia sopra che sotto le due sfumature vanno
+   unite, non sovrapposte: "add" tiene quel che e' visibile nell'una O
+   nell'altra. Con la sovrapposizione normale la seconda avrebbe cancellato
+   la prima. */
+.sfuma-da-entrambi {
+  --sfuma: linear-gradient(to top, #000 0%, #000 24%, transparent 74%),
+    linear-gradient(to bottom, #000 0%, #000 24%, transparent 74%);
 }
 
 @media (max-width: 767px) {

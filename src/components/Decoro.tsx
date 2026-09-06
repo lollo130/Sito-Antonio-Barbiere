@@ -151,52 +151,71 @@ const MACCHIE = {
 export type NomeMacchia = keyof typeof MACCHIE;
 
 export default function Decoro({
-  macchia,
+  macchie,
   suScuro = false,
 }: {
-  macchia: NomeMacchia;
+  /**
+   * Le macchie di questa fascia, TUTTE INSIEME.
+   *
+   * Non e' un vezzo di comodita': e' la ragione per cui le foglie si
+   * coprono invece di sommarsi. La fusione "multiply" agisce sul gruppo,
+   * quindi due gruppi separati si fondono ciascuno col colore della fascia
+   * e dove si incrociano si vedono tutt'e due in trasparenza. Dentro un
+   * gruppo solo, invece, le foglie si compongono fra loro normalmente —
+   * cioe' quella sopra copre quella sotto, come due foglie vere — e solo il
+   * risultato finito viene fuso col fondo.
+   */
+  macchie: NomeMacchia[];
   /** true sulle fasce scure: il tratto va schiarito invece che scurito */
   suScuro?: boolean;
 }) {
-  const { bordo, piante } = MACCHIE[macchia] as Macchia;
-  const dallAlto = bordo === 'alto';
+  const bordi = new Set(macchie.map((m) => (MACCHIE[m] as Macchia).bordo));
+  const sfumatura =
+    bordi.size === 2
+      ? 'sfuma-da-entrambi'
+      : bordi.has('alto')
+        ? 'sfuma-dalla-cima'
+        : 'sfuma-dal-fondo';
 
   return (
     <span
       aria-hidden="true"
-      className={`decoro ${suScuro ? 'decoro-su-scuro' : ''} pointer-events-none absolute inset-0 block overflow-hidden ${
-        dallAlto ? 'sfuma-dalla-cima' : 'sfuma-dal-fondo'
-      }`}
+      className={`decoro ${suScuro ? 'decoro-su-scuro' : ''} pointer-events-none absolute inset-0 block overflow-hidden ${sfumatura}`}
     >
-      {piante.map((p: Pianta, i) => {
-        const [telefono, schermo] = LARGHEZZA[p.misura];
-        const fuori = PICCIOLO[p.disegno] + (p.extra ?? 0);
-        return (
-          <img
-            key={`${p.disegno}-${i}`}
-            src={`/sfondi/${p.disegno}.svg`}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            style={
-              {
-                left: `${p.x}%`,
-                [dallAlto ? 'top' : 'bottom']: 0,
-                // -50% centra la pianta sulla sua x, poi la spinta oltre il
-                // bordo, poi la rotazione.
-                transform: `translate(-50%, ${dallAlto ? '-' : ''}${fuori}%) rotate(${p.ruota}deg)${
-                  p.specchia ? ' scaleX(-1)' : ''
-                }`,
-                '--larga-telefono': `${telefono}vw`,
-                '--larga-schermo': `${schermo}vw`,
-                aspectRatio: String(RAPPORTO[p.disegno]),
-              } as React.CSSProperties
-            }
-            className={`absolute max-w-none select-none ${
-              p.soloDaTablet ? 'hidden md:block' : 'block'
-            }`}
-          />
-        );
+      {macchie.flatMap((nome) => {
+        const { bordo, piante } = MACCHIE[nome] as Macchia;
+        const dallAlto = bordo === 'alto';
+
+        return piante.map((p: Pianta, i) => {
+          const [telefono, schermo] = LARGHEZZA[p.misura];
+          const fuori = PICCIOLO[p.disegno] + (p.extra ?? 0);
+          return (
+            <img
+              key={`${nome}-${p.disegno}-${i}`}
+              src={`/sfondi/${p.disegno}.svg`}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              style={
+                {
+                  left: `${p.x}%`,
+                  [dallAlto ? 'top' : 'bottom']: 0,
+                  // -50% centra la pianta sulla sua x, poi la spinta oltre
+                  // il bordo, poi la rotazione.
+                  transform: `translate(-50%, ${dallAlto ? '-' : ''}${fuori}%) rotate(${p.ruota}deg)${
+                    p.specchia ? ' scaleX(-1)' : ''
+                  }`,
+                  '--larga-telefono': `${telefono}vw`,
+                  '--larga-schermo': `${schermo}vw`,
+                  aspectRatio: String(RAPPORTO[p.disegno]),
+                } as React.CSSProperties
+              }
+              className={`absolute max-w-none select-none ${
+                p.soloDaTablet ? 'hidden md:block' : 'block'
+              }`}
+            />
+          );
+        });
       })}
     </span>
   );
