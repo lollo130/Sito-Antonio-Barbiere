@@ -122,11 +122,19 @@ a:active {
    della fascia. */
 .decoro {
   mix-blend-mode: multiply;
-  opacity: 0.26;
+  /* Primo piano. Lo sfondo, piu' sbiadito, sta in .decoro-sfondo: sono due
+     gruppi separati e non due opacita' sulle singole foglie, altrimenti le
+     foglie tornerebbero a vedersi l'una attraverso l'altra. */
+  opacity: 0.25;
   -webkit-mask-image: var(--sfuma);
   mask-image: var(--sfuma);
   -webkit-mask-composite: source-over;
   mask-composite: add;
+}
+
+/* Il piano di fondo: la stessa cornice, piu' indietro. */
+.decoro-sfondo {
+  opacity: 0.12;
 }
 
 /* Sull'apertura verde scura il ragionamento si rovescia: serve un tratto
@@ -135,10 +143,13 @@ a:active {
    verde, e "screen" fa sparire il nero lasciando solo il disegno. */
 .decoro-su-scuro {
   mix-blend-mode: screen;
-  /* Piu' alta della gemella su fondo chiaro: "screen" su un verde scuro
-     rende meno di quanto "multiply" renda sulla carta, e allo stesso
-     numero il disegno si perdeva. */
+  /* Piu' alta delle gemelle su fondo chiaro: "screen" su un verde scuro
+     rende meno di quanto "multiply" renda sulla carta, e agli stessi numeri
+     il disegno si perdeva. */
   opacity: 0.3;
+}
+.decoro-sfondo.decoro-su-scuro {
+  opacity: 0.15;
 }
 .decoro-su-scuro img {
   filter: invert(1) grayscale(1);
@@ -188,8 +199,14 @@ a:active {
   .decoro {
     opacity: 0.2;
   }
+  .decoro-sfondo {
+    opacity: 0.1;
+  }
   .decoro-su-scuro {
     opacity: 0.24;
+  }
+  .decoro-sfondo.decoro-su-scuro {
+    opacity: 0.12;
   }
 }
 
