@@ -70,7 +70,7 @@ export default function Home() {
             la toglie dall'aria di foglio bianco. Testo grande e chiaro su
             verde scuro: ben sopra il contrasto richiesto. */}
         <section className="relative overflow-hidden bg-verde px-5 py-14 text-carta-chiara sm:py-20">
-          <Decoro macchie={['fondoFitto', 'cimaRada']} suScuro />
+          <Decoro macchia="bosco" suScuro />
           <div className="relative mx-auto max-w-3xl text-center">
             <p className="font-titolo text-[0.7rem] uppercase tracking-[0.28em] text-marrone-chiaro">
               Dal {ANNO_FONDAZIONE} a Solarino
@@ -114,7 +114,7 @@ export default function Home() {
         {/* SERVIZI — fascia pietra con schede chiare, due colonne da tablet
             in su, così su schermo grande lo spazio è occupato davvero. */}
         <section className="relative overflow-hidden bg-pieno px-3 py-12 sm:px-5 sm:py-20">
-          <Decoro macchie={['fondoRado']} />
+          <Decoro macchia="sottobosco" />
           <div className="relative mx-auto max-w-4xl">
             <CorniceVintage>
             <Titolo>I nostri servizi</Titolo>
@@ -154,7 +154,7 @@ export default function Home() {
 
         {/* LA BOTTEGA — fascia chiara, il 1982 grande come un marchio. */}
         <section className="relative overflow-hidden bg-carta-chiara px-3 py-12 sm:px-5 sm:py-16">
-          <Decoro macchie={['cimaFitta']} />
+          <Decoro macchia="chioma" />
           <div className="relative mx-auto max-w-4xl">
             <CorniceVintage contenuto="grid gap-4 sm:grid-cols-[auto_1fr] sm:gap-10">
             <p className="font-titolo text-6xl font-bold leading-none text-cuoio-scuro sm:text-8xl">
@@ -180,7 +180,7 @@ export default function Home() {
 
         {/* GALLERIA — di nuovo la pietra, per staccare dalla fascia chiara. */}
         <section className="relative overflow-hidden bg-pieno px-3 py-12 sm:px-5 sm:py-20">
-          <Decoro macchie={['fondoFitto']} />
+          <Decoro macchia="bosco" />
           <div className="relative mx-auto max-w-4xl">
             <CorniceVintage>
               <Titolo>I nostri tagli</Titolo>
@@ -194,7 +194,7 @@ export default function Home() {
 
         {/* DOVE SIAMO — verde chiaro, l'ultima fascia prima del piede. */}
         <section className="relative overflow-hidden bg-verde-chiaro px-3 py-12 sm:px-5 sm:py-16">
-          <Decoro macchie={['cimaRada']} />
+          <Decoro macchia="radura" />
           <div className="relative mx-auto max-w-4xl">
             <CorniceVintage contenuto="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
