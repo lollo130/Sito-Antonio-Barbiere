@@ -241,7 +241,7 @@ a:active {
 .separatore-vintage {
   position: relative;
   display: flex;
-  height: 7rem;
+  height: 9rem;
   align-items: center;
   justify-content: center;
   /* Dal colore della fascia di sopra a quello della fascia di sotto.
@@ -253,17 +253,21 @@ a:active {
   background: linear-gradient(
     to bottom,
     var(--da) 0%,
-    color-mix(in srgb, var(--da) 94%, var(--a)) 14%,
-    color-mix(in srgb, var(--da) 78%, var(--a)) 28%,
+    color-mix(in srgb, var(--da) 99%, var(--a)) 8%,
+    color-mix(in srgb, var(--da) 95%, var(--a)) 16%,
+    color-mix(in srgb, var(--da) 86%, var(--a)) 26%,
+    color-mix(in srgb, var(--da) 70%, var(--a)) 38%,
     color-mix(in srgb, var(--da) 50%, var(--a)) 50%,
-    color-mix(in srgb, var(--da) 22%, var(--a)) 72%,
-    color-mix(in srgb, var(--da) 6%, var(--a)) 86%,
+    color-mix(in srgb, var(--da) 30%, var(--a)) 62%,
+    color-mix(in srgb, var(--da) 14%, var(--a)) 74%,
+    color-mix(in srgb, var(--da) 5%, var(--a)) 84%,
+    color-mix(in srgb, var(--da) 1%, var(--a)) 92%,
     var(--a) 100%
   );
 }
 @media (min-width: 768px) {
   .separatore-vintage {
-    height: 11rem;
+    height: 15rem;
   }
 }
 .separatore-vintage::before {
