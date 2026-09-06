@@ -128,8 +128,9 @@ a:active {
   opacity: 0.25;
   -webkit-mask-image: var(--sfuma);
   mask-image: var(--sfuma);
-  -webkit-mask-composite: source-over;
-  mask-composite: add;
+  /* Le sfumature dei lati si sommano, la zona sicura si sottrae: l'elenco
+     arriva dal componente, che sa quanti lati ha quella fascia. */
+  mask-composite: var(--composizione, add);
 }
 
 /* Il piano di fondo: la stessa cornice, piu' indietro. */

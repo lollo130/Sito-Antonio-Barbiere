@@ -123,6 +123,14 @@ type Pianta = {
 const PER_TELEFONO = 2.9;
 
 /**
+ * La zona al centro dove il testo deve restare pulito, come misure
+ * dell'ellisse da sottrarre alla maschera. Generosa di proposito: meglio
+ * qualche foglia in meno che una parola coperta, e il pubblico di questo
+ * sito legge male gia' di suo.
+ */
+const ZONA_SICURA = '44% 46%';
+
+/**
  * La cornice, lato per lato.
  *
  * Le posizioni non sono mai equidistanti e non si specchiano fra i lati
@@ -135,72 +143,72 @@ const MACCHIE = {
   // ha contenuto vicino ai bordi.
   cornicePiena: [
     // --- sfondo ---
-    { disegno: 'foglia-larga', bordo: 'basso', lungo: 21, giro: -14, vw: 11, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-sottile', bordo: 'alto', lungo: 47, giro: 22, vw: 9.5, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'sinistro', lungo: 61, giro: 31, vw: 12, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'monstera-incisa', bordo: 'destro', lungo: 37, giro: -19, vw: 10.5, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-lancia', bordo: 'basso', lungo: 66, giro: 27, vw: 8.5, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-larga', bordo: 'alto', lungo: 81, giro: -11, vw: 10, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-sottile', bordo: 'destro', lungo: 72, giro: 16, vw: 9, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'foglia-larga', bordo: 'basso', lungo: 11, giro: -14, vw: 11, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'foglia-sottile', bordo: 'alto', lungo: 6, giro: 22, vw: 9.5, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'sinistro', lungo: 17, giro: 31, vw: 12, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'monstera-incisa', bordo: 'destro', lungo: 24, giro: -19, vw: 10.5, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'foglia-lancia', bordo: 'basso', lungo: 92, giro: 27, vw: 8.5, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'foglia-larga', bordo: 'alto', lungo: 88, giro: -11, vw: 10, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'foglia-sottile', bordo: 'destro', lungo: 51, giro: 16, vw: 9, piano: 'sfondo', soloDaTablet: true },
     // --- primo piano ---
-    { disegno: 'palma', bordo: 'basso', lungo: 7, giro: 12, vw: 20, piano: 'primo' },
-    { disegno: 'monstera-incisa', bordo: 'alto', lungo: 16, giro: -8, vw: 15, extra: 2, piano: 'primo' },
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 14, giro: 24, vw: 13, piano: 'primo', soloDaTablet: true },
-    { disegno: 'foglia-lancia', bordo: 'sinistro', lungo: 28, giro: -21, vw: 12.5, piano: 'primo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'basso', lungo: 43, giro: -17, vw: 14, specchia: true, piano: 'primo', soloDaTablet: true },
-    { disegno: 'foglia-sottile', bordo: 'alto', lungo: 63, giro: 33, vw: 11.5, piano: 'primo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'basso', lungo: 89, giro: -13, vw: 17, extra: 3, specchia: true, piano: 'primo' },
-    { disegno: 'monstera-incisa', bordo: 'destro', lungo: 88, giro: 9, vw: 12, piano: 'primo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'basso', lungo: 4, giro: 12, vw: 20, piano: 'primo' },
+    { disegno: 'monstera-incisa', bordo: 'alto', lungo: 14, giro: -8, vw: 15, extra: 2, piano: 'primo' },
+    { disegno: 'foglia-larga', bordo: 'destro', lungo: 73, giro: 24, vw: 13, piano: 'primo', soloDaTablet: true },
+    { disegno: 'foglia-lancia', bordo: 'sinistro', lungo: 43, giro: -21, vw: 12.5, piano: 'primo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'basso', lungo: 84, giro: -17, vw: 14, specchia: true, piano: 'primo', soloDaTablet: true },
+    { disegno: 'foglia-sottile', bordo: 'alto', lungo: 95, giro: 33, vw: 11.5, piano: 'primo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'basso', lungo: 17, giro: -13, vw: 17, extra: 3, specchia: true, piano: 'primo' },
+    { disegno: 'monstera-incisa', bordo: 'destro', lungo: 94, giro: 9, vw: 12, piano: 'primo', soloDaTablet: true },
   ],
   // Cornice bassa: niente in cima, per le fasce col titolo in alto.
   corniceBassa: [
-    { disegno: 'foglia-sottile', bordo: 'basso', lungo: 34, giro: 19, vw: 9, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-larga', bordo: 'sinistro', lungo: 71, giro: -16, vw: 10.5, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'destro', lungo: 48, giro: 28, vw: 11, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-lancia', bordo: 'basso', lungo: 76, giro: -23, vw: 8.5, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'monstera-incisa', bordo: 'basso', lungo: 11, giro: 14, vw: 16, piano: 'primo' },
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 82, giro: -12, vw: 12.5, piano: 'primo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'basso', lungo: 57, giro: 31, vw: 13.5, piano: 'primo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'sinistro', lungo: 33, giro: -18, vw: 12, piano: 'primo', soloDaTablet: true },
-    { disegno: 'foglia-larga', bordo: 'basso', lungo: 93, giro: 8, vw: 15, extra: 2, piano: 'primo' },
+    { disegno: 'foglia-sottile', bordo: 'basso', lungo: 97, giro: 19, vw: 9, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'foglia-larga', bordo: 'sinistro', lungo: 66, giro: -16, vw: 10.5, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'destro', lungo: 12, giro: 28, vw: 11, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'foglia-lancia', bordo: 'basso', lungo: 14, giro: -23, vw: 8.5, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'monstera-incisa', bordo: 'basso', lungo: 89, giro: 14, vw: 16, piano: 'primo' },
+    { disegno: 'foglia-larga', bordo: 'destro', lungo: 38, giro: -12, vw: 12.5, piano: 'primo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'basso', lungo: 7, giro: 31, vw: 13.5, piano: 'primo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'sinistro', lungo: 88, giro: -18, vw: 12, piano: 'primo', soloDaTablet: true },
+    { disegno: 'foglia-larga', bordo: 'basso', lungo: 82, giro: 8, vw: 15, extra: 2, piano: 'primo' },
   ],
   // Cornice alta: niente in fondo, per le fasce che poggiano su un'altra.
   corniceAlta: [
-    { disegno: 'foglia-lancia', bordo: 'alto', lungo: 29, giro: -20, vw: 9.5, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'destro', lungo: 63, giro: 25, vw: 11, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-sottile', bordo: 'sinistro', lungo: 42, giro: -13, vw: 10, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-larga', bordo: 'alto', lungo: 71, giro: 17, vw: 10.5, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-larga', bordo: 'alto', lungo: 13, giro: 11, vw: 16, piano: 'primo' },
-    { disegno: 'monstera-incisa', bordo: 'alto', lungo: 52, giro: -15, vw: 13, piano: 'primo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'sinistro', lungo: 18, giro: 34, vw: 12.5, piano: 'primo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'alto', lungo: 86, giro: -9, vw: 15, extra: 2, piano: 'primo' },
-    { disegno: 'foglia-lancia', bordo: 'destro', lungo: 24, giro: 21, vw: 11.5, piano: 'primo', soloDaTablet: true },
+    { disegno: 'foglia-lancia', bordo: 'alto', lungo: 2, giro: -20, vw: 9.5, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'destro', lungo: 61, giro: 25, vw: 11, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'foglia-sottile', bordo: 'sinistro', lungo: 30, giro: -13, vw: 10, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'foglia-larga', bordo: 'alto', lungo: 82, giro: 17, vw: 10.5, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'foglia-larga', bordo: 'alto', lungo: 9, giro: 11, vw: 16, piano: 'primo' },
+    { disegno: 'monstera-incisa', bordo: 'alto', lungo: 85, giro: -15, vw: 13, piano: 'primo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'sinistro', lungo: 55, giro: 34, vw: 12.5, piano: 'primo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'alto', lungo: 17, giro: -9, vw: 15, extra: 2, piano: 'primo' },
+    { disegno: 'foglia-lancia', bordo: 'destro', lungo: 84, giro: 21, vw: 11.5, piano: 'primo', soloDaTablet: true },
   ],
   // Seconda cornice bassa: stesse regole, numeri tutti diversi. Due fasce
   // con la stessa disposizione si riconoscono a colpo d'occhio scorrendo, ed
   // e' esattamente l'effetto griglia che si vuole togliere.
   corniceBassaBis: [
-    { disegno: 'foglia-lancia', bordo: 'basso', lungo: 26, giro: -22, vw: 9.5, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'sinistro', lungo: 55, giro: 23, vw: 11.5, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 36, giro: -10, vw: 10, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-sottile', bordo: 'basso', lungo: 68, giro: 30, vw: 8, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'basso', lungo: 15, giro: 18, vw: 17, piano: 'primo' },
-    { disegno: 'monstera-incisa', bordo: 'destro', lungo: 69, giro: -24, vw: 13, piano: 'primo', soloDaTablet: true },
-    { disegno: 'foglia-larga', bordo: 'basso', lungo: 47, giro: -7, vw: 12.5, piano: 'primo', soloDaTablet: true },
-    { disegno: 'foglia-lancia', bordo: 'sinistro', lungo: 22, giro: 35, vw: 11, piano: 'primo', soloDaTablet: true },
-    { disegno: 'monstera-incisa', bordo: 'basso', lungo: 86, giro: 26, vw: 15.5, extra: 2, piano: 'primo' },
+    { disegno: 'foglia-lancia', bordo: 'basso', lungo: 18, giro: -22, vw: 9.5, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'sinistro', lungo: 77, giro: 23, vw: 11.5, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'foglia-larga', bordo: 'destro', lungo: 27, giro: -10, vw: 10, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'foglia-sottile', bordo: 'basso', lungo: 94, giro: 30, vw: 8, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'basso', lungo: 17, giro: 18, vw: 17, piano: 'primo' },
+    { disegno: 'monstera-incisa', bordo: 'destro', lungo: 48, giro: -24, vw: 13, piano: 'primo', soloDaTablet: true },
+    { disegno: 'foglia-larga', bordo: 'basso', lungo: 86, giro: -7, vw: 12.5, piano: 'primo', soloDaTablet: true },
+    { disegno: 'foglia-lancia', bordo: 'sinistro', lungo: 9, giro: 35, vw: 11, piano: 'primo', soloDaTablet: true },
+    { disegno: 'monstera-incisa', bordo: 'basso', lungo: 10, giro: 26, vw: 15.5, extra: 2, piano: 'primo' },
   ],
   // Seconda cornice alta, stesso ragionamento.
   corniceAltaBis: [
-    { disegno: 'foglia-larga', bordo: 'alto', lungo: 38, giro: 29, vw: 10, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-sottile', bordo: 'destro', lungo: 52, giro: -17, vw: 9.5, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'sinistro', lungo: 66, giro: 20, vw: 11, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'monstera-incisa', bordo: 'alto', lungo: 79, giro: -6, vw: 10.5, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'monstera-incisa', bordo: 'alto', lungo: 19, giro: -25, vw: 15.5, piano: 'primo' },
-    { disegno: 'foglia-lancia', bordo: 'destro', lungo: 31, giro: 15, vw: 12, piano: 'primo', soloDaTablet: true },
-    { disegno: 'foglia-larga', bordo: 'sinistro', lungo: 47, giro: -4, vw: 11.5, piano: 'primo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'alto', lungo: 58, giro: 32, vw: 13, piano: 'primo', soloDaTablet: true },
-    { disegno: 'foglia-larga', bordo: 'alto', lungo: 91, giro: -19, vw: 14.5, extra: 2, piano: 'primo' },
+    { disegno: 'foglia-larga', bordo: 'alto', lungo: 92, giro: 29, vw: 10, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'foglia-sottile', bordo: 'destro', lungo: 70, giro: -17, vw: 9.5, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'sinistro', lungo: 20, giro: 20, vw: 11, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'monstera-incisa', bordo: 'alto', lungo: 5, giro: -6, vw: 10.5, piano: 'sfondo', soloDaTablet: true },
+    { disegno: 'monstera-incisa', bordo: 'alto', lungo: 82, giro: -25, vw: 15.5, piano: 'primo' },
+    { disegno: 'foglia-lancia', bordo: 'destro', lungo: 91, giro: 15, vw: 12, piano: 'primo', soloDaTablet: true },
+    { disegno: 'foglia-larga', bordo: 'sinistro', lungo: 46, giro: -4, vw: 11.5, piano: 'primo', soloDaTablet: true },
+    { disegno: 'palma', bordo: 'alto', lungo: 12, giro: 32, vw: 13, piano: 'primo', soloDaTablet: true },
+    { disegno: 'foglia-larga', bordo: 'alto', lungo: 82, giro: -19, vw: 14.5, extra: 2, piano: 'primo' },
   ],
 } satisfies Record<string, Pianta[]>;
 
@@ -216,11 +224,16 @@ export type NomeMacchia = keyof typeof MACCHIE;
  * l'ordine invertito servirebbero quattro formule diverse.
  */
 function posizione(p: Pianta): CSSProperties {
+  // L'ancoraggio cade FUORI dal bordo di 20 px, non sul bordo: la pianta
+  // parte da oltre il margine del browser e penetra verso l'interno, come una
+  // pianta vera che ha le radici fuori dall'inquadratura. Sul bordo esatto
+  // sembrava appoggiata al vetro.
+  const FUORI = '1.25rem';
   const ancoraggio: Record<Bordo, { left: string; top: string }> = {
-    basso: { left: `${p.lungo}%`, top: '100%' },
-    alto: { left: `${p.lungo}%`, top: '0%' },
-    sinistro: { left: '0%', top: `${p.lungo}%` },
-    destro: { left: '100%', top: `${p.lungo}%` },
+    basso: { left: `${p.lungo}%`, top: `calc(100% + ${FUORI})` },
+    alto: { left: `${p.lungo}%`, top: `-${FUORI}` },
+    sinistro: { left: `-${FUORI}`, top: `${p.lungo}%` },
+    destro: { left: `calc(100% + ${FUORI})`, top: `${p.lungo}%` },
   };
   const rientro = PICCIOLO[p.disegno] + (p.extra ?? 0) - 50;
 
@@ -247,12 +260,29 @@ function Strato({
   // (in index.css) tiene quel che è visibile in una QUALUNQUE di esse.
   // Sovrapposte normalmente, l'ultima cancellerebbe le altre.
   const lati = [...new Set(piante.map((p) => p.bordo))];
-  const maschera = lati
-    .map(
+
+  // La maschera si costruisce in due tempi.
+  //
+  // Prima una sfumatura per ogni lato da cui nasce qualcosa, tutte UNITE
+  // ("add" in index.css): un punto si vede se e' visibile in una qualunque
+  // di esse. Sovrapposte normalmente, l'ultima cancellerebbe le altre.
+  //
+  // Poi si SOTTRAE la zona sicura: l'ellisse al centro dove stanno titolo,
+  // paragrafo e bottoni. E' l'unico modo per essere certi che nessuna foglia
+  // finisca sul testo — sperare che siano abbastanza corte non basta, perche'
+  // basta cambiare una misura o restringere la finestra e ci tornano sopra.
+  // Il bordo dell'ellisse e' sfumato, quindi le foglie si spengono avvicinandosi
+  // al testo invece di essere tagliate di netto.
+  const maschera = [
+    ...lati.map(
       (b) =>
         `linear-gradient(${SFUMATURA[b]}, transparent 0, #000 2.5rem, #000 30%, transparent 78%)`,
-    )
-    .join(', ');
+    ),
+    `radial-gradient(${ZONA_SICURA} at 50% 43%, #000 70%, transparent 100%)`,
+  ].join(', ');
+
+  // "add" fra tutte le sfumature dei lati, "subtract" per l'ultima.
+  const composizione = [...lati.map(() => 'add'), 'subtract'].join(', ');
 
   return (
     <span
@@ -260,7 +290,7 @@ function Strato({
       className={`decoro ${piano === 'sfondo' ? 'decoro-sfondo' : ''} ${
         suScuro ? 'decoro-su-scuro' : ''
       } pointer-events-none absolute inset-0 z-0 block overflow-hidden`}
-      style={{ '--sfuma': maschera } as CSSProperties}
+      style={{ '--sfuma': maschera, '--composizione': composizione } as CSSProperties}
     >
       {piante.map((p, i) => (
         <img
