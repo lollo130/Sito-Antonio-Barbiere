@@ -157,23 +157,31 @@ a:active {
 }
 
 /* La sfumatura parte dal bordo da cui crescono le piante e si spegne prima
-   di arrivare al testo. Prima erano quattro sfumature radiali, una per
+   di arrivare al testo.
+
+   E si spegne ANCHE sul bordo stesso, nei primi 2,5 rem. Senza, la maschera
+   era piena proprio li' e il ritaglio della fascia affettava le foglie di
+   netto: si vedeva la riga del taglio. Una misura fissa e non una
+   percentuale, perche' al 5% la dissolvenza sarebbe una cosa su una fascia
+   alta e un'altra su una bassa, e la pagina ne ha di tutt'e due.
+   Corta di proposito: allungandola si mangia il picciolo, che e' quello che
+   fa sembrare le piante piantate invece che appoggiate. Prima erano quattro sfumature radiali, una per
    angolo; adesso che le piante crescono lungo un bordo intero ne bastano
    due, ed e' anche piu' onesto: il fogliame si diradare allontanandosi dal
    terreno, non da un angolo. */
 .sfuma-dal-fondo {
-  --sfuma: linear-gradient(to top, #000 0%, #000 24%, transparent 74%);
+  --sfuma: linear-gradient(to top, transparent 0, #000 2.5rem, #000 28%, transparent 76%);
 }
 .sfuma-dalla-cima {
-  --sfuma: linear-gradient(to bottom, #000 0%, #000 24%, transparent 74%);
+  --sfuma: linear-gradient(to bottom, transparent 0, #000 2.5rem, #000 28%, transparent 76%);
 }
 /* Quando la fascia ha piante sia sopra che sotto le due sfumature vanno
    unite, non sovrapposte: "add" tiene quel che e' visibile nell'una O
-   nell'altra. Con la sovrapposizione normale la seconda avrebbe cancellato
-   la prima. */
+   nell'altra. Con la sovrapposizione normale la seconda cancellerebbe la
+   prima e sparirebbe meta' del fogliame. */
 .sfuma-da-entrambi {
-  --sfuma: linear-gradient(to top, #000 0%, #000 24%, transparent 74%),
-    linear-gradient(to bottom, #000 0%, #000 24%, transparent 74%);
+  --sfuma: linear-gradient(to top, transparent 0, #000 2.5rem, #000 28%, transparent 76%),
+    linear-gradient(to bottom, transparent 0, #000 2.5rem, #000 28%, transparent 76%);
 }
 
 @media (max-width: 767px) {
