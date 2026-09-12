@@ -211,65 +211,138 @@ const ZONA_SICURA = '46% 48%';
 /**
  * La cornice, lato per lato.
  *
- * Poche e distanziate: lungo ogni bordo la distanza fra due vicine supera la
- * somma dei loro mezzi ingombri, con margine. I bordi orizzontali hanno
- * foglie solo negli spicchi fuori dalla colonna del testo (sotto il 18% e
- * sopra l'82%), quindi ne reggono due per lato e non di più.
+ * Distanziate: lungo ogni bordo la distanza fra due vicine supera la somma dei
+ * loro mezzi ingombri, con margine. Non è più una cosa da ricontrollare a
+ * mano a ogni ritocco — la verifica `controllaDistanze()`, qui sotto.
+ *
+ * I bordi orizzontali hanno foglie solo negli spicchi fuori dalla colonna del
+ * testo (sotto il 18% e sopra l'82%), quindi ne reggono due per lato e non di
+ * più. I bordi verticali invece sono liberi per tutta la loro lunghezza: ne
+ * reggono due, e prima ne portavano una sola, piantata esattamente a metà.
+ *
+ * Quel `lungo: 50` ripetuto era il difetto della vecchia disposizione: dieci
+ * fianchi, dieci foglie tutte alla stessa quota, ognuna in faccia alla sua
+ * gemella dall'altra parte. Da lontano si leggeva come una simmetria fatta col
+ * righello, non come una pianta cresciuta lì. Adesso ogni fianco ne porta due,
+ * a quote diverse, di due misure diverse e su due piani diversi; e le quote di
+ * sinistra sono sfalsate rispetto a quelle di destra, così la fascia non si
+ * specchia mai su sé stessa.
  */
 const MACCHIE = {
-  // Apertura: una foglia per lato verticale a meta' bordo, due per angolo in
-  // alto e in basso.
+  // Apertura. Le dipinte qui non entrano (regola 7): solo incisioni.
   cornicePiena: [
-    { disegno: 'foglia-sottile', bordo: 'destro', lungo: 50, giro: -18, ingombro: 30, piano: 'sfondo' },
+    { disegno: 'foglia-larga', bordo: 'sinistro', lungo: 22, giro: 22, ingombro: 22, piano: 'sfondo' },
+    { disegno: 'foglia-sottile', bordo: 'destro', lungo: 38, giro: -18, ingombro: 30, piano: 'sfondo' },
     { disegno: 'foglia-larga', bordo: 'alto', lungo: 91, giro: -12, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
     { disegno: 'palma', bordo: 'basso', lungo: 8, giro: 16, ingombro: 13, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'sinistro', lungo: 50, giro: 27, ingombro: 33, piano: 'primo' },
+    { disegno: 'palma', bordo: 'sinistro', lungo: 64, giro: 27, ingombro: 33, piano: 'primo' },
+    { disegno: 'foglia-lancia', bordo: 'destro', lungo: 76, giro: 12, ingombro: 20, piano: 'primo' },
     { disegno: 'monstera-incisa', bordo: 'alto', lungo: 9, giro: 13, ingombro: 11, extra: 2, piano: 'primo', soloDaTablet: true },
     { disegno: 'foglia-lancia', bordo: 'basso', lungo: 92, giro: -9, ingombro: 13, piano: 'primo', soloDaTablet: true },
   ],
-  // LE QUATTRO FASCE CHIARE. Qui le dipinte sono ammesse (regola 7), e ogni
-  // fascia ne prende due tenendo due incisioni: mescolate, non a blocchi.
-  // Le posizioni e gli ingombri lungo il bordo sono gli stessi di prima, così
-  // le distanze già verificate (regola 2) restano valide.
+  // LE QUATTRO FASCE CHIARE. Le incisioni che c'erano restano tutte, al loro
+  // posto; le dipinte si aggiungono accanto, una per fianco.
   //
-  // Gli ingombri delle dipinte più slanciate sono più bassi di quelli che
-  // hanno preso il posto: a parità di larghezza una foglia lunga il triplo
-  // entra tre volte più a fondo nella fascia, e andrebbe a sbattere contro il
-  // tetto che il CSS le mette (`max-width`/`max-height`), che la schiaccia
-  // invece di rimpicciolirla. Meglio partire più strette.
+  // Le dipinte più slanciate hanno ingombri più bassi delle incisioni vicine.
+  // Non è timidezza: a parità di larghezza una foglia lunga il triplo entra
+  // tre volte più a fondo nella fascia, e andrebbe a pestare la zona sicura
+  // del testo.
 
   // Cornice bassa: niente in cima, per le fasce col titolo in alto.
   corniceBassa: [
-    { disegno: 'sansevieria', bordo: 'destro', lungo: 50, giro: -15, ingombro: 26, piano: 'sfondo' },
+    { disegno: 'ciuffo-variegato', bordo: 'sinistro', lungo: 26, giro: -12, ingombro: 20, piano: 'sfondo' },
+    { disegno: 'foglia-larga', bordo: 'destro', lungo: 34, giro: -15, ingombro: 30, piano: 'sfondo' },
     { disegno: 'foglia-lancia', bordo: 'basso', lungo: 90, giro: 22, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'monstera-incisa', bordo: 'sinistro', lungo: 50, giro: 28, ingombro: 30, piano: 'primo' },
-    { disegno: 'ciuffo-variegato', bordo: 'basso', lungo: 9, giro: -11, ingombro: 12, piano: 'primo', soloDaTablet: true },
+    { disegno: 'monstera-incisa', bordo: 'sinistro', lungo: 66, giro: 28, ingombro: 30, piano: 'primo' },
+    { disegno: 'sansevieria', bordo: 'destro', lungo: 74, giro: 8, ingombro: 22, piano: 'primo' },
+    { disegno: 'palma', bordo: 'basso', lungo: 9, giro: -11, ingombro: 11, piano: 'primo', soloDaTablet: true },
   ],
   // Cornice alta: niente in fondo, per le fasce che poggiano su un'altra.
   corniceAlta: [
-    { disegno: 'foglia-zebrata', bordo: 'sinistro', lungo: 50, giro: 19, ingombro: 24, piano: 'sfondo' },
+    { disegno: 'palma', bordo: 'sinistro', lungo: 32, giro: 19, ingombro: 33, piano: 'sfondo' },
+    { disegno: 'foglia-nastro', bordo: 'destro', lungo: 26, giro: 21, ingombro: 20, piano: 'sfondo' },
     { disegno: 'foglia-sottile', bordo: 'alto', lungo: 8, giro: -23, ingombro: 11, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 50, giro: -7, ingombro: 30, piano: 'primo' },
-    { disegno: 'calatea-tonda', bordo: 'alto', lungo: 92, giro: 34, ingombro: 13, extra: 2, piano: 'primo', soloDaTablet: true },
+    { disegno: 'foglia-zebrata', bordo: 'sinistro', lungo: 72, giro: -14, ingombro: 20, piano: 'primo' },
+    { disegno: 'foglia-larga', bordo: 'destro', lungo: 66, giro: -7, ingombro: 30, piano: 'primo' },
+    { disegno: 'monstera-incisa', bordo: 'alto', lungo: 92, giro: 34, ingombro: 13, extra: 2, piano: 'primo', soloDaTablet: true },
   ],
   // Seconda cornice bassa: stesse regole, numeri diversi. Due fasce con la
   // stessa disposizione si riconoscono a colpo d'occhio scorrendo.
   corniceBassaBis: [
-    { disegno: 'foglia-nastro', bordo: 'sinistro', lungo: 50, giro: -26, ingombro: 25, piano: 'sfondo' },
+    { disegno: 'foglia-sottile', bordo: 'sinistro', lungo: 30, giro: -26, ingombro: 34, piano: 'sfondo' },
+    { disegno: 'calatea-tonda', bordo: 'destro', lungo: 26, giro: -9, ingombro: 20, piano: 'sfondo' },
     { disegno: 'palma', bordo: 'basso', lungo: 88, giro: 12, ingombro: 13, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 50, giro: 17, ingombro: 34, piano: 'primo' },
-    { disegno: 'calatea-tonda', bordo: 'basso', lungo: 11, giro: -14, ingombro: 12, piano: 'primo', soloDaTablet: true },
+    { disegno: 'foglie-appuntite', bordo: 'sinistro', lungo: 72, giro: 18, ingombro: 16, piano: 'primo' },
+    { disegno: 'foglia-larga', bordo: 'destro', lungo: 66, giro: 17, ingombro: 34, piano: 'primo' },
+    { disegno: 'monstera-incisa', bordo: 'basso', lungo: 11, giro: -14, ingombro: 11, piano: 'primo', soloDaTablet: true },
   ],
   // Seconda cornice alta, stesso ragionamento.
   corniceAltaBis: [
-    { disegno: 'foglie-appuntite', bordo: 'destro', lungo: 50, giro: -20, ingombro: 16, piano: 'sfondo' },
+    { disegno: 'foglia-zebrata', bordo: 'sinistro', lungo: 26, giro: -15, ingombro: 20, piano: 'sfondo' },
+    { disegno: 'foglia-larga', bordo: 'destro', lungo: 34, giro: -20, ingombro: 30, piano: 'sfondo' },
     { disegno: 'foglia-lancia', bordo: 'alto', lungo: 89, giro: 15, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'monstera-incisa', bordo: 'sinistro', lungo: 50, giro: 30, ingombro: 30, piano: 'primo' },
-    { disegno: 'ciuffo-variegato', bordo: 'alto', lungo: 10, giro: -8, ingombro: 12, extra: 2, piano: 'primo', soloDaTablet: true },
+    { disegno: 'monstera-incisa', bordo: 'sinistro', lungo: 66, giro: 30, ingombro: 30, piano: 'primo' },
+    { disegno: 'sansevieria', bordo: 'destro', lungo: 74, giro: 11, ingombro: 20, piano: 'primo' },
+    { disegno: 'palma', bordo: 'alto', lungo: 10, giro: -8, ingombro: 11, extra: 2, piano: 'primo', soloDaTablet: true },
   ],
 } satisfies Record<string, Pianta[]>;
 
 export type NomeMacchia = keyof typeof MACCHIE;
+
+/**
+ * La regola 2, verificata invece che raccomandata.
+ *
+ * Due foglie sullo stesso bordo non si toccano se la distanza fra i loro
+ * centri supera la somma dei mezzi ingombri. Il margine in più serve perché
+ * l'ingombro è la larghezza del disegno, e una foglia ruotata di 30 gradi
+ * occupa lungo il bordo qualcosa in più della sua larghezza.
+ *
+ * Gira solo in sviluppo, una volta sola al caricamento del modulo: chi sposta
+ * un numero lo scopre subito, invece di accorgersene da uno screenshot fatto a
+ * una sola larghezza di finestra.
+ *
+ * E controlla TUTTE E DUE LE SCALE. Sul telefono gli ingombri vengono
+ * moltiplicati (`PER_TELEFONO`) mentre le distanze restano quelle: è lì che
+ * due foglie si pestano per prime, e un controllo fatto solo sui numeri dello
+ * schermo grande direbbe che va tutto bene proprio nel caso peggiore.
+ */
+const MARGINE = 1.15;
+
+function controllaDistanze() {
+  const scale = [
+    { nome: 'schermo', fattore: { orizzontale: 1, verticale: 1 } },
+    { nome: 'telefono', fattore: PER_TELEFONO },
+  ];
+
+  for (const [macchia, piante] of Object.entries(MACCHIE) as [string, Pianta[]][]) {
+    for (let i = 0; i < piante.length; i++) {
+      for (let j = i + 1; j < piante.length; j++) {
+        const a = piante[i];
+        const b = piante[j];
+        if (a.bordo !== b.bordo) continue;
+        // Due piante che non compaiono mai insieme non possono pestarsi.
+        if (a.soloDaTablet !== b.soloDaTablet) continue;
+
+        const distanza = Math.abs(a.lungo - b.lungo);
+        for (const scala of scale) {
+          // Sul telefono le nascoste non ci sono: quella scala non le riguarda.
+          if (scala.nome === 'telefono' && a.soloDaTablet) continue;
+          const k = eVerticale(a.bordo) ? scala.fattore.verticale : scala.fattore.orizzontale;
+          const minima = (((a.ingombro + b.ingombro) / 2) * k) * MARGINE;
+          if (distanza < minima) {
+            console.warn(
+              `Decoro "${macchia}" (${scala.nome}): ${a.disegno} e ${b.disegno} sul bordo ` +
+                `${a.bordo} distano ${distanza} ma ne servono ${minima.toFixed(1)} — ` +
+                `si accavallano (regola 2 in cima al file).`,
+            );
+          }
+        }
+      }
+    }
+  }
+}
+
+if (import.meta.env.DEV) controllaDistanze();
 
 /**
  * Dove finisce una pianta.
