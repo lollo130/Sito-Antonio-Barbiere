@@ -231,58 +231,61 @@ const ZONA_SICURA = '46% 48%';
 const MACCHIE = {
   // Apertura. Le dipinte qui non entrano (regola 7): solo incisioni.
   cornicePiena: [
-    { disegno: 'foglia-larga', bordo: 'sinistro', lungo: 22, giro: 22, ingombro: 22, piano: 'sfondo' },
-    { disegno: 'foglia-sottile', bordo: 'destro', lungo: 38, giro: -18, ingombro: 30, piano: 'sfondo' },
+    { disegno: 'foglia-larga', bordo: 'sinistro', lungo: 26, giro: 22, ingombro: 26, piano: 'sfondo' },
+    { disegno: 'foglia-sottile', bordo: 'destro', lungo: 32, giro: -18, ingombro: 30, piano: 'sfondo' },
     { disegno: 'foglia-larga', bordo: 'alto', lungo: 91, giro: -12, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
     { disegno: 'palma', bordo: 'basso', lungo: 8, giro: 16, ingombro: 13, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'sinistro', lungo: 64, giro: 27, ingombro: 33, piano: 'primo' },
-    { disegno: 'foglia-lancia', bordo: 'destro', lungo: 76, giro: 12, ingombro: 20, piano: 'primo' },
+    { disegno: 'palma', bordo: 'sinistro', lungo: 70, giro: 27, ingombro: 33, piano: 'primo' },
+    { disegno: 'foglia-lancia', bordo: 'destro', lungo: 76, giro: 12, ingombro: 26, piano: 'primo' },
     { disegno: 'monstera-incisa', bordo: 'alto', lungo: 9, giro: 13, ingombro: 11, extra: 2, piano: 'primo', soloDaTablet: true },
     { disegno: 'foglia-lancia', bordo: 'basso', lungo: 92, giro: -9, ingombro: 13, piano: 'primo', soloDaTablet: true },
   ],
-  // LE QUATTRO FASCE CHIARE. Le incisioni che c'erano restano tutte, al loro
-  // posto; le dipinte si aggiungono accanto, una per fianco.
+  // LE QUATTRO FASCE CHIARE. Le incisioni che c'erano restano tutte; le
+  // dipinte si aggiungono accanto, una per fianco, alla LORO STESSA MISURA.
   //
-  // Le dipinte più slanciate hanno ingombri più bassi delle incisioni vicine.
-  // Non è timidezza: a parità di larghezza una foglia lunga il triplo entra
-  // tre volte più a fondo nella fascia, e andrebbe a pestare la zona sicura
-  // del testo.
+  // E stanno sempre in primo piano, mai sullo sfondo. Non e' un capriccio, e'
+  // una misura: sul piano di sfondo, al 12%, una dipinta toglie al fondo fra i
+  // 5 e i 10 punti di grigio su 232 — sotto la soglia di quello che si vede.
+  // Le incisioni li' reggono perche' il loro tratto e' quasi nero e ne toglie
+  // 13-17. Chiaro e scuro non si comportano allo stesso modo quando li
+  // sbiadisci: le prime volte le avevo messe piccole e sullo sfondo, ed erano
+  // sul sito senza esserci.
 
   // Cornice bassa: niente in cima, per le fasce col titolo in alto.
   corniceBassa: [
-    { disegno: 'ciuffo-variegato', bordo: 'sinistro', lungo: 26, giro: -12, ingombro: 20, piano: 'sfondo' },
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 34, giro: -15, ingombro: 30, piano: 'sfondo' },
+    { disegno: 'monstera-incisa', bordo: 'sinistro', lungo: 30, giro: 28, ingombro: 30, piano: 'sfondo' },
+    { disegno: 'foglia-larga', bordo: 'destro', lungo: 24, giro: -15, ingombro: 30, piano: 'sfondo' },
     { disegno: 'foglia-lancia', bordo: 'basso', lungo: 90, giro: 22, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'monstera-incisa', bordo: 'sinistro', lungo: 66, giro: 28, ingombro: 30, piano: 'primo' },
-    { disegno: 'sansevieria', bordo: 'destro', lungo: 74, giro: 8, ingombro: 22, piano: 'primo' },
+    { disegno: 'ciuffo-variegato', bordo: 'sinistro', lungo: 74, giro: -12, ingombro: 30, piano: 'primo' },
+    { disegno: 'sansevieria', bordo: 'destro', lungo: 68, giro: 8, ingombro: 30, piano: 'primo' },
     { disegno: 'palma', bordo: 'basso', lungo: 9, giro: -11, ingombro: 11, piano: 'primo', soloDaTablet: true },
   ],
   // Cornice alta: niente in fondo, per le fasce che poggiano su un'altra.
   corniceAlta: [
-    { disegno: 'palma', bordo: 'sinistro', lungo: 32, giro: 19, ingombro: 33, piano: 'sfondo' },
-    { disegno: 'foglia-nastro', bordo: 'destro', lungo: 26, giro: 21, ingombro: 20, piano: 'sfondo' },
+    { disegno: 'palma', bordo: 'sinistro', lungo: 25, giro: 19, ingombro: 33, piano: 'sfondo' },
+    { disegno: 'foglia-larga', bordo: 'destro', lungo: 33, giro: -7, ingombro: 30, piano: 'sfondo' },
     { disegno: 'foglia-sottile', bordo: 'alto', lungo: 8, giro: -23, ingombro: 11, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-zebrata', bordo: 'sinistro', lungo: 72, giro: -14, ingombro: 20, piano: 'primo' },
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 66, giro: -7, ingombro: 30, piano: 'primo' },
+    { disegno: 'foglia-zebrata', bordo: 'sinistro', lungo: 69, giro: -14, ingombro: 28, piano: 'primo' },
+    { disegno: 'foglia-nastro', bordo: 'destro', lungo: 77, giro: 21, ingombro: 28, piano: 'primo' },
     { disegno: 'monstera-incisa', bordo: 'alto', lungo: 92, giro: 34, ingombro: 13, extra: 2, piano: 'primo', soloDaTablet: true },
   ],
   // Seconda cornice bassa: stesse regole, numeri diversi. Due fasce con la
   // stessa disposizione si riconoscono a colpo d'occhio scorrendo.
   corniceBassaBis: [
-    { disegno: 'foglia-sottile', bordo: 'sinistro', lungo: 30, giro: -26, ingombro: 34, piano: 'sfondo' },
-    { disegno: 'calatea-tonda', bordo: 'destro', lungo: 26, giro: -9, ingombro: 20, piano: 'sfondo' },
+    { disegno: 'foglia-sottile', bordo: 'sinistro', lungo: 29, giro: -26, ingombro: 34, piano: 'sfondo' },
+    { disegno: 'foglia-larga', bordo: 'destro', lungo: 23, giro: 17, ingombro: 34, piano: 'sfondo' },
     { disegno: 'palma', bordo: 'basso', lungo: 88, giro: 12, ingombro: 13, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglie-appuntite', bordo: 'sinistro', lungo: 72, giro: 18, ingombro: 16, piano: 'primo' },
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 66, giro: 17, ingombro: 34, piano: 'primo' },
+    { disegno: 'foglie-appuntite', bordo: 'sinistro', lungo: 73, giro: 18, ingombro: 22, piano: 'primo' },
+    { disegno: 'calatea-tonda', bordo: 'destro', lungo: 67, giro: -9, ingombro: 28, piano: 'primo' },
     { disegno: 'monstera-incisa', bordo: 'basso', lungo: 11, giro: -14, ingombro: 11, piano: 'primo', soloDaTablet: true },
   ],
   // Seconda cornice alta, stesso ragionamento.
   corniceAltaBis: [
-    { disegno: 'foglia-zebrata', bordo: 'sinistro', lungo: 26, giro: -15, ingombro: 20, piano: 'sfondo' },
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 34, giro: -20, ingombro: 30, piano: 'sfondo' },
+    { disegno: 'monstera-incisa', bordo: 'sinistro', lungo: 34, giro: 30, ingombro: 30, piano: 'sfondo' },
+    { disegno: 'foglia-larga', bordo: 'destro', lungo: 26, giro: -20, ingombro: 30, piano: 'sfondo' },
     { disegno: 'foglia-lancia', bordo: 'alto', lungo: 89, giro: 15, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'monstera-incisa', bordo: 'sinistro', lungo: 66, giro: 30, ingombro: 30, piano: 'primo' },
-    { disegno: 'sansevieria', bordo: 'destro', lungo: 74, giro: 11, ingombro: 20, piano: 'primo' },
+    { disegno: 'foglia-zebrata', bordo: 'sinistro', lungo: 78, giro: -15, ingombro: 28, piano: 'primo' },
+    { disegno: 'sansevieria', bordo: 'destro', lungo: 70, giro: 11, ingombro: 28, piano: 'primo' },
     { disegno: 'palma', bordo: 'alto', lungo: 10, giro: -8, ingombro: 11, extra: 2, piano: 'primo', soloDaTablet: true },
   ],
 } satisfies Record<string, Pianta[]>;

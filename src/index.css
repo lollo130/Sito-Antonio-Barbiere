@@ -192,15 +192,16 @@ a:active {
 }
 
 /* Le piante dipinte.
-   Un'incisione e' quasi tutta bianca: "multiply" la cancella e resta il
-   tratto, sottile. Un dipinto ha campiture verdi larghe, che "multiply"
-   tiene per intero: alla stessa opacita' pesa molto di piu' e si mangia la
-   fascia. Qui viene portato al peso dell'incisione — un po' meno colore,
-   un po' piu' chiaro — invece che con l'opacita': l'opacita' sulla singola
-   foglia le farebbe tornare a vedersi l'una attraverso l'altra, che e'
-   esattamente il problema che i due piani risolvono (regola 4). */
+   Qui prima c'era anche un `brightness` che le schiariva, messo dando per
+   scontato che un dipinto, avendo campiture piene invece di sole linee,
+   pesasse piu' di un'incisione. Misurato, non e' vero: sulla stessa fascia e
+   alla stessa opacita' una dipinta toglie al fondo 5-18 punti di grigio e
+   un'incisione 13-17. Schiarirle le rendeva soltanto invisibili.
+   Resta la desaturazione, che serve a un'altra cosa: tenerle dentro i verdi
+   spenti del sito invece dei verdi vivi dell'originale. Il peso lo regolano i
+   due piani, come per tutte le altre (regola 4). */
 .decoro .pianta-dipinta {
-  filter: saturate(0.78) brightness(1.08);
+  filter: saturate(0.85);
 }
 @media (min-width: 768px) {
   .decoro .pianta-orizzontale,
