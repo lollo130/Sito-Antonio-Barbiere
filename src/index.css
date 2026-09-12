@@ -171,6 +171,35 @@ a:active {
 .decoro {
   container-type: size;
 }
+
+/* Nessuna foglia finisce contro uno spigolo.
+   Il contenitore taglia (overflow: hidden), e la maschera di sopra sfuma solo
+   lungo il bordo da cui la pianta nasce: una foglia che sporge da un ALTRO
+   lato — una laterale abbastanza alta da uscire sopra o sotto — la' finiva di
+   netto. Misurate, erano tre su trentadue, fino a 91 px fuori.
+   Qui la sfumatura sta su tutti e quattro i lati: due gradienti incrociati,
+   uno per asse, intersecati. L'intersezione e' commutativa, quindi a
+   differenza dell'elenco di sopra l'ordine non conta e non c'e' niente da
+   sbagliare.
+   Basta che la maschera arrivi a zero ESATTAMENTE sul bordo: quello che sta
+   fuori viene tagliato come prima, ma e' gia' trasparente e la riga non si
+   vede. La larghezza della fascia decide solo quanto e' morbido il passaggio. */
+.bordi-morbidi {
+  /* Stessa rampa della maschera di sopra. Larga quanto basta perche' il
+     passaggio non si legga come un taglio, e non di piu': ogni millimetro in
+     piu' e' fogliame sbiadito che non serviva sbiadire. */
+  --sfuma-bordo: 2rem;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0, #000 var(--sfuma-bordo), #000 calc(100% - var(--sfuma-bordo)), transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 var(--sfuma-bordo), #000 calc(100% - var(--sfuma-bordo)), transparent 100%);
+  mask-image:
+    linear-gradient(to right, transparent 0, #000 var(--sfuma-bordo), #000 calc(100% - var(--sfuma-bordo)), transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 var(--sfuma-bordo), #000 calc(100% - var(--sfuma-bordo)), transparent 100%);
+  /* Solo la proprieta' standard, come per la maschera di sopra: la versione
+     -webkit- di questa accetta parole diverse ("source-in" invece di
+     "intersect") e messe insieme si contendono lo stesso effetto. */
+  mask-composite: intersect;
+}
 /* Il tetto e' sempre sulla LARGHEZZA, anche quando quello che si vuole
    limitare e' l'altezza.
    Un `max-height` non rimpicciolisce la foglia: le taglia l'altezza e le

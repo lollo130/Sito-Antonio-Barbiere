@@ -385,10 +385,18 @@ function Strato({
 }) {
   if (piante.length === 0) return null;
 
-  // Una sfumatura per ogni lato da cui nasce qualcosa, tutte UNITE ("add" in
-  // index.css): un punto si vede se è visibile in una qualunque di esse. Poi
-  // si SOTTRAE la zona sicura del testo. Entrambe con rampe lunghe: le foglie
-  // si dissolvono fino a sparire invece di finire di colpo.
+  // DUE MASCHERE ANNIDATE, e non una sola con più strati.
+  //
+  // Questa, sul contenitore, dice DA DOVE nasce il fogliame: una sfumatura per
+  // ogni lato da cui spunta qualcosa, tutte UNITE ("add" in index.css), meno
+  // la zona sicura del testo.
+  //
+  // Quella dentro (`.bordi-morbidi`) dice tutt'altro: che niente deve finire
+  // contro uno spigolo. Sono due cose separate, e tenerle separate non è
+  // pignoleria — impilare due gradienti in più in questo stesso elenco
+  // vorrebbe dire farli convivere con le operazioni di `mask-composite`, il
+  // cui ordine è la parte più facile da sbagliare di tutto il file. Annidate,
+  // ognuna fa un mestiere solo e si moltiplicano da sole.
   const lati = [...new Set(piante.map((p) => p.bordo))];
   const maschera = [
     ...lati.map(
@@ -407,6 +415,7 @@ function Strato({
       } pointer-events-none absolute inset-0 z-0 block overflow-hidden`}
       style={{ '--sfuma': maschera, '--composizione': composizione } as CSSProperties}
     >
+      <span className="bordi-morbidi absolute inset-0 block">
       {piante.map((p, i) => {
         const verticale = eVerticale(p.bordo);
         const dipinta = DIPINTE.has(p.disegno);
@@ -440,6 +449,7 @@ function Strato({
           />
         );
       })}
+      </span>
     </span>
   );
 }
