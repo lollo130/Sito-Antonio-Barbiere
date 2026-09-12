@@ -171,15 +171,36 @@ a:active {
 .decoro {
   container-type: size;
 }
+/* Il tetto e' sempre sulla LARGHEZZA, anche quando quello che si vuole
+   limitare e' l'altezza.
+   Un `max-height` non rimpicciolisce la foglia: le taglia l'altezza e le
+   lascia la larghezza che aveva, e siccome un <img> di suo stira il disegno
+   per riempire la casella, la foglia viene schiacciata. Si vedeva: a 32cqh
+   la foglia-lancia in basso arrivava a stare il 60% piu' larga del dovuto.
+   Convertendo il limite in larghezza — l'altezza voluta moltiplicata per la
+   proporzione del disegno, che il componente passa in `--rapporto` — il
+   limite e' lo stesso ma la foglia rimpicciolisce invece di deformarsi. */
 .decoro .pianta-orizzontale {
   width: var(--ingombro-telefono);
   height: auto;
-  max-height: 32cqh;
+  max-width: calc(32cqh * var(--rapporto));
 }
 .decoro .pianta-verticale {
   width: var(--ingombro-telefono);
   height: auto;
   max-width: 34cqw;
+}
+
+/* Le piante dipinte.
+   Un'incisione e' quasi tutta bianca: "multiply" la cancella e resta il
+   tratto, sottile. Un dipinto ha campiture verdi larghe, che "multiply"
+   tiene per intero: alla stessa opacita' pesa molto di piu' e si mangia la
+   fascia. Qui viene portato al peso dell'incisione — un po' meno colore,
+   un po' piu' chiaro — invece che con l'opacita': l'opacita' sulla singola
+   foglia le farebbe tornare a vedersi l'una attraverso l'altra, che e'
+   esattamente il problema che i due piani risolvono (regola 4). */
+.decoro .pianta-dipinta {
+  filter: saturate(0.78) brightness(1.08);
 }
 @media (min-width: 768px) {
   .decoro .pianta-orizzontale,

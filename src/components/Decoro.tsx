@@ -22,8 +22,9 @@ import type { CSSProperties } from 'react';
 //    15 senza pestarsi.
 //
 // 3. IL PICCIOLO ESCE, LA PUNTA GUARDA DENTRO. In natura il gambo viene da
-//    fuori e la foglia si apre verso l'interno. In tutti e cinque i disegni il
-//    picciolo sta in basso, quindi la rotazione la decide il lato: 0° in
+//    fuori e la foglia si apre verso l'interno. In tutti i disegni — anche nei
+//    sei aggiunti dopo — il picciolo sta in basso: è la condizione per
+//    entrare in questo elenco. Quindi la rotazione la decide il lato: 0° in
 //    basso, 180° in alto, 90° a sinistra, -90° a destra, più uno scarto fra
 //    -25° e +35°. L'ancoraggio cade 20 px OLTRE il bordo: la pianta parte da
 //    fuori inquadratura e penetra verso l'interno.
@@ -41,29 +42,83 @@ import type { CSSProperties } from 'react';
 // 6. IL CONTENUTO NON SI TOCCA. `pointer-events: none` e z-index dichiarati:
 //    cornice a 0, contenuto a 10.
 //
+// 7. DUE FAMIGLIE DI DISEGNI, E NON VANNO NELLO STESSO POSTO. Le prime cinque
+//    sono incisioni a due toni: quasi tutto bianco, con il tratto scuro
+//    sottile. Le sei aggiunte dopo sono dipinti a colori, con larghe campiture
+//    verdi. Sulle fasce chiare convivono bene — "multiply" cancella il bianco
+//    e restano tratto e campitura, due pesi diversi che fanno profondità. Sul
+//    verde scuro no: lì il disegno viene invertito (vedi index.css), e
+//    l'inversione di un'incisione è un disegno a linee chiare, mentre
+//    l'inversione di un dipinto è una macchia piena. Accostate sulla stessa
+//    fascia sembrano due errori. Per questo le dipinte stanno SOLO sulle
+//    fasce chiare, ed è un controllo, non un promemoria: vedi `DIPINTE`.
+//
 // Il disordine è scritto a mano una volta e resta sempre quello. Non è
 // casuale a ogni caricamento: la pagina ballerebbe a ogni visita e non si
 // potrebbe più correggere una pianta venuta male.
 //
-// Incisioni botaniche — attribuzione nel piede del sito.
+// Illustrazioni botaniche — attribuzione nel piede del sito.
 
 type Disegno =
+  // incisioni a due toni
   | 'foglia-lancia'
   | 'foglia-larga'
   | 'foglia-sottile'
   | 'monstera-incisa'
-  | 'palma';
+  | 'palma'
+  // dipinti a colori
+  | 'foglia-zebrata'
+  | 'foglia-nastro'
+  | 'ciuffo-variegato'
+  | 'foglie-appuntite'
+  | 'sansevieria'
+  | 'calatea-tonda';
+
+/**
+ * Le dipinte. Fuori di qui è solo un elenco di nomi; qui è la regola 7.
+ */
+const DIPINTE = new Set<Disegno>([
+  'foglia-zebrata',
+  'foglia-nastro',
+  'ciuffo-variegato',
+  'foglie-appuntite',
+  'sansevieria',
+  'calatea-tonda',
+]);
+
+/**
+ * Il formato di ognuna.
+ *
+ * Cinque delle sei dipinte erano vettori veri sotto un fondo bianco, e vettori
+ * sono rimaste. La sesta era un'immagine e basta — nessun tracciato da
+ * salvare — e viene servita come WebP con trasparenza. Un'eccezione sola, e
+ * dichiarata: il resto del componente non deve sapere che esiste.
+ */
+const FORMATO: Partial<Record<Disegno, 'webp'>> = {
+  'calatea-tonda': 'webp',
+};
+
+const fileDi = (d: Disegno) => `/sfondi/${d}.${FORMATO[d] ?? 'svg'}`;
 
 type Bordo = 'alto' | 'basso' | 'sinistro' | 'destro';
 type Piano = 'sfondo' | 'primo';
 
-/** Proporzione di ogni disegno, dal suo viewBox. */
+/**
+ * Proporzione di ogni disegno, dal suo viewBox.
+ * `node scripts/misura-piante.mjs` li rilegge tutti dai file veri.
+ */
 const RAPPORTO: Record<Disegno, number> = {
   'foglia-lancia': 1232 / 1885,
   'foglia-larga': 1204 / 1305,
   'foglia-sottile': 1012 / 1756,
   'monstera-incisa': 1204 / 1305,
   palma: 1584 / 2041,
+  'foglia-zebrata': 1001 / 2078,
+  'foglia-nastro': 639 / 1267,
+  'ciuffo-variegato': 758 / 749,
+  'foglie-appuntite': 543 / 1672,
+  sansevieria: 919 / 1578,
+  'calatea-tonda': 900 / 884,
 };
 
 /**
@@ -73,6 +128,13 @@ const RAPPORTO: Record<Disegno, number> = {
  * hanno un tratto stretto — meno del 18% della larghezza massima — prima che
  * cominci la lamina. È la quota che può uscire dal bordo senza perdere niente
  * di quello che si deve vedere.
+ *
+ * La misura sta in `scripts/misura-piante.mjs`, che su queste cinque ritrova
+ * esattamente i numeri che erano stati ricavati a mano.
+ *
+ * I due cespugli — ciuffo e calatea — hanno quote basse non per sbaglio: non
+ * hanno un gambo, poggiano a terra. Escono dal bordo di pochissimo, ed è
+ * giusto così.
  */
 const PICCIOLO: Record<Disegno, number> = {
   'foglia-lancia': 9,
@@ -80,6 +142,12 @@ const PICCIOLO: Record<Disegno, number> = {
   'foglia-sottile': 11,
   'monstera-incisa': 9,
   palma: 9,
+  'foglia-zebrata': 11,
+  'foglia-nastro': 6,
+  'ciuffo-variegato': 10,
+  'foglie-appuntite': 4,
+  sansevieria: 14,
+  'calatea-tonda': 2,
 };
 
 /** Rotazione che mette il picciolo fuori e la punta verso il centro. */
@@ -159,34 +227,45 @@ const MACCHIE = {
     { disegno: 'monstera-incisa', bordo: 'alto', lungo: 9, giro: 13, ingombro: 11, extra: 2, piano: 'primo', soloDaTablet: true },
     { disegno: 'foglia-lancia', bordo: 'basso', lungo: 92, giro: -9, ingombro: 13, piano: 'primo', soloDaTablet: true },
   ],
+  // LE QUATTRO FASCE CHIARE. Qui le dipinte sono ammesse (regola 7), e ogni
+  // fascia ne prende due tenendo due incisioni: mescolate, non a blocchi.
+  // Le posizioni e gli ingombri lungo il bordo sono gli stessi di prima, così
+  // le distanze già verificate (regola 2) restano valide.
+  //
+  // Gli ingombri delle dipinte più slanciate sono più bassi di quelli che
+  // hanno preso il posto: a parità di larghezza una foglia lunga il triplo
+  // entra tre volte più a fondo nella fascia, e andrebbe a sbattere contro il
+  // tetto che il CSS le mette (`max-width`/`max-height`), che la schiaccia
+  // invece di rimpicciolirla. Meglio partire più strette.
+
   // Cornice bassa: niente in cima, per le fasce col titolo in alto.
   corniceBassa: [
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 50, giro: -15, ingombro: 30, piano: 'sfondo' },
+    { disegno: 'sansevieria', bordo: 'destro', lungo: 50, giro: -15, ingombro: 26, piano: 'sfondo' },
     { disegno: 'foglia-lancia', bordo: 'basso', lungo: 90, giro: 22, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
     { disegno: 'monstera-incisa', bordo: 'sinistro', lungo: 50, giro: 28, ingombro: 30, piano: 'primo' },
-    { disegno: 'palma', bordo: 'basso', lungo: 9, giro: -11, ingombro: 11, piano: 'primo', soloDaTablet: true },
+    { disegno: 'ciuffo-variegato', bordo: 'basso', lungo: 9, giro: -11, ingombro: 12, piano: 'primo', soloDaTablet: true },
   ],
   // Cornice alta: niente in fondo, per le fasce che poggiano su un'altra.
   corniceAlta: [
-    { disegno: 'palma', bordo: 'sinistro', lungo: 50, giro: 19, ingombro: 33, piano: 'sfondo' },
+    { disegno: 'foglia-zebrata', bordo: 'sinistro', lungo: 50, giro: 19, ingombro: 24, piano: 'sfondo' },
     { disegno: 'foglia-sottile', bordo: 'alto', lungo: 8, giro: -23, ingombro: 11, piano: 'sfondo', soloDaTablet: true },
     { disegno: 'foglia-larga', bordo: 'destro', lungo: 50, giro: -7, ingombro: 30, piano: 'primo' },
-    { disegno: 'monstera-incisa', bordo: 'alto', lungo: 92, giro: 34, ingombro: 13, extra: 2, piano: 'primo', soloDaTablet: true },
+    { disegno: 'calatea-tonda', bordo: 'alto', lungo: 92, giro: 34, ingombro: 13, extra: 2, piano: 'primo', soloDaTablet: true },
   ],
   // Seconda cornice bassa: stesse regole, numeri diversi. Due fasce con la
   // stessa disposizione si riconoscono a colpo d'occhio scorrendo.
   corniceBassaBis: [
-    { disegno: 'foglia-sottile', bordo: 'sinistro', lungo: 50, giro: -26, ingombro: 34, piano: 'sfondo' },
+    { disegno: 'foglia-nastro', bordo: 'sinistro', lungo: 50, giro: -26, ingombro: 25, piano: 'sfondo' },
     { disegno: 'palma', bordo: 'basso', lungo: 88, giro: 12, ingombro: 13, piano: 'sfondo', soloDaTablet: true },
     { disegno: 'foglia-larga', bordo: 'destro', lungo: 50, giro: 17, ingombro: 34, piano: 'primo' },
-    { disegno: 'monstera-incisa', bordo: 'basso', lungo: 11, giro: -14, ingombro: 11, piano: 'primo', soloDaTablet: true },
+    { disegno: 'calatea-tonda', bordo: 'basso', lungo: 11, giro: -14, ingombro: 12, piano: 'primo', soloDaTablet: true },
   ],
   // Seconda cornice alta, stesso ragionamento.
   corniceAltaBis: [
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 50, giro: -20, ingombro: 30, piano: 'sfondo' },
+    { disegno: 'foglie-appuntite', bordo: 'destro', lungo: 50, giro: -20, ingombro: 16, piano: 'sfondo' },
     { disegno: 'foglia-lancia', bordo: 'alto', lungo: 89, giro: 15, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
     { disegno: 'monstera-incisa', bordo: 'sinistro', lungo: 50, giro: 30, ingombro: 30, piano: 'primo' },
-    { disegno: 'palma', bordo: 'alto', lungo: 10, giro: -8, ingombro: 11, extra: 2, piano: 'primo', soloDaTablet: true },
+    { disegno: 'ciuffo-variegato', bordo: 'alto', lungo: 10, giro: -8, ingombro: 12, extra: 2, piano: 'primo', soloDaTablet: true },
   ],
 } satisfies Record<string, Pianta[]>;
 
@@ -254,13 +333,14 @@ function Strato({
     >
       {piante.map((p, i) => {
         const verticale = eVerticale(p.bordo);
+        const dipinta = DIPINTE.has(p.disegno);
         const fattore = verticale ? PER_TELEFONO.verticale : PER_TELEFONO.orizzontale;
         // cqh = percentuale dell'altezza della fascia, cqw della larghezza.
         const unita = verticale ? 'cqh' : 'cqw';
         return (
           <img
             key={`${p.disegno}-${i}`}
-            src={`/sfondi/${p.disegno}.svg`}
+            src={fileDi(p.disegno)}
             alt=""
             loading="lazy"
             decoding="async"
@@ -269,12 +349,18 @@ function Strato({
                 ...posizione(p),
                 '--ingombro-telefono': `${(p.ingombro * fattore).toFixed(1)}${unita}`,
                 '--ingombro-schermo': `${p.ingombro}${unita}`,
+                // Serve al CSS per trasformare un tetto sull'altezza in un
+                // tetto sulla larghezza, che rimpicciolisce invece di
+                // schiacciare (vedi .pianta-orizzontale in index.css).
+                '--rapporto': String(RAPPORTO[p.disegno]),
                 aspectRatio: String(RAPPORTO[p.disegno]),
               } as CSSProperties
             }
             className={`absolute max-w-none select-none ${
               verticale ? 'pianta-verticale' : 'pianta-orizzontale'
-            } ${p.soloDaTablet ? 'hidden md:block' : 'block'}`}
+            } ${dipinta ? 'pianta-dipinta' : ''} ${
+              p.soloDaTablet ? 'hidden md:block' : 'block'
+            }`}
           />
         );
       })}
@@ -291,6 +377,20 @@ export default function Decoro({
   suScuro?: boolean;
 }) {
   const piante = MACCHIE[macchia] as Pianta[];
+
+  // Regola 7, fatta rispettare. Non taglio via la pianta sbagliata: chi
+  // modifica una macchia deve VEDERE l'errore, non trovarsi un buco nella
+  // cornice senza capire perché. In produzione il controllo sparisce.
+  if (import.meta.env.DEV && suScuro) {
+    const sbagliate = piante.filter((p) => DIPINTE.has(p.disegno)).map((p) => p.disegno);
+    if (sbagliate.length > 0) {
+      console.warn(
+        `Decoro "${macchia}": ${sbagliate.join(', ')} ${sbagliate.length === 1 ? 'è un dipinto' : 'sono dipinti'} ` +
+          `su una fascia scura. Invertiti diventano macchie piene invece di disegni a linee ` +
+          `(regola 7 in cima al file): su fondo scuro vanno solo le incisioni.`,
+      );
+    }
+  }
 
   return (
     <>
