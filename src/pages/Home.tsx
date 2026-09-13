@@ -152,34 +152,11 @@ export default function Home() {
 
         <Separatore da="pieno" a="carta-chiara" />
 
-        {/* LA BOTTEGA — fascia chiara, il 1982 grande come un marchio. */}
-        <section className="relative overflow-hidden bg-carta-chiara px-3 py-12 sm:px-5 sm:py-16">
-          <Decoro macchia="corniceAlta" />
-          <div className="relative z-10 mx-auto max-w-4xl">
-            <CorniceVintage contenuto="grid gap-4 sm:grid-cols-[auto_1fr] sm:gap-10">
-            <p className="font-titolo text-6xl font-bold leading-none text-cuoio-scuro sm:text-8xl">
-              {ANNO_FONDAZIONE}
-            </p>
-            <div>
-              <Titolo>La bottega</Titolo>
-              <p className="font-lettura mt-4 text-lg leading-relaxed text-grigio">
-                Abbiamo aperto nel {ANNO_FONDAZIONE} e da allora tagliamo capelli a Solarino, nello
-                stesso quartiere e spesso agli stessi cognomi. Sono passati i figli di chi si sedeva
-                qui il sabato mattina, e adesso passano i loro.
-              </p>
-              <p className="font-lettura mt-3 text-lg leading-relaxed text-grigio">
-                [DA RISCRIVERE CON LE PAROLE DEL TITOLARE — chi ha aperto, chi ci lavora oggi, cosa
-                non è cambiato in tutti questi anni. Bastano tre righe, purché siano sue.]
-              </p>
-            </div>
-            </CorniceVintage>
-          </div>
-        </section>
-
-        <Separatore da="carta-chiara" a="pieno" />
-
-        {/* GALLERIA — di nuovo la pietra, per staccare dalla fascia chiara. */}
-        <section className="relative overflow-hidden bg-pieno px-3 py-12 sm:px-5 sm:py-20">
+        {/* GALLERIA — fascia chiara. Prima era pietra come i servizi, con la
+            bottega in mezzo a dividerle; adesso che la bottega è scesa in fondo
+            le due pietre si toccherebbero e si salderebbero in un'unica fascia
+            lunga. Le foto stanno anche meglio su un fondo più pulito. */}
+        <section className="relative overflow-hidden bg-carta-chiara px-3 py-12 sm:px-5 sm:py-20">
           <Decoro macchia="corniceBassaBis" />
           <div className="relative z-10 mx-auto max-w-4xl">
             <CorniceVintage>
@@ -190,12 +167,34 @@ export default function Home() {
           </div>
         </section>
 
-        <Separatore da="pieno" a="verde-chiaro" />
+        <Separatore da="carta-chiara" a="verde-chiaro" />
 
-        {/* DOVE SIAMO — verde chiaro, l'ultima fascia prima del piede. */}
+        {/* LA BOTTEGA E DOVE SIAMO — una fascia sola, due cornici distinte.
+            Stanno insieme perché sono le due cose che si cercano in fondo a
+            una pagina come questa: da quanto c'è e dove si trova. Due cornici
+            e non una sola perché restano due letture separate — una si legge,
+            l'altra si usa per arrivarci. */}
         <section className="relative overflow-hidden bg-verde-chiaro px-3 py-12 sm:px-5 sm:py-16">
-          <Decoro macchia="corniceAltaBis" />
-          <div className="relative z-10 mx-auto max-w-4xl">
+          <Decoro macchia="corniceAlta" />
+          <div className="relative z-10 mx-auto flex max-w-4xl flex-col gap-7">
+            <CorniceVintage contenuto="grid gap-4 sm:grid-cols-[auto_1fr] sm:gap-10">
+              <p className="font-titolo text-6xl font-bold leading-none text-cuoio-scuro sm:text-8xl">
+                {ANNO_FONDAZIONE}
+              </p>
+              <div>
+                <Titolo>La bottega</Titolo>
+                <p className="font-lettura mt-4 text-lg leading-relaxed text-grigio">
+                  Abbiamo aperto nel {ANNO_FONDAZIONE} e da allora tagliamo capelli a Solarino,
+                  nello stesso quartiere e spesso agli stessi cognomi. Sono passati i figli di chi
+                  si sedeva qui il sabato mattina, e adesso passano i loro.
+                </p>
+                <p className="font-lettura mt-3 text-lg leading-relaxed text-grigio">
+                  [DA RISCRIVERE CON LE PAROLE DEL TITOLARE — chi ha aperto, chi ci lavora oggi,
+                  cosa non è cambiato in tutti questi anni. Bastano tre righe, purché siano sue.]
+                </p>
+              </div>
+            </CorniceVintage>
+
             <CorniceVintage contenuto="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <Titolo>Dove siamo</Titolo>

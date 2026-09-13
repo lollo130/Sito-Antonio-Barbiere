@@ -122,20 +122,21 @@ a:active {
    della fascia. */
 .decoro {
   mix-blend-mode: multiply;
-  /* Primo piano. Lo sfondo, piu' sbiadito, sta in .decoro-sfondo: sono due
-     gruppi separati e non due opacita' sulle singole foglie, altrimenti le
-     foglie tornerebbero a vedersi l'una attraverso l'altra. */
-  opacity: 0.25;
+  /* UN SOLO gruppo, e una sola fusione.
+     Prima erano due — sfondo e primo piano, a due opacita' diverse — ed e'
+     esattamente per questo che una foglia dietro si vedeva ATTRAVERSO quella
+     davanti: due veli semitrasparenti si sommano invece di coprirsi.
+     Adesso le foglie si disegnano una sull'altra dentro questo gruppo, dove
+     chi sta sopra nasconde chi sta sotto perche' i corpi sono pieni, e la
+     fusione con la pagina avviene una volta sola sul risultato gia' composto.
+     La profondita' la fanno misura e tono, che il componente mette su ogni
+     foglia come filtro: un filtro schiarisce senza bucare (regola 4). */
+  opacity: 0.26;
   -webkit-mask-image: var(--sfuma);
   mask-image: var(--sfuma);
   /* Le sfumature dei lati si sommano, la zona sicura si sottrae: l'elenco
      arriva dal componente, che sa quanti lati ha quella fascia. */
   mask-composite: var(--composizione, add);
-}
-
-/* Il piano di fondo: la stessa cornice, piu' indietro. */
-.decoro-sfondo {
-  opacity: 0.12;
 }
 
 /* Sull'apertura verde scura il ragionamento si rovescia: serve un tratto
@@ -146,14 +147,11 @@ a:active {
   mix-blend-mode: screen;
   /* Piu' alta delle gemelle su fondo chiaro: "screen" su un verde scuro
      rende meno di quanto "multiply" renda sulla carta, e agli stessi numeri
-     il disegno si perdeva. */
-  opacity: 0.3;
-}
-.decoro-sfondo.decoro-su-scuro {
-  opacity: 0.15;
-}
-.decoro-su-scuro img {
-  filter: invert(1) grayscale(1);
+     il disegno si perdeva.
+     L'inversione del tratto non sta piu' qui: la compone il componente
+     insieme al tono, perche' le due cose finiscono nella stessa proprieta'
+     "filter" e due regole separate se la porterebbero via a vicenda. */
+  opacity: 0.32;
 }
 
 /* Ogni foglia si misura sull'asse che conta DOPO la rotazione, e sempre
@@ -220,18 +218,7 @@ a:active {
   max-width: 34cqw;
 }
 
-/* Le piante dipinte.
-   Qui prima c'era anche un `brightness` che le schiariva, messo dando per
-   scontato che un dipinto, avendo campiture piene invece di sole linee,
-   pesasse piu' di un'incisione. Misurato, non e' vero: sulla stessa fascia e
-   alla stessa opacita' una dipinta toglie al fondo 5-18 punti di grigio e
-   un'incisione 13-17. Schiarirle le rendeva soltanto invisibili.
-   Resta la desaturazione, che serve a un'altra cosa: tenerle dentro i verdi
-   spenti del sito invece dei verdi vivi dell'originale. Il peso lo regolano i
-   due piani, come per tutte le altre (regola 4). */
-.decoro .pianta-dipinta {
-  filter: saturate(0.85);
-}
+
 @media (min-width: 768px) {
   .decoro .pianta-orizzontale,
   .decoro .pianta-verticale {
