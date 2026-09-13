@@ -15,11 +15,21 @@ import type { CSSProperties } from 'react';
 //    e la distanza dall'altezza della fascia: due grandezze scollegate, e le
 //    sovrapposizioni ricomparivano appena si cambiava finestra.
 //
-// 2. NIENTE ACCAVALLAMENTI. Lungo ogni bordo le foglie sono distanziate più
-//    della somma dei loro mezzi ingombri. È il motivo per cui sono poche: su
-//    un bordo orizzontale restano liberi solo gli spicchi fuori dalla colonna
-//    del testo, e in 18 punti percentuali non ci stanno cinque foglie larghe
-//    15 senza pestarsi.
+// 2. NIENTE ACCAVALLAMENTI FRA CESPI DIVERSI — ma DENTRO un cespo sì.
+//    Le foglie di uno stesso cespo si coprono, e devono: è quello che le fa
+//    leggere come una pianta sola invece che come esemplari da erbario messi
+//    in fila. L'occlusione viene giusta da sé, perché il fondo bianco del
+//    disegno davanti nasconde quello dietro e "multiply" lo cancella solo
+//    dove non c'è niente sotto.
+//    Quello che non deve succedere è che due CESPI si tocchino: lì la
+//    distanza fra i due cuori deve superare la somma delle loro estensioni,
+//    e lo verifica `controllaDistanze()`. Sui bordi orizzontali resta libero
+//    solo lo spicchio fuori dalla colonna del testo, quindi lì di cespi ce
+//    ne sta uno per angolo e basta.
+//    Il controllo confronta solo cespi sullo STESSO bordo, e non è una
+//    dimenticanza: due cespi su bordi diversi che si fondono lo fanno in un
+//    angolo, ed è esattamente la massa d'angolo che la regola 8 vuole. Lì il
+//    fogliame deve accumularsi, non scansarsi.
 //
 // 3. IL PICCIOLO ESCE, LA PUNTA GUARDA DENTRO. In natura il gambo viene da
 //    fuori e la foglia si apre verso l'interno. In tutti i disegni — anche nei
@@ -52,6 +62,30 @@ import type { CSSProperties } from 'react';
 //    l'inversione di un dipinto è una macchia piena. Accostate sulla stessa
 //    fascia sembrano due errori. Per questo le dipinte stanno SOLO sulle
 //    fasce chiare, ed è un controllo, non un promemoria: vedi `DIPINTE`.
+//
+// 8. LA COMPOSIZIONE. Le foglie non stanno una ogni tanto lungo il bordo:
+//    stanno in CESPI, e i cespi stanno negli angoli. Prima erano distribuite
+//    a intervalli regolari, una per volta, e il risultato era un fregio —
+//    un motivo ripetuto. Nessuna pianta cresce a intervalli regolari.
+//
+//    - UN CESPO NASCE DA UN PUNTO SOLO del bordo, e le sue foglie si aprono a
+//      ventaglio: più una foglia nasce lontana dal cuore, più è inclinata, e
+//      inclinata DALLA PARTE in cui si è spostata. È come si apre una pianta
+//      dal colletto, e da solo basta a togliere l'aria di roba appoggiata lì.
+//    - DENTRO IL CESPO LA FOGLIA PIÙ GRANDE STA DAVANTI, le piccole dietro.
+//      Al contrario si legge come un errore di prospettiva, perché le cose
+//      vicine sono più grandi. Qui "davanti" e "dietro" sono i due piani
+//      della regola 4, quindi la grandezza e la profondità dicono la stessa
+//      cosa invece di contraddirsi.
+//    - OGNI FASCIA HA TRE PESI DIVERSI: una massa principale a un angolo, un
+//      contrappunto più piccolo dalla parte opposta, e una foglia sola come
+//      terzo accento. Tre pesi uguali disposti bene si riconoscono subito
+//      come una cosa disegnata a tavolino.
+//    - L'ANGOLO CHE PRENDE LA MASSA CAMBIA da una fascia all'altra, così
+//      scorrendo la pagina la composizione non si ripete.
+//    - UN ANGOLO PER FASCIA RESTA SPOGLIO, di proposito. In natura non c'è
+//      niente di distribuito uniformemente, e un fogliame che pareggia i
+//      quattro angoli torna a sembrare una cornice stampata.
 //
 // Il disordine è scritto a mano una volta e resta sempre quello. Non è
 // casuale a ogni caricamento: la pagina ballerebbe a ogni visita e non si
@@ -170,6 +204,13 @@ const eVerticale = (b: Bordo) => b === 'sinistro' || b === 'destro';
 
 type Pianta = {
   disegno: Disegno;
+  /**
+   * Da quale cespo viene, es. "sinistro@76". Finisce in `data-cespo` sul
+   * disegno: e' l'unico modo, guardando la pagina resa, di sapere quali
+   * foglie dovrebbero coprirsi e quali no. Senza, la composizione si puo'
+   * solo leggere nel sorgente e sperare.
+   */
+  cespo: string;
   /** da quale lato nasce */
   bordo: Bordo;
   /** dove sta lungo quel lato, in percentuale */
@@ -190,6 +231,72 @@ type Pianta = {
   /** le piante che sul telefono coprirebbero il testo */
   soloDaTablet?: boolean;
 };
+
+/**
+ * Una foglia dentro un cespo.
+ *
+ * Non sa dove si trova sulla fascia: sa solo quanto nasce più in là del cuore
+ * del cespo e di quanto si apre. È il punto di tutta la struttura — spostando
+ * il cuore si sposta la pianta intera senza toccare un solo rapporto interno,
+ * e quei rapporti sono la ragione per cui la pianta sembra una pianta.
+ */
+type Foglia = {
+  disegno: Disegno;
+  /**
+   * Di quanto nasce più avanti o più indietro del cuore, lungo il bordo, in
+   * punti percentuali. Zero è la foglia centrale.
+   */
+  scarto: number;
+  /**
+   * Apertura del ventaglio: quanto si scosta dalla perpendicolare al bordo,
+   * fra -30 e +35 gradi. Deve avere lo STESSO SEGNO dello scarto e crescere
+   * con lui: una foglia nata di lato si apre verso quel lato (regola 8).
+   */
+  apertura: number;
+  ingombro: number;
+  piano: Piano;
+  extra?: number;
+  specchia?: boolean;
+  soloDaTablet?: boolean;
+};
+
+/**
+ * Un cespo: più foglie che nascono dallo stesso punto del bordo.
+ *
+ * È l'unità della composizione. Le distanze si misurano fra cespi, non fra
+ * foglie (regola 2), e la massa di una fascia è un cespo, non una foglia.
+ */
+type Cespo = {
+  bordo: Bordo;
+  /** dove sta il cuore del cespo lungo quel bordo, in percentuale */
+  ancora: number;
+  foglie: Foglia[];
+};
+
+/** Dal cespo alle singole piante che il resto del componente sa disegnare. */
+function spiega(cespo: Cespo): Pianta[] {
+  const identita = `${cespo.bordo}@${cespo.ancora}`;
+  return cespo.foglie.map((f) => ({
+    disegno: f.disegno,
+    cespo: identita,
+    bordo: cespo.bordo,
+    lungo: cespo.ancora + f.scarto,
+    giro: f.apertura,
+    ingombro: f.ingombro,
+    piano: f.piano,
+    extra: f.extra,
+    specchia: f.specchia,
+    soloDaTablet: f.soloDaTablet,
+  }));
+}
+
+/**
+ * Quanto sporge un cespo dal proprio cuore, in punti percentuali del bordo.
+ * Serve a tenere separati due cespi vicini senza guardarne le foglie una a una.
+ */
+function estensione(cespo: Cespo): number {
+  return Math.max(...cespo.foglie.map((f) => Math.abs(f.scarto) + f.ingombro / 2));
+}
 
 /**
  * Quanto ingrandire le foglie sul telefono.
@@ -229,66 +336,196 @@ const ZONA_SICURA = '46% 48%';
  * specchia mai su sé stessa.
  */
 const MACCHIE = {
-  // Apertura. Le dipinte qui non entrano (regola 7): solo incisioni.
+  // APERTURA — massa in basso a sinistra, contrappunto in alto a destra,
+  // accento in basso a destra. In alto a sinistra non c'e' niente, ed e' li'
+  // che comincia a leggersi l'insegna.
+  // Solo incisioni: e' la fascia scura (regola 7).
   cornicePiena: [
-    { disegno: 'foglia-larga', bordo: 'sinistro', lungo: 26, giro: 22, ingombro: 26, piano: 'sfondo' },
-    { disegno: 'foglia-sottile', bordo: 'destro', lungo: 32, giro: -18, ingombro: 30, piano: 'sfondo' },
-    { disegno: 'foglia-larga', bordo: 'alto', lungo: 91, giro: -12, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'basso', lungo: 8, giro: 16, ingombro: 13, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'palma', bordo: 'sinistro', lungo: 70, giro: 27, ingombro: 33, piano: 'primo' },
-    { disegno: 'foglia-lancia', bordo: 'destro', lungo: 76, giro: 12, ingombro: 26, piano: 'primo' },
-    { disegno: 'monstera-incisa', bordo: 'alto', lungo: 9, giro: 13, ingombro: 11, extra: 2, piano: 'primo', soloDaTablet: true },
-    { disegno: 'foglia-lancia', bordo: 'basso', lungo: 92, giro: -9, ingombro: 13, piano: 'primo', soloDaTablet: true },
+    {
+      bordo: 'sinistro',
+      ancora: 76,
+      foglie: [
+        { disegno: 'palma', scarto: 0, apertura: 16, ingombro: 33, piano: 'primo' },
+        { disegno: 'foglia-larga', scarto: -12, apertura: -16, ingombro: 22, piano: 'sfondo' },
+        { disegno: 'foglia-lancia', scarto: 11, apertura: 32, ingombro: 18, piano: 'sfondo' },
+      ],
+    },
+    {
+      bordo: 'basso',
+      ancora: 9,
+      foglie: [
+        { disegno: 'palma', scarto: 0, apertura: -14, ingombro: 13, piano: 'primo', soloDaTablet: true },
+      ],
+    },
+    {
+      bordo: 'destro',
+      ancora: 28,
+      foglie: [
+        { disegno: 'foglia-sottile', scarto: 0, apertura: -18, ingombro: 28, piano: 'primo' },
+        { disegno: 'monstera-incisa', scarto: 10, apertura: 14, ingombro: 17, piano: 'sfondo' },
+      ],
+    },
+    {
+      bordo: 'alto',
+      ancora: 91,
+      foglie: [
+        { disegno: 'foglia-larga', scarto: 0, apertura: 12, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
+      ],
+    },
+    {
+      bordo: 'basso',
+      ancora: 92,
+      foglie: [
+        { disegno: 'foglia-lancia', scarto: 0, apertura: -9, ingombro: 13, piano: 'primo', soloDaTablet: true },
+      ],
+    },
   ],
-  // LE QUATTRO FASCE CHIARE. Le incisioni che c'erano restano tutte; le
-  // dipinte si aggiungono accanto, una per fianco, alla LORO STESSA MISURA.
-  //
-  // E stanno sempre in primo piano, mai sullo sfondo. Non e' un capriccio, e'
-  // una misura: sul piano di sfondo, al 12%, una dipinta toglie al fondo fra i
-  // 5 e i 10 punti di grigio su 232 — sotto la soglia di quello che si vede.
-  // Le incisioni li' reggono perche' il loro tratto e' quasi nero e ne toglie
-  // 13-17. Chiaro e scuro non si comportano allo stesso modo quando li
-  // sbiadisci: le prime volte le avevo messe piccole e sullo sfondo, ed erano
-  // sul sito senza esserci.
 
-  // Cornice bassa: niente in cima, per le fasce col titolo in alto.
+  // I SERVIZI — massa in basso a destra. Niente in cima: la fascia porta il
+  // titolo li'. Il contrappunto sta a meta' del fianco sinistro perche' un
+  // angolo alto non c'e'.
   corniceBassa: [
-    { disegno: 'monstera-incisa', bordo: 'sinistro', lungo: 30, giro: 28, ingombro: 30, piano: 'sfondo' },
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 24, giro: -15, ingombro: 30, piano: 'sfondo' },
-    { disegno: 'foglia-lancia', bordo: 'basso', lungo: 90, giro: 22, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'ciuffo-variegato', bordo: 'sinistro', lungo: 74, giro: -12, ingombro: 30, piano: 'primo' },
-    { disegno: 'sansevieria', bordo: 'destro', lungo: 68, giro: 8, ingombro: 30, piano: 'primo' },
-    { disegno: 'palma', bordo: 'basso', lungo: 9, giro: -11, ingombro: 11, piano: 'primo', soloDaTablet: true },
+    {
+      bordo: 'destro',
+      ancora: 74,
+      foglie: [
+        { disegno: 'sansevieria', scarto: 0, apertura: 10, ingombro: 30, piano: 'primo' },
+        { disegno: 'foglia-larga', scarto: -12, apertura: -15, ingombro: 22, piano: 'sfondo' },
+        { disegno: 'foglia-lancia', scarto: 10, apertura: 28, ingombro: 17, piano: 'sfondo' },
+      ],
+    },
+    {
+      bordo: 'basso',
+      ancora: 90,
+      foglie: [
+        { disegno: 'foglia-lancia', scarto: 0, apertura: 20, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
+      ],
+    },
+    {
+      bordo: 'sinistro',
+      ancora: 30,
+      foglie: [
+        { disegno: 'ciuffo-variegato', scarto: 0, apertura: -12, ingombro: 28, piano: 'primo' },
+        { disegno: 'monstera-incisa', scarto: 11, apertura: 20, ingombro: 18, piano: 'sfondo' },
+      ],
+    },
+    {
+      bordo: 'basso',
+      ancora: 9,
+      foglie: [
+        { disegno: 'palma', scarto: 0, apertura: -11, ingombro: 11, piano: 'primo', soloDaTablet: true },
+      ],
+    },
   ],
-  // Cornice alta: niente in fondo, per le fasce che poggiano su un'altra.
+
+  // LA BOTTEGA — la massa passa in alto a sinistra: e' la prima fascia chiara
+  // dopo il verde, e mettere il peso dall'altra parte rompe il ritmo.
   corniceAlta: [
-    { disegno: 'palma', bordo: 'sinistro', lungo: 25, giro: 19, ingombro: 33, piano: 'sfondo' },
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 33, giro: -7, ingombro: 30, piano: 'sfondo' },
-    { disegno: 'foglia-sottile', bordo: 'alto', lungo: 8, giro: -23, ingombro: 11, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-zebrata', bordo: 'sinistro', lungo: 69, giro: -14, ingombro: 28, piano: 'primo' },
-    { disegno: 'foglia-nastro', bordo: 'destro', lungo: 77, giro: 21, ingombro: 28, piano: 'primo' },
-    { disegno: 'monstera-incisa', bordo: 'alto', lungo: 92, giro: 34, ingombro: 13, extra: 2, piano: 'primo', soloDaTablet: true },
+    {
+      bordo: 'sinistro',
+      ancora: 26,
+      foglie: [
+        { disegno: 'foglia-zebrata', scarto: 0, apertura: -12, ingombro: 28, piano: 'primo' },
+        { disegno: 'palma', scarto: 13, apertura: 20, ingombro: 24, piano: 'sfondo' },
+        { disegno: 'foglia-lancia', scarto: -9, apertura: -30, ingombro: 16, piano: 'sfondo' },
+      ],
+    },
+    {
+      bordo: 'alto',
+      ancora: 8,
+      foglie: [
+        { disegno: 'foglia-sottile', scarto: 0, apertura: -22, ingombro: 11, piano: 'sfondo', soloDaTablet: true },
+      ],
+    },
+    {
+      bordo: 'destro',
+      ancora: 72,
+      foglie: [
+        { disegno: 'foglia-nastro', scarto: 0, apertura: 18, ingombro: 28, piano: 'primo' },
+        { disegno: 'foglia-larga', scarto: -12, apertura: -10, ingombro: 22, piano: 'sfondo' },
+      ],
+    },
+    {
+      bordo: 'alto',
+      ancora: 92,
+      foglie: [
+        { disegno: 'monstera-incisa', scarto: 0, apertura: 30, ingombro: 13, extra: 2, piano: 'primo', soloDaTablet: true },
+      ],
+    },
   ],
-  // Seconda cornice bassa: stesse regole, numeri diversi. Due fasce con la
-  // stessa disposizione si riconoscono a colpo d'occhio scorrendo.
+
+  // I TAGLI — la fascia piu' alta della pagina. Massa in basso a sinistra,
+  // dalla parte opposta a quella della bottega qui sopra.
   corniceBassaBis: [
-    { disegno: 'foglia-sottile', bordo: 'sinistro', lungo: 29, giro: -26, ingombro: 34, piano: 'sfondo' },
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 23, giro: 17, ingombro: 34, piano: 'sfondo' },
-    { disegno: 'palma', bordo: 'basso', lungo: 88, giro: 12, ingombro: 13, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglie-appuntite', bordo: 'sinistro', lungo: 73, giro: 18, ingombro: 22, piano: 'primo' },
-    { disegno: 'calatea-tonda', bordo: 'destro', lungo: 67, giro: -9, ingombro: 28, piano: 'primo' },
-    { disegno: 'monstera-incisa', bordo: 'basso', lungo: 11, giro: -14, ingombro: 11, piano: 'primo', soloDaTablet: true },
+    {
+      bordo: 'sinistro',
+      ancora: 76,
+      foglie: [
+        { disegno: 'foglie-appuntite', scarto: 0, apertura: 14, ingombro: 26, piano: 'primo' },
+        { disegno: 'foglia-sottile', scarto: -13, apertura: -20, ingombro: 22, piano: 'sfondo' },
+        { disegno: 'palma', scarto: 11, apertura: 30, ingombro: 17, piano: 'sfondo' },
+      ],
+    },
+    {
+      bordo: 'basso',
+      ancora: 88,
+      foglie: [
+        { disegno: 'palma', scarto: 0, apertura: 12, ingombro: 13, piano: 'sfondo', soloDaTablet: true },
+      ],
+    },
+    {
+      bordo: 'destro',
+      ancora: 30,
+      foglie: [
+        { disegno: 'calatea-tonda', scarto: 0, apertura: -10, ingombro: 28, piano: 'primo' },
+        { disegno: 'foglia-larga', scarto: 12, apertura: 18, ingombro: 22, piano: 'sfondo' },
+      ],
+    },
+    {
+      bordo: 'basso',
+      ancora: 11,
+      foglie: [
+        { disegno: 'monstera-incisa', scarto: 0, apertura: -14, ingombro: 11, piano: 'primo', soloDaTablet: true },
+      ],
+    },
   ],
-  // Seconda cornice alta, stesso ragionamento.
+
+  // DOVE SIAMO — la fascia piu' bassa, e l'ultima prima del piede. Massa in
+  // alto a destra: il quarto angolo diverso in quattro fasce.
   corniceAltaBis: [
-    { disegno: 'monstera-incisa', bordo: 'sinistro', lungo: 34, giro: 30, ingombro: 30, piano: 'sfondo' },
-    { disegno: 'foglia-larga', bordo: 'destro', lungo: 26, giro: -20, ingombro: 30, piano: 'sfondo' },
-    { disegno: 'foglia-lancia', bordo: 'alto', lungo: 89, giro: 15, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
-    { disegno: 'foglia-zebrata', bordo: 'sinistro', lungo: 78, giro: -15, ingombro: 28, piano: 'primo' },
-    { disegno: 'sansevieria', bordo: 'destro', lungo: 70, giro: 11, ingombro: 28, piano: 'primo' },
-    { disegno: 'palma', bordo: 'alto', lungo: 10, giro: -8, ingombro: 11, extra: 2, piano: 'primo', soloDaTablet: true },
+    {
+      bordo: 'destro',
+      ancora: 26,
+      foglie: [
+        { disegno: 'sansevieria', scarto: 0, apertura: -12, ingombro: 28, piano: 'primo' },
+        { disegno: 'foglia-larga', scarto: 12, apertura: 16, ingombro: 22, piano: 'sfondo' },
+        { disegno: 'monstera-incisa', scarto: -10, apertura: -28, ingombro: 16, piano: 'sfondo' },
+      ],
+    },
+    {
+      bordo: 'alto',
+      ancora: 89,
+      foglie: [
+        { disegno: 'foglia-lancia', scarto: 0, apertura: 15, ingombro: 12, piano: 'sfondo', soloDaTablet: true },
+      ],
+    },
+    {
+      bordo: 'sinistro',
+      ancora: 70,
+      foglie: [
+        { disegno: 'foglia-zebrata', scarto: 0, apertura: 14, ingombro: 28, piano: 'primo' },
+        { disegno: 'monstera-incisa', scarto: -12, apertura: -12, ingombro: 20, piano: 'sfondo' },
+      ],
+    },
+    {
+      bordo: 'alto',
+      ancora: 10,
+      foglie: [
+        { disegno: 'palma', scarto: 0, apertura: -8, ingombro: 11, extra: 2, piano: 'primo', soloDaTablet: true },
+      ],
+    },
   ],
-} satisfies Record<string, Pianta[]>;
+} satisfies Record<string, Cespo[]>;
 
 export type NomeMacchia = keyof typeof MACCHIE;
 
@@ -317,26 +554,31 @@ function controllaDistanze() {
     { nome: 'telefono', fattore: PER_TELEFONO },
   ];
 
-  for (const [macchia, piante] of Object.entries(MACCHIE) as [string, Pianta[]][]) {
-    for (let i = 0; i < piante.length; i++) {
-      for (let j = i + 1; j < piante.length; j++) {
-        const a = piante[i];
-        const b = piante[j];
+  for (const [macchia, cespi] of Object.entries(MACCHIE) as [string, Cespo[]][]) {
+    for (let i = 0; i < cespi.length; i++) {
+      for (let j = i + 1; j < cespi.length; j++) {
+        const a = cespi[i];
+        const b = cespi[j];
         if (a.bordo !== b.bordo) continue;
-        // Due piante che non compaiono mai insieme non possono pestarsi.
-        if (a.soloDaTablet !== b.soloDaTablet) continue;
+        // Due cespi che non compaiono mai insieme non possono pestarsi. Un
+        // cespo o e' tutto da tablet in su o non lo e': mescolarli renderebbe
+        // la pianta meta' presente sul telefono, che non e' una pianta.
+        const soloA = a.foglie.every((f) => f.soloDaTablet);
+        const soloB = b.foglie.every((f) => f.soloDaTablet);
+        if (soloA !== soloB) continue;
 
-        const distanza = Math.abs(a.lungo - b.lungo);
+        const distanza = Math.abs(a.ancora - b.ancora);
         for (const scala of scale) {
-          // Sul telefono le nascoste non ci sono: quella scala non le riguarda.
-          if (scala.nome === 'telefono' && a.soloDaTablet) continue;
+          // Sul telefono i nascosti non ci sono: quella scala non li riguarda.
+          if (scala.nome === 'telefono' && soloA) continue;
           const k = eVerticale(a.bordo) ? scala.fattore.verticale : scala.fattore.orizzontale;
-          const minima = (((a.ingombro + b.ingombro) / 2) * k) * MARGINE;
+          const minima = (estensione(a) + estensione(b)) * k * MARGINE;
           if (distanza < minima) {
+            const nomi = (c: Cespo) => c.foglie.map((f) => f.disegno).join('+');
             console.warn(
-              `Decoro "${macchia}" (${scala.nome}): ${a.disegno} e ${b.disegno} sul bordo ` +
-                `${a.bordo} distano ${distanza} ma ne servono ${minima.toFixed(1)} — ` +
-                `si accavallano (regola 2 in cima al file).`,
+              `Decoro "${macchia}" (${scala.nome}): i cespi [${nomi(a)}] e [${nomi(b)}] sul ` +
+                `bordo ${a.bordo} distano ${distanza} ma ne servono ${minima.toFixed(1)} — ` +
+                `si toccano (regola 2 in cima al file).`,
             );
           }
         }
@@ -345,7 +587,44 @@ function controllaDistanze() {
   }
 }
 
-if (import.meta.env.DEV) controllaDistanze();
+/**
+ * La regola 8, per la parte che si puo' verificare da sola: il ventaglio.
+ * Una foglia nata di lato deve aprirsi verso quel lato, altrimenti il cespo
+ * si chiude su se stesso e torna a sembrare un mazzo legato.
+ */
+function controllaVentagli() {
+  for (const [macchia, cespi] of Object.entries(MACCHIE) as [string, Cespo[]][]) {
+    for (const cespo of cespi) {
+      for (const f of cespo.foglie) {
+        if (f.scarto !== 0 && Math.sign(f.scarto) !== Math.sign(f.apertura)) {
+          console.warn(
+            `Decoro "${macchia}": ${f.disegno} nasce a ${f.scarto} dal cuore del cespo ma si ` +
+              `apre di ${f.apertura}° dalla parte opposta — il ventaglio si chiude ` +
+              `(regola 8 in cima al file).`,
+          );
+        }
+      }
+      const davanti = cespo.foglie.filter((f) => f.piano === 'primo');
+      const dietro = cespo.foglie.filter((f) => f.piano === 'sfondo');
+      if (davanti.length > 0 && dietro.length > 0) {
+        const piuGrandeDavanti = Math.max(...davanti.map((f) => f.ingombro));
+        const piuGrandeDietro = Math.max(...dietro.map((f) => f.ingombro));
+        if (piuGrandeDietro > piuGrandeDavanti) {
+          console.warn(
+            `Decoro "${macchia}": nel cespo su ${cespo.bordo} la foglia più grande sta ` +
+              `DIETRO (${piuGrandeDietro} contro ${piuGrandeDavanti}) — si legge come un ` +
+              `errore di prospettiva (regola 8 in cima al file).`,
+          );
+        }
+      }
+    }
+  }
+}
+
+if (import.meta.env.DEV) {
+  controllaDistanze();
+  controllaVentagli();
+}
 
 /**
  * Dove finisce una pianta.
@@ -426,6 +705,7 @@ function Strato({
           <img
             key={`${p.disegno}-${i}`}
             src={fileDi(p.disegno)}
+            data-cespo={p.cespo}
             alt=""
             loading="lazy"
             decoding="async"
@@ -462,7 +742,8 @@ export default function Decoro({
   /** true sulle fasce scure: il tratto va schiarito invece che scurito */
   suScuro?: boolean;
 }) {
-  const piante = MACCHIE[macchia] as Pianta[];
+  // I cespi si aprono qui: da qui in giu' il componente disegna foglie.
+  const piante = (MACCHIE[macchia] as Cespo[]).flatMap(spiega);
 
   // Regola 7, fatta rispettare. Non taglio via la pianta sbagliata: chi
   // modifica una macchia deve VEDERE l'errore, non trovarsi un buco nella
