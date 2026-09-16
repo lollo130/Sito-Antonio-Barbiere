@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { agendaDelMese, dimenticaAgenda, precarica } from '../lib/agenda';
+import { annoMeseDi, dataRomaDi } from '../lib/data';
 import ChiamaSalone from '../components/prenotazione/ChiamaSalone';
 import Progresso from '../components/prenotazione/Progresso';
 import ConfermaPrenotazione from './prenotazione/ConfermaPrenotazione';
@@ -34,7 +36,20 @@ export default function Prenota() {
       {!prenotazione && <Progresso passo={passo} />}
       <ChiamaSalone />
 
-      {!servizio && <Passo1Servizio onScelto={setServizio} />}
+      {!servizio && (
+        <Passo1Servizio
+          onScelto={(s) => {
+            // Il calendario parte QUI, non quando appare la schermata dopo.
+            // È la stessa chiamata che farà il passo 2: la cache tiene la
+            // promessa, quindi là non ne parte una seconda — o la trova
+            // arrivata, o si mette in coda a questa. Guadagnati gratis i
+            // decimi fra il tocco e il disegno della schermata, che è anche
+            // il momento in cui si sveglia la funzione se dormiva.
+            precarica(agendaDelMese(s.id, annoMeseDi(dataRomaDi(new Date().toISOString()))));
+            setServizio(s);
+          }}
+        />
+      )}
 
       {servizio && !inizio && (
         <Passo2Quando servizio={servizio} onScelto={setInizio} onIndietro={() => setServizio(null)} />
@@ -50,7 +65,12 @@ export default function Prenota() {
           inizio={inizio}
           operatorePreferenza={operatore}
           onIndietro={() => setOperatore(undefined)}
-          onConfermata={setPrenotazione}
+          onConfermata={(p) => {
+            // Da adesso ogni risposta tenuta da parte descrive un'agenda che
+            // non esiste piu': quello slot l'ha appena preso questo cliente.
+            dimenticaAgenda();
+            setPrenotazione(p);
+          }}
         />
       )}
 

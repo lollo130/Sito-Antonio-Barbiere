@@ -112,10 +112,36 @@ export async function caricaContesto(
   if (operatori.length === 0) return CONTESTO_VUOTO;
   const attivi = new Set(operatori.map((o) => o.id));
 
-  // Orari settimanali. Sono pochi documenti: si prendono tutti e si filtra
-  // qui, invece di una query per operatore.
+  // LE QUATTRO LETTURE CHE RESTANO PARTONO INSIEME.
+  //
+  // Prima erano quattro `await` in fila: orari, poi prenotazioni, poi assenze,
+  // poi chiusure. Ma nessuna delle quattro serve alle altre — l'unica cosa che
+  // le lega è `attivi`, che si usa per SCARTARE le righe una volta arrivate,
+  // non per costruire le query. Messe in fila, il tempo era la somma dei
+  // quattro viaggi fino al database; messe insieme, è quello del più lento.
+  //
+  // È il pezzo di attesa che si poteva togliere senza cambiare una riga del
+  // calcolo né spendere un euro. Quello che resta — la partenza a freddo della
+  // funzione — non si risolve da qui.
+  //
+  // Una prenotazione cominciata prima della finestra può finirci dentro: si
+  // parte indietro di una durata massima e si scarta sulla fine.
+  const daConMargine = new Date(da.getTime() - DURATA_MASSIMA_ORE * 3600_000);
+
+  const [righeOrari, prenotazioni, assenze, righeChiusure] = await Promise.all([
+    // Orari settimanali. Sono pochi documenti: si prendono tutti e si filtra
+    // qui, invece di una query per operatore.
+    db.collection('orari_operatore').get(),
+    db
+      .collection('prenotazioni')
+      .where('inizio', '>=', daConMargine)
+      .where('inizio', '<', a)
+      .get(),
+    db.collection('assenze').where('fine', '>', da).get(),
+    db.collection('chiusure_salone').where('fine', '>', da).get(),
+  ]);
+
   const orari = new Map<string, FasciaOraria[]>();
-  const righeOrari = await db.collection('orari_operatore').get();
   righeOrari.docs.forEach((d) => {
     const operatoreId = d.get('operatore_id') as string;
     if (!attivi.has(operatoreId)) return;
@@ -138,14 +164,6 @@ export async function caricaContesto(
     occupati.set(operatoreId, lista);
   };
 
-  // Una prenotazione cominciata prima della finestra può finirci dentro: si
-  // parte indietro di una durata massima e si scarta sulla fine.
-  const daConMargine = new Date(da.getTime() - DURATA_MASSIMA_ORE * 3600_000);
-  const prenotazioni = await db
-    .collection('prenotazioni')
-    .where('inizio', '>=', daConMargine)
-    .where('inizio', '<', a)
-    .get();
   prenotazioni.docs.forEach((d) => {
     const stato = d.get('stato') as (typeof STATI_OCCUPANTI)[number];
     if (!STATI_OCCUPANTI.includes(stato)) return;

@@ -14,7 +14,13 @@ import {
   meseSuccessivo,
   type AnnoMese,
 } from '../../lib/data';
-import { agendaDelGiorno, agendaDelMese, type RigaAgenda, type RigaGiorno } from '../../lib/agenda';
+import {
+  agendaDelGiorno,
+  agendaDelMese,
+  precarica,
+  type RigaAgenda,
+  type RigaGiorno,
+} from '../../lib/agenda';
 import type { Servizio } from './Passo1Servizio';
 
 // Calendario mensile pubblico (SPECIFICA.md § 5): un mese alla volta a
@@ -28,6 +34,39 @@ import type { Servizio } from './Passo1Servizio';
 
 const FINESTRA_MASSIMA_GIORNI = 60;
 const NOMI_GIORNI = ['LUN', 'MAR', 'MER', 'GIO', 'VEN', 'SAB', 'DOM'];
+
+// GLI ORARI DEL GIORNO, A GRIGLIA E DIVISI IN FASCE.
+//
+// Prima erano una lista verticale, una riga per orario: in una giornata piena
+// diventavano trenta righe da scorrere, e per arrivare alle cinque del
+// pomeriggio si passava per tutta la mattina.
+//
+// Era stato chiesto un menu a tendina. Non si può: CLAUDE.md § "Interfaccia"
+// vieta i `<select>` proprio in questo passo, perché il pubblico del salone
+// comprende persone anziane, e una tendina nasconde tutte le scelte dietro un
+// tocco, si apre in modo diverso su ogni telefono e non si può ingrandire.
+// La griglia risolve però il problema vero — la lista era lunga — senza
+// nascondere niente: tutti gli orari restano sotto gli occhi, ogni riquadro è
+// un bottone da 60 px, e tre fasce fanno capire a colpo d'occhio se il posto
+// libero è di mattina o di pomeriggio.
+const FASCE = [
+  { chiave: 'mattina', titolo: 'Mattina' },
+  { chiave: 'pomeriggio', titolo: 'Pomeriggio' },
+  { chiave: 'sera', titolo: 'Sera' },
+] as const;
+
+/**
+ * In quale fascia cade un istante.
+ *
+ * Si guarda l'ora di Roma, non quella del telefono: un cliente che prenota
+ * dall'estero vedrebbe altrimenti la mattina finire nel pomeriggio.
+ */
+function fasciaDi(istante: string): (typeof FASCE)[number]['chiave'] {
+  const ora = Number(formattaOra(istante).slice(0, 2));
+  if (ora < 13) return 'mattina';
+  if (ora < 18) return 'pomeriggio';
+  return 'sera';
+}
 
 type Props = {
   servizio: Servizio;
@@ -57,7 +96,15 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
     setErroreMese(null);
     agendaDelMese(servizio.id, mese)
       .then((r) => {
-        if (attivo) setGiorniMese(r);
+        if (!attivo) return;
+        setGiorniMese(r);
+        // Appena si sa quali giorni sono liberi, si chiedono gli orari del
+        // primo: è la casella che quasi tutti toccano per prima, e intanto
+        // che la persona legge il calendario la risposta è già per strada.
+        // Se poi tocca un altro giorno non si è perso niente — una chiamata
+        // che nessuno aspetta e che la cache terrà comunque da parte.
+        const primoLibero = r.find((g) => g.giorno >= oggi && g.libero);
+        if (primoLibero) precarica(agendaDelGiorno(servizio.id, primoLibero.giorno));
       })
       .catch(() => {
         if (attivo) setErroreMese('Non riesco a controllare il calendario. Riprova tra poco.');
@@ -65,7 +112,9 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
     return () => {
       attivo = false;
     };
-  }, [servizio.id, mese]);
+    // `oggi` è una data in forma di stringa, ricalcolata a ogni disegno ma
+    // sempre uguale a se stessa fino a mezzanotte: come dipendenza è stabile.
+  }, [servizio.id, mese, oggi]);
 
   function apriGiorno(dataStr: string) {
     setGiornoScelto(dataStr);
@@ -81,17 +130,32 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
     setCercandoPrimoLibero(true);
     setErroreMese(null);
     try {
+      // I mesi da guardare si sanno già tutti in partenza: la finestra è di
+      // 60 giorni e quindi tocca al massimo tre mesi. Chiederli UNO ALLA
+      // VOLTA, come si faceva prima, voleva dire aspettare tre viaggi in fila
+      // per la risposta più lenta — e quasi sempre la risposta era nel primo,
+      // ma i due dopo si pagavano lo stesso quando non lo era.
+      // Chiesti insieme, si aspetta il più lento e basta. Il primo di solito
+      // è già in cache, perché è quello precaricato alla scelta del servizio.
+      const daGuardare: AnnoMese[] = [];
       let cursore = primoMese;
       for (let i = 0; i < 3; i++) {
-        const giorni = await agendaDelMese(servizio.id, cursore);
+        daGuardare.push(cursore);
+        if (confrontaAnnoMese(cursore, ultimoMese) >= 0) break;
+        cursore = meseSuccessivo(cursore);
+      }
+
+      const risposte = await Promise.all(
+        daGuardare.map((m) => agendaDelMese(servizio.id, m)),
+      );
+
+      for (const [i, giorni] of risposte.entries()) {
         const trovato = giorni.find((g) => g.giorno >= oggi && g.giorno <= ultimoGiorno && g.libero);
         if (trovato) {
-          setMese(cursore);
+          setMese(daGuardare[i]);
           apriGiorno(trovato.giorno);
           return;
         }
-        if (confrontaAnnoMese(cursore, ultimoMese) >= 0) break;
-        cursore = meseSuccessivo(cursore);
       }
       setErroreMese('Non ci sono orari liberi nei prossimi 60 giorni.');
     } catch {
@@ -105,6 +169,7 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
   // Agenda di un singolo giorno
   // ------------------------------------------------------------------
   if (vista === 'giorno' && giornoScelto) {
+    const liberiDelGiorno = righeGiorno?.filter((r) => r.libero).length ?? 0;
     return (
       <div className="flex flex-col gap-5">
         <button
@@ -126,34 +191,56 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
         )}
 
         {righeGiorno && righeGiorno.length > 0 && (
-          <div className="overflow-hidden rounded-lg border-2 border-verde">
-            {righeGiorno.map((r, i) => (
-              <button
-                key={r.inizio}
-                type="button"
-                disabled={!r.libero}
-                onClick={() => onScelto(r.inizio)}
-                className={`flex min-h-[58px] w-full items-center justify-between gap-4 px-4 text-left ${
-                  i > 0 ? 'border-t border-bordo' : ''
-                } ${r.libero ? 'bg-carta-chiara active:bg-verde-chiaro' : 'bg-pieno'}`}
-              >
-                <span
-                  className={`font-titolo text-xl font-bold tabular-nums ${
-                    r.libero ? 'text-verde' : 'text-pieno-testo'
-                  }`}
-                >
-                  {formattaOra(r.inizio)}
-                </span>
-                <span
-                  className={`font-titolo text-sm uppercase tracking-widest ${
-                    r.libero ? 'text-marrone' : 'text-pieno-testo'
-                  }`}
-                >
-                  {r.libero ? (r.operatore_nome ?? 'libero') : 'occupato'}
-                </span>
-              </button>
-            ))}
-          </div>
+          <>
+            <p className="text-lg text-grigio">
+              {liberiDelGiorno === 0
+                ? 'Tutti gli orari di questo giorno sono presi.'
+                : `${liberiDelGiorno} ${liberiDelGiorno === 1 ? 'orario libero' : 'orari liberi'}. Tocca quello che ti va bene.`}
+            </p>
+
+            {FASCE.map((fascia) => {
+              const righe = righeGiorno.filter((r) => fasciaDi(r.inizio) === fascia.chiave);
+              if (righe.length === 0) return null;
+              return (
+                <div key={fascia.chiave} className="flex flex-col gap-3">
+                  <h2 className="font-titolo text-sm font-bold uppercase tracking-[0.2em] text-marrone">
+                    {fascia.titolo}
+                  </h2>
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                    {righe.map((r) => (
+                      <button
+                        key={r.inizio}
+                        type="button"
+                        disabled={!r.libero}
+                        onClick={() => onScelto(r.inizio)}
+                        aria-label={`${formattaOra(r.inizio)}${r.libero ? '' : ', occupato'}`}
+                        className={`relative flex min-h-[64px] items-center justify-center rounded-xl border-2 px-1 pb-3 ${
+                          r.libero
+                            ? 'border-verde bg-carta-chiara text-verde active:bg-verde active:text-carta-chiara'
+                            : 'border-bordo bg-pieno text-pieno-testo line-through decoration-1'
+                        }`}
+                      >
+                        <span className="font-titolo text-xl font-bold tabular-nums">
+                          {formattaOra(r.inizio)}
+                        </span>
+                        {/* Il nome sta appeso in fondo al riquadro invece che
+                            sotto l'ora: ce l'hanno solo alcuni orari — quelli
+                            con un operatore solo libero — e messo nel flusso
+                            spingeva l'ora più in alto proprio in quei
+                            riquadri, lasciando le ore della stessa riga a
+                            quote diverse. Così restano tutte allineate. */}
+                        {r.libero && r.operatore_nome && (
+                          <span className="absolute inset-x-0 bottom-1 truncate px-1 font-titolo text-[0.6rem] uppercase tracking-wider text-marrone">
+                            {r.operatore_nome}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </>
         )}
       </div>
     );
