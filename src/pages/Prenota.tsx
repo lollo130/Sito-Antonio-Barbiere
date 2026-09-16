@@ -22,11 +22,17 @@ export default function Prenota() {
 
   return (
     <>
-      {/* Solo l'insegna, senza navigazione: qui si fa una cosa sola. */}
-      <header className="border-b border-bordo bg-carta-chiara px-5 py-3">
+      {/* Solo l'insegna, senza navigazione né telefono: qui si fa una cosa
+          sola, e il numero sta già nel bottone "Chiama il salone" qui sotto,
+          che per specifica deve restare visibile a ogni passo.
+          Scura come quella delle pagine pubbliche: chi tocca "Prenota ora"
+          non deve vedere la testata cambiare colore sotto le mani. */}
+      <header className="border-b border-bronzo bg-verde-scuro px-5 py-2.5">
         <div className="mx-auto max-w-md">
-          <p className="font-titolo text-2xl leading-tight text-inchiostro">{NOME_SALONE}</p>
-          <p className="text-[0.62rem] uppercase tracking-[0.14em] text-marrone">
+          <p className="font-titolo text-xl font-bold leading-none tracking-wide text-carta-chiara">
+            {NOME_SALONE}
+          </p>
+          <p className="mt-1 text-[0.58rem] uppercase leading-none tracking-[0.18em] text-cuoio-chiaro">
             {SOTTOTITOLO_SALONE}
           </p>
         </div>

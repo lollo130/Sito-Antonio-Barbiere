@@ -43,8 +43,14 @@
   --color-cuoio-scuro: #4e341c;
   --color-crema: #fdf5e6;
   /* Il cuoio pieno su verde scuro dà 1.36 di contrasto: illeggibile. Per
-     testo e bordo su fondo verde si usa questo cuoio schiarito (5.03). */
+     testo e bordo su fondo verde si usa questo cuoio schiarito (5.03; sul
+     verde più scuro dell'insegna arriva a 7.42). */
   --color-cuoio-chiaro: #e8c9a0;
+
+  /* Bronzo: solo per FILETTI e CORNICI su fondo scuro, mai per il testo.
+     Sul verde dell'insegna dà 4.45 — abbastanza per una linea o un bordo,
+     sotto la soglia per una parola scritta, che infatti usa cuoio-chiaro. */
+  --color-bronzo: #c8965a;
 
   /* neutri */
   --color-inchiostro: #2a241e;
