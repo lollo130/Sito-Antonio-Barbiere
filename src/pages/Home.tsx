@@ -63,13 +63,15 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(datiStrutturati) }}
       />
-      <Intestazione />
+      <Intestazione sopra="scuro" />
 
       <main>
         {/* APERTURA — blocco verde pieno. È quello che dà peso alla pagina e
             la toglie dall'aria di foglio bianco. Testo grande e chiaro su
             verde scuro: ben sopra il contrasto richiesto. */}
-        <section className="relative overflow-hidden bg-verde px-5 py-14 text-carta-chiara sm:py-20">
+        {/* pt più alto del py: l'insegna e' appoggiata sopra e non occupa
+            posto, quindi lo spazio glielo lascia l'apertura. */}
+        <section className="relative overflow-hidden bg-verde px-5 pb-14 pt-24 text-carta-chiara sm:pb-20 sm:pt-28">
           <Decoro macchia="cornicePiena" suScuro />
           <div className="relative z-10 mx-auto max-w-3xl text-center">
             <p className="font-titolo text-[0.7rem] uppercase tracking-[0.28em] text-marrone-chiaro">

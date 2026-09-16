@@ -17,7 +17,7 @@ export default function Cookie() {
     <>
       <Intestazione />
 
-      <main className="mx-auto max-w-3xl px-5 py-10">
+      <main className="mx-auto max-w-3xl px-5 pb-10 pt-24">
         <h1 className="font-titolo text-3xl font-bold uppercase text-inchiostro">
           Informativa sui cookie
         </h1>

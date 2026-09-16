@@ -27,7 +27,7 @@ export default function DoveSiamo() {
     <>
       <Intestazione />
 
-      <main className="mx-auto max-w-2xl px-5 py-12">
+      <main className="mx-auto max-w-2xl px-5 pb-12 pt-24">
         <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Dove siamo</h1>
 
         <div className="mt-6 flex h-64 items-center justify-center rounded-2xl border-2 border-dashed border-bordo bg-carta-chiara text-lg text-pieno-testo">

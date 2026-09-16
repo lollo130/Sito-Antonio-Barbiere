@@ -30,7 +30,7 @@ export default function Privacy() {
     <>
       <Intestazione />
 
-      <main className="font-lettura mx-auto max-w-2xl px-5 py-12">
+      <main className="font-lettura mx-auto max-w-2xl px-5 pb-12 pt-24">
         <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Privacy</h1>
         <p className="mt-3 text-base text-grigio">
           Ultimo aggiornamento: {AGGIORNAMENTO_INFORMATIVA}
