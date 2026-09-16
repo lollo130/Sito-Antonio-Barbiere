@@ -51,19 +51,33 @@ export default function Intestazione({ sopra = 'chiaro' }: Props) {
           </span>
         </Link>
 
-        {/* Un comando solo, in cuoio come quello grande dell'apertura: si
-            legge come lo stesso invito ripetuto in piccolo, non come un
-            secondo invito diverso. Prima qui c'era il numero di telefono da
-            solo, che a quella distanza dall'insegna sembrava lasciato lì. */}
+        {/* A CONTORNO, NON PIENO.
+            Era un rettangolo di cuoio pieno, e faceva due danni insieme: si
+            prendeva l'occhio prima del titolo — una testata deve incorniciare,
+            non competere col centro della pagina — ed era il gemello esatto
+            del "PRENOTA ORA" duecento pixel più sotto, stesso colore e stessa
+            forma. Svuotato, il marrone resta ma il peso no: l'unico pieno
+            della schermata torna a essere quello grande in mezzo.
+
+            L'AREA TOCCABILE RESTA 56 px, che CLAUDE.md impone per il pubblico
+            anziano del salone. Il riquadro che si vede però è più basso: il
+            bordo sta sul <span>, mentre lo spazio che lo porta a 56 sta sul
+            link, invisibile e tutto cliccabile. Così il bottone è leggero da
+            guardare e grande da centrare col dito, che sono due cose diverse
+            e qui andavano separate. */}
         <Link
           to="/prenota"
-          // 56 px e non meno: CLAUDE.md lo impone per ogni area toccabile,
-          // perche' il pubblico del salone comprende persone anziane. La
-          // barra resta comunque bassa perche' l'altezza gliela toglie il
-          // margine, non il bottone.
-          className="flex min-h-[56px] shrink-0 items-center rounded-lg border border-cuoio-scuro bg-cuoio px-4 font-titolo text-sm font-bold uppercase tracking-wide text-crema"
+          className="flex min-h-[56px] shrink-0 items-center"
         >
-          Prenota
+          <span
+            className={`rounded-md border px-4 py-2 font-titolo text-sm font-bold uppercase tracking-wide ${
+              scuro
+                ? 'border-bronzo text-cuoio-chiaro'
+                : 'border-cuoio text-marrone'
+            }`}
+          >
+            Prenota
+          </span>
         </Link>
       </div>
     </header>

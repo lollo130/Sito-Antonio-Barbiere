@@ -46,6 +46,13 @@
      testo e bordo su fondo verde si usa questo cuoio schiarito (5.03). */
   --color-cuoio-chiaro: #e8c9a0;
 
+  /* Bronzo: contorni su fondo SCURO, e solo quelli.
+     Sul verde dà 4.44 — abbastanza per una linea, sotto la soglia per una
+     parola. Sulla carta chiara crolla a 2.48, cioè si vede appena: per questo
+     il bottone a contorno dell'insegna usa il bronzo sull'apertura e il cuoio
+     pieno (5.51) sulle pagine chiare, invece dello stesso colore ovunque. */
+  --color-bronzo: #c8965a;
+
   /* neutri */
   --color-inchiostro: #2a241e;
   --color-grigio: #5a5045;
