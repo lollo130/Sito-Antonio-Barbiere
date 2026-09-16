@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import BottoneScelta from '../../components/prenotazione/BottoneScelta';
+import Ritratto from '../../components/Ritratto';
 import { operatoriPerServizio, type Operatore } from '../../lib/db';
 import type { Servizio } from './Passo1Servizio';
 
@@ -54,7 +55,12 @@ export default function Passo3Operatore({ servizio, onScelto, onIndietro }: Prop
       <div className="flex flex-col gap-3">
         <BottoneScelta etichetta="Nessuna preferenza" selezionato onClick={() => onScelto(null)} />
         {operatori.map((o) => (
-          <BottoneScelta key={o.id} etichetta={o.nome} onClick={() => onScelto(o.id)} />
+          <BottoneScelta
+            key={o.id}
+            etichetta={o.nome}
+            davanti={<Ritratto nome={o.nome} foto={o.foto} colore={o.colore} misura={52} />}
+            onClick={() => onScelto(o.id)}
+          />
         ))}
       </div>
     </div>

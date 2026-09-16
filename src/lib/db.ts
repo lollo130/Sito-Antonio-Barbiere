@@ -48,7 +48,15 @@ export type Servizio = {
   categoria: 'uomo' | 'donna' | 'entrambi';
 };
 
-export type Operatore = { id: string; nome: string; ordine: number };
+export type Operatore = {
+  id: string;
+  nome: string;
+  ordine: number;
+  /** il colore in agenda; fa da ripiego quando manca la foto */
+  colore: string;
+  /** la foto, come data URL, oppure null (vedi src/lib/foto.ts) */
+  foto: string | null;
+};
 
 export type FasciaSalone = { giorno: number; ora_inizio: string; ora_fine: string };
 
@@ -62,11 +70,27 @@ function servizioDa(d: QueryDocumentSnapshot): Servizio {
   };
 }
 
+/**
+ * I servizi che il pubblico può vedere e prenotare.
+ *
+ * Il taglio femminile resta FUORI, per decisione del titolare: il salone
+ * riapre quel capitolo più avanti. Non è stato tolto dai dati né dal pannello
+ * — i servizi `donna` si possono ancora creare e restano lì con i loro prezzi
+ * — viene solo nascosto al pubblico, così quando si riprenderà basterà
+ * togliere questo filtro invece di rifare listino e categorie.
+ *
+ * Il filtro sta qui e non nella pagina di prenotazione perché queste righe le
+ * legge anche il listino della home: separandoli, prima o poi la home
+ * mostrerebbe un servizio che poi non si riesce a prenotare.
+ *
+ * I servizi `entrambi` restano: sono cose come la barba o il taglio bambino,
+ * che non sono "femminili" — sono per tutti.
+ */
 export async function serviziAttivi(): Promise<Servizio[]> {
   const risultato = await conScadenza(
     getDocs(query(collection(db, 'servizi'), where('attivo', '==', true), orderBy('ordine'))),
   );
-  return risultato.docs.map(servizioDa);
+  return risultato.docs.map(servizioDa).filter((s) => s.categoria !== 'donna');
 }
 
 export async function operatoriAttivi(): Promise<Operatore[]> {
@@ -77,6 +101,10 @@ export async function operatoriAttivi(): Promise<Operatore[]> {
     id: d.id,
     nome: d.get('nome'),
     ordine: d.get('ordine') ?? 0,
+    colore: d.get('colore') ?? '#888888',
+    // Assente sui documenti creati prima che le foto esistessero, null quando
+    // il titolare l'ha tolta: per chi legge sono la stessa cosa.
+    foto: d.get('foto') ?? null,
   }));
 }
 

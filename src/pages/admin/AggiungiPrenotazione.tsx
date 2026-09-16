@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import GuscioAdmin from '../../components/admin/GuscioAdmin';
 import { useNavigate } from 'react-router-dom';
 import { aggiungiGiorni, dataRomaDi, formattaGiornoEsteso, formattaOra } from '../../lib/data';
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
@@ -128,18 +129,11 @@ export default function AggiungiPrenotazione() {
   }
 
   return (
-    <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="font-titolo text-2xl font-bold uppercase text-inchiostro">Aggiungi a mano</h1>
-        <button
-          type="button"
-          onClick={() => naviga('/admin')}
-          className="font-titolo text-base font-bold text-grigio underline"
-        >
-          Annulla
-        </button>
-      </div>
-
+    <GuscioAdmin
+      titolo="Aggiungi a mano"
+      sottotitolo="Per chi si presenta in negozio senza aver prenotato"
+      indietro={{ a: '/admin', etichetta: 'Torna all’agenda' }}
+    >
       <Sezione titolo="Giorno">
         <div className="flex items-center gap-3">
           <FrecciaGiorno verso="‹" onClick={() => setGiorno((g) => aggiungiGiorni(g, -1))} etichetta="Giorno precedente" />
@@ -274,7 +268,7 @@ export default function AggiungiPrenotazione() {
           {salvando ? 'Salvo…' : 'Salva prenotazione'}
         </button>
       )}
-    </main>
+    </GuscioAdmin>
   );
 }
 

@@ -325,3 +325,14 @@ a:active {
   box-shadow: 0 0 0 7px color-mix(in srgb, var(--da) 50%, var(--a));
   transform: rotate(45deg);
 }
+
+/* La scheda su cui poggia ogni schermata del pannello.
+   Un bordo sottile e un'ombra corta: quel tanto che basta a staccarla dalla
+   pietra del fondo. Lo stesso trucco delle schede del listino — bordo chiaro,
+   spessore in basso — ma senza il cuoio: il pannello e' un attrezzo da
+   lavoro, non una vetrina. */
+.scheda-admin {
+  border: 1px solid var(--color-bordo);
+  border-bottom: 4px solid var(--color-verde);
+  box-shadow: 0 2px 6px rgba(42, 36, 30, 0.08);
+}

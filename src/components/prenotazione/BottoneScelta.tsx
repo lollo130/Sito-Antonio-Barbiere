@@ -4,12 +4,15 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   etichetta: ReactNode;
   dettaglio?: ReactNode;
   selezionato?: boolean;
+  /** un'immagine prima dell'etichetta: per ora il ritratto dell'operatore */
+  davanti?: ReactNode;
 };
 
 export default function BottoneScelta({
   etichetta,
   dettaglio,
   selezionato,
+  davanti,
   className = '',
   ...resto
 }: Props) {
@@ -24,7 +27,10 @@ export default function BottoneScelta({
       } ${className}`}
       {...resto}
     >
-      <span>{etichetta}</span>
+      <span className="flex items-center gap-3">
+        {davanti}
+        <span>{etichetta}</span>
+      </span>
       {dettaglio && <span className="text-base font-normal opacity-90">{dettaglio}</span>}
     </button>
   );

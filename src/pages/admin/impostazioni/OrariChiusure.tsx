@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import GuscioAdmin from '../../../components/admin/GuscioAdmin';
 import EditorOrariSettimanali, { type Fascia } from '../../../components/admin/EditorOrariSettimanali';
 import { classeCampo, classeEtichetta } from '../../../components/admin/campi';
 import { formattaGiornoEsteso, dataRomaDi } from '../../../lib/data';
@@ -124,11 +124,10 @@ export default function OrariChiusure() {
   }
 
   return (
-    <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
-      <Link to="/admin/impostazioni" className="self-start text-lg font-medium text-grigio">
-        ‹ Impostazioni
-      </Link>
-      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Orari del salone e chiusure</h1>
+    <GuscioAdmin
+      titolo={"Orari del salone e chiusure"}
+      indietro={{ a: '/admin/impostazioni', etichetta: 'Impostazioni' }}
+    >
 
       {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
 
@@ -209,6 +208,6 @@ export default function OrariChiusure() {
           </button>
         </div>
       </div>
-    </main>
+    </GuscioAdmin>
   );
 }

@@ -40,6 +40,22 @@ service cloud.firestore {
       return request.resource.data;
     }
 
+    // La foto dell'operatore sta DENTRO il documento, come data URL (vedi
+    // src/lib/foto.ts). Comodo, ma con un rischio preciso: `operatori` la
+    // legge anche il pubblico, quindi un'immagine grossa la pagherebbe ogni
+    // cliente che apre la prenotazione, sul suo telefono.
+    // Il browser la stringe gia' sotto i 40.000 caratteri; questo e' lo
+    // stesso numero messo dove conta davvero. Un limite che vive solo nel
+    // codice della pagina non e' un limite: basta una console aperta.
+    // Il campo puo' mancare (documenti vecchi) o essere null (foto tolta).
+    function fotoAccettabile(dati) {
+      return !('foto' in dati)
+        || dati.foto == null
+        || (dati.foto is string
+            && dati.foto.size() <= 40000
+            && dati.foto.matches('^data:image/(webp|jpeg|png);base64,.*'));
+    }
+
     function stringaPiena(campo, minimo, massimo) {
       return campo is string
         && campo.trim().size() >= minimo
@@ -61,7 +77,8 @@ service cloud.firestore {
         && stringaPiena(nuovo().nome, 1, 60)
         && nuovo().colore is string
         && nuovo().ordine is int
-        && nuovo().attivo is bool;
+        && nuovo().attivo is bool
+        && fotoAccettabile(nuovo());
       // Gli operatori si disattivano, non si cancellano (CLAUDE.md § 5).
       allow delete: if false;
     }

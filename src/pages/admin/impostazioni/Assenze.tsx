@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import GuscioAdmin from '../../../components/admin/GuscioAdmin';
 import BottoneToggle from '../../../components/admin/BottoneToggle';
 import { classeCampo, classeEtichetta } from '../../../components/admin/campi';
 import { formattaGiornoEsteso, dataRomaDi } from '../../../lib/data';
@@ -102,11 +102,10 @@ export default function Assenze() {
   }
 
   return (
-    <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
-      <Link to="/admin/impostazioni" className="self-start text-lg font-medium text-grigio">
-        ‹ Impostazioni
-      </Link>
-      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Assenze</h1>
+    <GuscioAdmin
+      titolo={"Assenze"}
+      indietro={{ a: '/admin/impostazioni', etichetta: 'Impostazioni' }}
+    >
 
       <div className="flex flex-wrap gap-2">
         {operatori.map((o) => (
@@ -179,6 +178,6 @@ export default function Assenze() {
           + Aggiungi assenza
         </button>
       </div>
-    </main>
+    </GuscioAdmin>
   );
 }

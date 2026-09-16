@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import GuscioAdmin from '../../components/admin/GuscioAdmin';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -215,15 +216,12 @@ export default function Oggi() {
   const daFare = prenotazioni?.filter((p) => p.stato === 'confermata').length ?? 0;
 
   return (
-    <main className="mx-auto flex min-h-svh max-w-5xl flex-col gap-5 px-4 py-6 sm:px-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-titolo text-2xl font-bold uppercase text-inchiostro">Agenda</h1>
-          <p className="text-base text-grigio">
-            {prenotazioni ? `${daFare} da fare` : 'Carico…'}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
+    <GuscioAdmin
+      largo
+      titolo="Agenda"
+      sottotitolo={prenotazioni ? `${daFare} da fare` : 'Carico…'}
+      azioni={
+        <>
           <Link
             to="/admin/aggiungi"
             className="flex min-h-[48px] items-center rounded-lg bg-verde px-4 font-titolo text-base font-bold uppercase text-carta-chiara"
@@ -232,12 +230,13 @@ export default function Oggi() {
           </Link>
           <Link
             to="/admin/impostazioni"
-            className="flex min-h-[48px] items-center rounded-lg border-2 border-bordo px-4 font-titolo text-base font-bold text-grigio"
+            className="flex min-h-[48px] items-center rounded-lg border-2 border-bordo bg-carta-chiara px-4 font-titolo text-base font-bold text-grigio"
           >
             Impostazioni
           </Link>
-        </div>
-      </div>
+        </>
+      }
+    >
 
       <div className="grid grid-cols-3 overflow-hidden rounded-lg border-2 border-verde">
         {(['giorno', 'settimana', 'mese'] as Vista[]).map((v, i) => (
@@ -303,7 +302,7 @@ export default function Oggi() {
       {prenotazioni && vista === 'mese' && (
         <VistaMese giorni={giorniVisti} perGiorno={perGiorno} oggi={oggi} onApri={apriGiorno} />
       )}
-    </main>
+    </GuscioAdmin>
   );
 }
 

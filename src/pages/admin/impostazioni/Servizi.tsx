@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import GuscioAdmin from '../../../components/admin/GuscioAdmin';
 import BottoneToggle from '../../../components/admin/BottoneToggle';
 import { classeCampo, classeEtichetta } from '../../../components/admin/campi';
 import {
@@ -149,17 +149,10 @@ export default function Servizi() {
 
   if (editando) {
     return (
-      <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
-        <button
-          type="button"
-          onClick={() => setEditando(null)}
-          className="self-start text-lg font-medium text-grigio"
-        >
-          ‹ Indietro
-        </button>
-        <h1 className="font-titolo text-3xl font-semibold text-inchiostro">
-          {editando === 'nuovo' ? 'Nuovo servizio' : 'Modifica servizio'}
-        </h1>
+      <GuscioAdmin
+        titolo={editando === 'nuovo' ? 'Nuovo servizio' : 'Modifica servizio'}
+        indietro={{ etichetta: 'Indietro', onClick: () => setEditando(null) }}
+      >
 
         <div className="flex flex-col gap-2">
           <label className={classeEtichetta} htmlFor="nome">
@@ -245,16 +238,15 @@ export default function Servizi() {
             {editando.attivo ? 'Disattiva servizio' : 'Riattiva servizio'}
           </button>
         )}
-      </main>
+      </GuscioAdmin>
     );
   }
 
   return (
-    <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
-      <Link to="/admin/impostazioni" className="self-start text-lg font-medium text-grigio">
-        ‹ Impostazioni
-      </Link>
-      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Servizi</h1>
+    <GuscioAdmin
+      titolo={"Servizi"}
+      indietro={{ a: '/admin/impostazioni', etichetta: 'Impostazioni' }}
+    >
 
       {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
       {!servizi && !errore && <p className="text-lg text-grigio">Carico…</p>}
@@ -286,6 +278,6 @@ export default function Servizi() {
       >
         + Nuovo servizio
       </button>
-    </main>
+    </GuscioAdmin>
   );
 }

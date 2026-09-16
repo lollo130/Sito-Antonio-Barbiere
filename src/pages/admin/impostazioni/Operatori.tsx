@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import GuscioAdmin from '../../../components/admin/GuscioAdmin';
+import Ritratto from '../../../components/Ritratto';
+import { preparaFoto } from '../../../lib/foto';
 import EditorOrariSettimanali, { type Fascia } from '../../../components/admin/EditorOrariSettimanali';
 import { classeCampo, classeEtichetta } from '../../../components/admin/campi';
 import { formattaGiornoEsteso, formattaOra, dataRomaDi } from '../../../lib/data';
@@ -29,7 +31,14 @@ const idAbbinamento = (operatoreId: string, servizioId: string) =>
 // servizi che sa fare, orari settimanali. Se disattivo un operatore con
 // prenotazioni future, avviso e mostro quali sono prima di procedere.
 
-type Operatore = { id: string; nome: string; attivo: boolean; ordine: number };
+type Operatore = {
+  id: string;
+  nome: string;
+  attivo: boolean;
+  ordine: number;
+  colore: string;
+  foto: string | null;
+};
 type Servizio = { id: string; nome: string };
 type PrenotazioneFutura = { id: string; inizio: string; cliente_nome: string; cliente_cognome: string | null };
 
@@ -48,6 +57,8 @@ export default function Operatori() {
             nome: d.get('nome'),
             attivo: d.get('attivo'),
             ordine: d.get('ordine') ?? 0,
+            colore: d.get('colore') ?? '#888888',
+            foto: d.get('foto') ?? null,
           })),
         ),
       )
@@ -93,11 +104,10 @@ export default function Operatori() {
   }
 
   return (
-    <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
-      <Link to="/admin/impostazioni" className="self-start text-lg font-medium text-grigio">
-        ‹ Impostazioni
-      </Link>
-      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Operatori</h1>
+    <GuscioAdmin
+      titolo={"Operatori"}
+      indietro={{ a: '/admin/impostazioni', etichetta: 'Impostazioni' }}
+    >
 
       {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
       {!operatori && !errore && <p className="text-lg text-grigio">Carico…</p>}
@@ -108,11 +118,15 @@ export default function Operatori() {
             key={o.id}
             type="button"
             onClick={() => setSelezionato(o)}
-            className={`flex min-h-[56px] items-center rounded-2xl border-2 px-5 text-left text-lg font-semibold ${
-              o.attivo ? 'border-bordo text-inchiostro' : 'border-bordo bg-carta-chiara text-grigio'
+            className={`flex min-h-[64px] items-center gap-3 rounded-2xl border-2 px-4 text-left text-lg font-semibold ${
+              o.attivo ? 'border-bordo text-inchiostro' : 'border-bordo bg-pieno text-grigio'
             }`}
           >
-            {o.nome} {!o.attivo && '(disattivo)'}
+            <Ritratto nome={o.nome} foto={o.foto} colore={o.colore} />
+            <span>
+              {o.nome}
+              {!o.attivo && <span className="block text-base font-normal">disattivo</span>}
+            </span>
           </button>
         ))}
       </div>
@@ -136,13 +150,15 @@ export default function Operatori() {
           + Aggiungi operatore
         </button>
       </div>
-    </main>
+    </GuscioAdmin>
   );
 }
 
 function DettaglioOperatore({ operatore, onIndietro }: { operatore: Operatore; onIndietro: () => void }) {
   const [attivo, setAttivo] = useState(operatore.attivo);
   const [errore, setErrore] = useState<string | null>(null);
+  const [foto, setFoto] = useState<string | null>(operatore.foto);
+  const [caricandoFoto, setCaricandoFoto] = useState(false);
   const [prenotazioniFuture, setPrenotazioniFuture] = useState<PrenotazioneFutura[] | null>(null);
 
   const [servizi, setServizi] = useState<Servizio[]>([]);
@@ -266,14 +282,80 @@ function DettaglioOperatore({ operatore, onIndietro }: { operatore: Operatore; o
     }
   }
 
-  return (
-    <main className="mx-auto flex min-h-svh max-w-md flex-col gap-6 px-5 py-8">
-      <button type="button" onClick={onIndietro} className="self-start text-lg font-medium text-grigio">
-        ‹ Operatori
-      </button>
-      <h1 className="font-titolo text-3xl font-semibold text-inchiostro">{operatore.nome}</h1>
+  async function salvaFoto(nuova: string | null) {
+    setErrore(null);
+    // `null` e non un campo mancante: così "questo operatore non ha foto" è
+    // una cosa scritta, e non si confonde con un documento vecchio in cui il
+    // campo non è mai esistito.
+    const error = await seFallisce(updateDoc(doc(db, 'operatori', operatore.id), { foto: nuova }));
+    if (error) {
+      setErrore('Non sono riuscito a salvare la foto. Riprova.');
+      return;
+    }
+    // Solo lo stato locale: l'elenco dietro si rilegge da Firestore quando si
+    // torna indietro (`onIndietro` chiama `caricaOperatori`), quindi la foto
+    // nuova la trova già lì. Scriverla anche dentro l'oggetto ricevuto come
+    // prop sembrerebbe più diretto ed è invece il modo di avere due verità.
+    setFoto(nuova);
+  }
 
+  async function cambiaFoto(file: File) {
+    setCaricandoFoto(true);
+    setErrore(null);
+    const esito = await preparaFoto(file);
+    if (!esito.ok) {
+      setErrore(esito.errore);
+      setCaricandoFoto(false);
+      return;
+    }
+    await salvaFoto(esito.foto);
+    setCaricandoFoto(false);
+  }
+
+  return (
+    <GuscioAdmin titolo={operatore.nome} indietro={{ etichetta: 'Operatori', onClick: onIndietro }}>
       {errore && <p className="text-lg font-medium text-allarme-testo">{errore}</p>}
+
+      <div className="flex items-center gap-4 rounded-2xl border-2 border-bordo p-4">
+        <Ritratto nome={operatore.nome} foto={foto} colore={operatore.colore} misura={84} />
+        <div className="flex flex-1 flex-col gap-2">
+          <p className={classeEtichetta}>Foto</p>
+          <div className="flex flex-wrap gap-2">
+            {/* Il campo file vero resta nascosto: da solo è minuscolo, non si
+                può colorare e ogni browser lo disegna a modo suo. La label
+                fa da bottone, e per la tastiera resta comunque il campo. */}
+            <label className="flex min-h-[48px] cursor-pointer items-center rounded-lg border-2 border-inchiostro px-4 font-titolo text-base font-bold text-inchiostro">
+              {caricandoFoto ? 'Riduco…' : foto ? 'Cambia foto' : 'Scegli una foto'}
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                disabled={caricandoFoto}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  // Si azzera subito: senza, riscegliere LO STESSO file non
+                  // fa scattare di nuovo l'evento e sembra che non funzioni.
+                  e.target.value = '';
+                  if (file) cambiaFoto(file);
+                }}
+              />
+            </label>
+            {foto && (
+              <button
+                type="button"
+                onClick={() => salvaFoto(null)}
+                className="min-h-[48px] rounded-lg border-2 border-bordo px-4 font-titolo text-base font-bold text-grigio"
+              >
+                Togli
+              </button>
+            )}
+          </div>
+          <p className="text-sm text-grigio">
+            Si vede quando il cliente sceglie chi lo taglia. Viene ritagliata quadrata e rimpicciolita
+            da sola: va bene anche una foto fatta col telefono.
+          </p>
+        </div>
+      </div>
 
       {prenotazioniFuture && (
         <div className="flex flex-col gap-3 rounded-2xl border-2 border-red-300 bg-allarme-sfondo p-4">
@@ -346,6 +428,6 @@ function DettaglioOperatore({ operatore, onIndietro }: { operatore: Operatore; o
         <h2 className="text-xl font-bold text-inchiostro">Orari settimanali</h2>
         <EditorOrariSettimanali fasce={fasce} onAggiungi={aggiungiFascia} onRimuovi={rimuoviFascia} />
       </div>
-    </main>
+    </GuscioAdmin>
   );
 }
