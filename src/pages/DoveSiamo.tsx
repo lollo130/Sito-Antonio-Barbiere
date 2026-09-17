@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import ChiamaSalone from '../components/prenotazione/ChiamaSalone';
+import Mappa from '../components/Mappa';
 import Intestazione from '../components/layout/Intestazione';
 import Piede from '../components/layout/Piede';
 import { INDIRIZZO_SALONE } from '../lib/salone';
@@ -30,8 +31,8 @@ export default function DoveSiamo() {
       <main className="mx-auto max-w-2xl px-5 pb-12 pt-24">
         <h1 className="font-titolo text-3xl font-semibold text-inchiostro">Dove siamo</h1>
 
-        <div className="mt-6 flex h-64 items-center justify-center rounded-2xl border-2 border-dashed border-bordo bg-carta-chiara text-lg text-pieno-testo">
-          Mappa — in arrivo con l'indirizzo definitivo
+        <div className="mt-6">
+          <Mappa />
         </div>
 
         <p className="mt-6 text-xl text-inchiostro">{INDIRIZZO_SALONE}</p>

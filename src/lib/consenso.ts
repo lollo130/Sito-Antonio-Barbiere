@@ -32,7 +32,10 @@ export const CATEGORIE: Categoria[] = [
     nome: 'Mappa',
     descrizione:
       'Serve a mostrare la mappa di Google con la posizione del salone. Google riceve il tuo indirizzo IP.',
-    inUso: false,
+    // In uso da quando "Dove siamo" mostra la mappa incorporata. Finché era
+    // false il banner non compariva affatto, ed era giusto cosi': il sito non
+    // usava niente di non tecnico.
+    inUso: true,
   },
   {
     id: 'statistiche',
