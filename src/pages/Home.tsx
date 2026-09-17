@@ -93,6 +93,17 @@ export default function Home() {
                 Prenota ora
                 <IconaFreccia />
               </Link>
+              {/* Calendario e Chiama hanno lo stesso contorno, e non è pigrizia:
+                  sono due modi di arrivare alla stessa cosa — sapere quando c'è
+                  posto — mentre il pieno resta uno solo, quello che prenota
+                  davvero. Tre rettangoli pieni in fila non avrebbero più un
+                  centro. */}
+              <Link
+                to="/calendario"
+                className="flex min-h-[64px] items-center justify-center rounded-lg border-2 border-cuoio-chiaro bg-transparent px-8 font-titolo text-lg font-bold uppercase tracking-wide text-cuoio-chiaro"
+              >
+                Calendario
+              </Link>
               <a
                 href={TELEFONO_SALONE_TEL}
                 className="flex min-h-[64px] items-center justify-center rounded-lg border-2 border-cuoio-chiaro bg-transparent px-8 font-titolo text-lg font-bold uppercase tracking-wide text-cuoio-chiaro"

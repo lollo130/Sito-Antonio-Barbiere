@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react';
 import BottoneScelta from '../../components/prenotazione/BottoneScelta';
+import CalendarioMese from '../../components/CalendarioMese';
+import OrariDelGiorno from '../../components/OrariDelGiorno';
 import {
   aggiungiGiorni,
   annoMeseDi,
   confrontaAnnoMese,
   dataRomaDi,
   formattaGiornoEsteso,
-  formattaMeseAnno,
-  formattaOra,
-  giorniDelMese,
-  giornoSettimanaLunediPrimo,
-  mesePrecedente,
   meseSuccessivo,
   type AnnoMese,
 } from '../../lib/data';
@@ -23,50 +20,14 @@ import {
 } from '../../lib/agenda';
 import type { Servizio } from './Passo1Servizio';
 
-// Calendario mensile pubblico (SPECIFICA.md § 5): un mese alla volta a
-// griglia, giorni colorati libero/pieno. Si tocca un giorno per aprire
-// l'agenda di quel giorno (occupato/libero orario per orario, mai un nome).
+// Il passo "Quando" (SPECIFICA.md § 5): un mese alla volta a griglia, giorni
+// colorati libero/pieno, si tocca un giorno e si apre l'agenda oraria.
 //
-// L'impaginazione riprende il calendario da parete chiesto dal titolare:
-// cornice, testata verde con i giorni abbreviati, celle squadrate col numero
-// in alto a sinistra, fascia in fondo. La settimana comincia di lunedì come
-// da specifica, non di domenica.
+// La griglia del mese sta in components/CalendarioMese.tsx, perché la usa
+// anche la pagina pubblica /calendario. Qui restano le cose che riguardano il
+// PRENOTARE: cercare il primo giorno libero, scegliere l'ora, andare avanti.
 
 const FINESTRA_MASSIMA_GIORNI = 60;
-const NOMI_GIORNI = ['LUN', 'MAR', 'MER', 'GIO', 'VEN', 'SAB', 'DOM'];
-
-// GLI ORARI DEL GIORNO, A GRIGLIA E DIVISI IN FASCE.
-//
-// Prima erano una lista verticale, una riga per orario: in una giornata piena
-// diventavano trenta righe da scorrere, e per arrivare alle cinque del
-// pomeriggio si passava per tutta la mattina.
-//
-// Era stato chiesto un menu a tendina. Non si può: CLAUDE.md § "Interfaccia"
-// vieta i `<select>` proprio in questo passo, perché il pubblico del salone
-// comprende persone anziane, e una tendina nasconde tutte le scelte dietro un
-// tocco, si apre in modo diverso su ogni telefono e non si può ingrandire.
-// La griglia risolve però il problema vero — la lista era lunga — senza
-// nascondere niente: tutti gli orari restano sotto gli occhi, ogni riquadro è
-// un bottone da 60 px, e tre fasce fanno capire a colpo d'occhio se il posto
-// libero è di mattina o di pomeriggio.
-const FASCE = [
-  { chiave: 'mattina', titolo: 'Mattina' },
-  { chiave: 'pomeriggio', titolo: 'Pomeriggio' },
-  { chiave: 'sera', titolo: 'Sera' },
-] as const;
-
-/**
- * In quale fascia cade un istante.
- *
- * Si guarda l'ora di Roma, non quella del telefono: un cliente che prenota
- * dall'estero vedrebbe altrimenti la mattina finire nel pomeriggio.
- */
-function fasciaDi(istante: string): (typeof FASCE)[number]['chiave'] {
-  const ora = Number(formattaOra(istante).slice(0, 2));
-  if (ora < 13) return 'mattina';
-  if (ora < 18) return 'pomeriggio';
-  return 'sera';
-}
 
 type Props = {
   servizio: Servizio;
@@ -198,48 +159,7 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
                 : `${liberiDelGiorno} ${liberiDelGiorno === 1 ? 'orario libero' : 'orari liberi'}. Tocca quello che ti va bene.`}
             </p>
 
-            {FASCE.map((fascia) => {
-              const righe = righeGiorno.filter((r) => fasciaDi(r.inizio) === fascia.chiave);
-              if (righe.length === 0) return null;
-              return (
-                <div key={fascia.chiave} className="flex flex-col gap-3">
-                  <h2 className="font-titolo text-sm font-bold uppercase tracking-[0.2em] text-marrone">
-                    {fascia.titolo}
-                  </h2>
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                    {righe.map((r) => (
-                      <button
-                        key={r.inizio}
-                        type="button"
-                        disabled={!r.libero}
-                        onClick={() => onScelto(r.inizio)}
-                        aria-label={`${formattaOra(r.inizio)}${r.libero ? '' : ', occupato'}`}
-                        className={`relative flex min-h-[64px] items-center justify-center rounded-xl border-2 px-1 pb-3 ${
-                          r.libero
-                            ? 'border-verde bg-carta-chiara text-verde active:bg-verde active:text-carta-chiara'
-                            : 'border-bordo bg-pieno text-pieno-testo line-through decoration-1'
-                        }`}
-                      >
-                        <span className="font-titolo text-xl font-bold tabular-nums">
-                          {formattaOra(r.inizio)}
-                        </span>
-                        {/* Il nome sta appeso in fondo al riquadro invece che
-                            sotto l'ora: ce l'hanno solo alcuni orari — quelli
-                            con un operatore solo libero — e messo nel flusso
-                            spingeva l'ora più in alto proprio in quei
-                            riquadri, lasciando le ore della stessa riga a
-                            quote diverse. Così restano tutte allineate. */}
-                        {r.libero && r.operatore_nome && (
-                          <span className="absolute inset-x-0 bottom-1 truncate px-1 font-titolo text-[0.6rem] uppercase tracking-wider text-marrone">
-                            {r.operatore_nome}
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+            <OrariDelGiorno righe={righeGiorno} onScelto={onScelto} mostraOperatore />
           </>
         )}
       </div>
@@ -249,15 +169,6 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
   // ------------------------------------------------------------------
   // Vista mensile
   // ------------------------------------------------------------------
-  const statoPerGiorno = new Map(giorniMese?.map((g) => [g.giorno, g.libero]));
-  const giorniGriglia = giorniDelMese(mese.anno, mese.mese);
-  const spazioIniziale = giornoSettimanaLunediPrimo(giorniGriglia[0]);
-  const celle: (string | null)[] = [...Array(spazioIniziale).fill(null), ...giorniGriglia];
-  while (celle.length % 7 !== 0) celle.push(null);
-
-  const puoMesePrecedente = confrontaAnnoMese(mese, primoMese) > 0;
-  const puoMeseSuccessivo = confrontaAnnoMese(mese, ultimoMese) < 0;
-
   return (
     <div className="flex flex-col gap-5">
       <button
@@ -280,115 +191,16 @@ export default function Passo2Quando({ servizio, onScelto, onIndietro }: Props) 
 
       {erroreMese && <p className="text-lg font-bold text-allarme-testo">{erroreMese}</p>}
 
-      {/* Il calendario da parete: cornice, testata verde, celle squadrate. */}
-      <div className="overflow-hidden rounded-lg border-2 border-verde bg-carta-chiara">
-        <div className="flex items-center justify-between gap-2 border-b-2 border-verde px-2 py-2">
-          <button
-            type="button"
-            disabled={!puoMesePrecedente}
-            onClick={() => setMese((m) => mesePrecedente(m))}
-            className="flex h-11 w-11 shrink-0 items-center justify-center font-titolo text-2xl font-bold text-verde disabled:opacity-25"
-            aria-label="Mese precedente"
-          >
-            ‹
-          </button>
-          <p className="whitespace-nowrap font-titolo text-base font-bold uppercase tracking-[0.06em] text-inchiostro sm:text-lg sm:tracking-[0.12em]">
-            {formattaMeseAnno(mese.anno, mese.mese)}
-          </p>
-          <button
-            type="button"
-            disabled={!puoMeseSuccessivo}
-            onClick={() => setMese((m) => meseSuccessivo(m))}
-            className="flex h-11 w-11 shrink-0 items-center justify-center font-titolo text-2xl font-bold text-verde disabled:opacity-25"
-            aria-label="Mese successivo"
-          >
-            ›
-          </button>
-        </div>
-
-        <div className="grid grid-cols-7 bg-verde">
-          {NOMI_GIORNI.map((n) => (
-            <div
-              key={n}
-              className="py-1.5 text-center font-titolo text-[0.62rem] font-bold tracking-[0.1em] text-carta-chiara"
-            >
-              {n}
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-7">
-          {celle.map((dataStr, i) => {
-            const bordi = `${i % 7 !== 6 ? 'border-r' : ''} ${i >= 7 ? 'border-t' : ''} border-bordo`;
-
-            if (!dataStr) {
-              return <div key={`vuoto-${i}`} className={`min-h-[56px] bg-carta-chiara ${bordi}`} />;
-            }
-
-            const fuoriRange = dataStr < oggi || dataStr > ultimoGiorno;
-            const libero = statoPerGiorno.get(dataStr);
-            const numero = Number(dataStr.slice(-2));
-            const eOggi = dataStr === oggi;
-            const selezionabile = !fuoriRange && !!giorniMese && !!libero;
-
-            let sfondo = 'bg-carta-chiara';
-            let testo = 'text-inchiostro';
-            if (fuoriRange || !giorniMese) {
-              testo = 'text-bordo';
-            } else if (!libero) {
-              sfondo = 'bg-pieno';
-              testo = 'text-pieno-testo';
-            }
-
-            return (
-              <button
-                key={dataStr}
-                type="button"
-                disabled={!selezionabile}
-                onClick={() => apriGiorno(dataStr)}
-                className={`relative flex min-h-[56px] flex-col items-start p-1.5 ${sfondo} ${bordi} ${
-                  selezionabile ? 'active:bg-verde-chiaro' : ''
-                }`}
-              >
-                <span
-                  className={`font-titolo text-[0.82rem] font-bold tabular-nums ${
-                    eOggi
-                      ? 'flex h-6 w-6 items-center justify-center rounded-full bg-marrone text-carta-chiara'
-                      : testo
-                  }`}
-                >
-                  {numero}
-                </span>
-                {selezionabile && (
-                  <span className="absolute bottom-1.5 right-1.5 h-2 w-2 rounded-full bg-verde" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* La fascia in fondo, come sui calendari da parete. */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t-2 border-verde bg-carta px-3 py-2.5">
-          <span className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-verde" />
-            <span className="font-titolo text-[0.66rem] uppercase tracking-[0.12em] text-inchiostro">
-              Libero
-            </span>
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="h-3.5 w-3.5 border border-bordo bg-pieno" />
-            <span className="font-titolo text-[0.66rem] uppercase tracking-[0.12em] text-grigio">
-              Pieno o chiuso
-            </span>
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="h-3.5 w-3.5 rounded-full bg-marrone" />
-            <span className="font-titolo text-[0.66rem] uppercase tracking-[0.12em] text-grigio">
-              Oggi
-            </span>
-          </span>
-        </div>
-      </div>
+      <CalendarioMese
+        mese={mese}
+        onMese={setMese}
+        giorni={giorniMese}
+        oggi={oggi}
+        ultimoGiorno={ultimoGiorno}
+        primoMese={primoMese}
+        ultimoMese={ultimoMese}
+        onGiorno={apriGiorno}
+      />
 
       {!giorniMese && !erroreMese && <p className="text-lg text-grigio">Controllo il calendario…</p>}
     </div>

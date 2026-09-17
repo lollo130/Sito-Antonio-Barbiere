@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Calendario from './pages/Calendario';
 import { Route, Routes } from "react-router-dom";
 import BannerCookie from "./components/BannerCookie";
 import Benvenuto from "./components/Benvenuto";
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/cookie" element={<Cookie />} />
         <Route path="/installa" element={<Installa />} />
+        <Route path="/calendario" element={<Calendario />} />
         <Route path="/prenota" element={<Prenota />} />
         <Route path="/admin/*" element={<Admin />} />
       </Routes>

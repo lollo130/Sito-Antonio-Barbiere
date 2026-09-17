@@ -64,6 +64,10 @@ export default function Piede({ attaccato = false }: { attaccato?: boolean }) {
             Preferenze cookie
           </button>
           {' · '}
+          <Link to="/calendario" className="underline">
+            Calendario
+          </Link>
+          {' · '}
           <Link to="/dove-siamo" className="underline">
             Dove siamo
           </Link>
