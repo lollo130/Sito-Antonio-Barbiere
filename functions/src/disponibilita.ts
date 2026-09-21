@@ -172,7 +172,6 @@ export async function caricaContesto(
     segnaOccupato(d.get('operatore_id'), aData(d.get('inizio')), fine);
   });
 
-  const assenze = await db.collection('assenze').where('fine', '>', da).get();
   assenze.docs.forEach((d) => {
     const inizio = aData(d.get('inizio'));
     if (inizio >= a) return;
@@ -180,7 +179,6 @@ export async function caricaContesto(
   });
 
   const chiusure: Intervallo[] = [];
-  const righeChiusure = await db.collection('chiusure_salone').where('fine', '>', da).get();
   righeChiusure.docs.forEach((d) => {
     const inizio = aData(d.get('inizio'));
     if (inizio >= a) return;
