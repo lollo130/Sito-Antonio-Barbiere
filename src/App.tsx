@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Calendario from './pages/Calendario';
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
+import { aggiornaTagApp } from "./lib/installazione";
 import BannerCookie from "./components/BannerCookie";
 import Benvenuto from "./components/Benvenuto";
 import { inApp, leggiCliente } from "./lib/cliente";
@@ -17,6 +18,11 @@ export default function App() {
   // Nel browser non si sbarra mai la strada a chi cerca gli orari.
   const [presentato, setPresentato] = useState(() => !inApp() || leggiCliente() !== null);
 
+  // Sotto /admin il sito si presenta come un'app diversa, "Agenda", che si
+  // installa per conto suo e si apre sull'agenda. Vedi src/lib/installazione.ts.
+  const { pathname } = useLocation();
+  useEffect(() => aggiornaTagApp(pathname), [pathname]);
+
   if (!presentato) return <Benvenuto onFatto={() => setPresentato(true)} />;
 
   return (
@@ -31,7 +37,13 @@ export default function App() {
         <Route path="/prenota" element={<Prenota />} />
         <Route path="/admin/*" element={<Admin />} />
       </Routes>
-      <BannerCookie />
+      {/* Nel pannello no. Il banner esiste perché la pagina "Dove siamo" fa
+          entrare la mappa di Google: sotto /admin non entra nessuno, non c'è
+          niente da chiedere, e a chi ci lavora tutti i giorni resterebbe solo
+          una coperta grigia sopra l'agenda da togliere al primo avvio. Se un
+          domani il pannello dovesse caricare qualcosa da fuori, questa riga
+          va tolta prima di quel giorno. */}
+      {!pathname.startsWith('/admin') && <BannerCookie />}
     </>
   );
 }

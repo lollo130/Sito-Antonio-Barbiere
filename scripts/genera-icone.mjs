@@ -1,4 +1,14 @@
-// Icone dell'app: fondo verde, forbici e monogramma "A" in bianco caldo.
+// Le icone delle app. Sono DUE app, non una:
+//
+//  - quella dei clienti, fondo verde e monogramma "A": si apre sul salone;
+//  - quella del titolare, fondo cuoio scuro e un calendario: si apre
+//    sull'agenda (vedi public/manifest-agenda.json).
+//
+// Stanno sulla stessa schermata Home dello stesso telefono, quindi non
+// possono somigliarsi: cambia il colore del fondo E il segno sopra. Due
+// icone verdi con dentro due lettere diverse sarebbero indistinguibili a
+// colpo d'occhio, che è l'unico modo in cui un'icona viene guardata.
+//
 // Nessuna dipendenza esterna: solo zlib. I bordi sono puliti perché ogni
 // icona viene disegnata a quadrupla risoluzione e poi rimpicciolita.
 //
@@ -14,6 +24,7 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 const CARTELLA = 'public/icons';
 const VERDE = [46, 89, 73]; // #2e5949
 const CREMA = [251, 248, 241]; // #fbf8f1
+const CUOIO_SCURO = [78, 52, 28]; // #4e341c
 const SUPERCAMPIONAMENTO = 4;
 
 // ---------------------------------------------------------------- PNG
@@ -86,6 +97,11 @@ function distanzaDaSegmento(px, py, ax, ay, bx, by) {
   return Math.hypot(px - cx, py - cy);
 }
 
+/** Vero dentro il rettangolo, bordi compresi. */
+function dentroRettangolo(u, v, x1, y1, x2, y2) {
+  return u >= x1 && u <= x2 && v >= y1 && v <= y2;
+}
+
 /** Il segno è disegnato su una tela ideale 100x100, poi scalato. */
 function dentroIlSegno(u, v) {
   const spessore = 11;
@@ -108,7 +124,49 @@ function dentroIlSegno(u, v) {
   return false;
 }
 
-function generaIcona(percorso, dimensione, { zonaSicura = 1 } = {}) {
+/**
+ * Il segno dell'agenda: un calendario da parete.
+ *
+ * Non una "P" di pannello e non una forbice: un calendario si riconosce
+ * anche senza leggerlo, ed è esattamente quello che l'app fa vedere appena
+ * si apre. Il fascione in cima è pieno perché è la parte che si distingue
+ * quando l'icona è piccola: a 48 pixel le griglie sottili sparirebbero e
+ * resterebbe un quadrato vuoto.
+ */
+function dentroIlSegnoAgenda(u, v) {
+  const spessore = 7;
+
+  // i due anelli che tengono il calendario appeso
+  if (distanzaDaSegmento(u, v, 37, 15, 37, 27) < spessore / 2) return true;
+  if (distanzaDaSegmento(u, v, 63, 15, 63, 27) < spessore / 2) return true;
+
+  const x1 = 20;
+  const y1 = 24;
+  const x2 = 80;
+  const y2 = 83;
+
+  // fuori dalla carta: niente
+  if (!dentroRettangolo(u, v, x1, y1, x2, y2)) return false;
+
+  // il fascione in cima, pieno
+  if (v <= y1 + 15) return true;
+
+  // la cornice
+  if (!dentroRettangolo(u, v, x1 + spessore, y1 + spessore, x2 - spessore, y2 - spessore)) {
+    return true;
+  }
+
+  // i giorni: due file di tre caselle
+  for (const cx of [30, 45.5, 61]) {
+    for (const cy of [50, 65]) {
+      if (dentroRettangolo(u, v, cx, cy, cx + 9, cy + 9)) return true;
+    }
+  }
+
+  return false;
+}
+
+function generaIcona(percorso, dimensione, { zonaSicura = 1, segno = dentroIlSegno, fondo = VERDE } = {}) {
   const s = SUPERCAMPIONAMENTO;
   scriviPng(percorso, dimensione, (x, y) => {
     let dentro = 0;
@@ -117,24 +175,34 @@ function generaIcona(percorso, dimensione, { zonaSicura = 1 } = {}) {
         // coordinate sulla tela 100x100, con eventuale rientro per le maschere
         const fx = ((x + (sx + 0.5) / s) / dimensione - 0.5) / zonaSicura + 0.5;
         const fy = ((y + (sy + 0.5) / s) / dimensione - 0.5) / zonaSicura + 0.5;
-        if (dentroIlSegno(fx * 100, fy * 100)) dentro++;
+        if (segno(fx * 100, fy * 100)) dentro++;
       }
     }
     const a = dentro / (s * s);
     return [
-      Math.round(VERDE[0] + (CREMA[0] - VERDE[0]) * a),
-      Math.round(VERDE[1] + (CREMA[1] - VERDE[1]) * a),
-      Math.round(VERDE[2] + (CREMA[2] - VERDE[2]) * a),
+      Math.round(fondo[0] + (CREMA[0] - fondo[0]) * a),
+      Math.round(fondo[1] + (CREMA[1] - fondo[1]) * a),
+      Math.round(fondo[2] + (CREMA[2] - fondo[2]) * a),
     ];
   });
   console.log('  scritta', percorso);
 }
 
 mkdirSync(CARTELLA, { recursive: true });
+
+// --- l'app dei clienti -------------------------------------------------
 generaIcona(`${CARTELLA}/icon-192.png`, 192);
 generaIcona(`${CARTELLA}/icon-512.png`, 512);
 // Le icone mascherabili vengono ritagliate da Android: il segno sta più stretto.
 generaIcona(`${CARTELLA}/icon-maskable-512.png`, 512, { zonaSicura: 0.72 });
 // iOS ignora il manifest e usa questa (vedi index.html).
 generaIcona(`${CARTELLA}/apple-touch-icon.png`, 180);
+
+// --- l'agenda del titolare --------------------------------------------
+const AGENDA = { segno: dentroIlSegnoAgenda, fondo: CUOIO_SCURO };
+generaIcona(`${CARTELLA}/agenda-192.png`, 192, AGENDA);
+generaIcona(`${CARTELLA}/agenda-512.png`, 512, AGENDA);
+generaIcona(`${CARTELLA}/agenda-maskable-512.png`, 512, { ...AGENDA, zonaSicura: 0.72 });
+generaIcona(`${CARTELLA}/agenda-apple-touch.png`, 180, AGENDA);
+
 console.log('fatto');

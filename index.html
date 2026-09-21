@@ -2,7 +2,7 @@
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="/manifest.json" id="manifesto" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#2e5949" />
     <meta
@@ -17,11 +17,40 @@
       il nome sotto l'icona è il titolo intero, troncato. Sono l'unico modo
       di controllare come appare l'app su iOS.
     -->
-    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="Antonio" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" id="icona-ios" />
+    <meta name="apple-mobile-web-app-title" content="Antonio" id="nome-ios" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+    <!--
+      Due app, non una.
+
+      Sotto /admin questa stessa pagina si presenta come un'app diversa:
+      "Agenda", icona cuoio col calendario, che si apre direttamente
+      sull'agenda del titolare. I clienti installano "Antonio" dalla home e
+      si ritrovano il salone; il titolare installa "Agenda" da /admin e si
+      ritrova il suo lavoro, senza passare dal sito e senza scrivere
+      indirizzi. Sullo stesso telefono possono stare tutte e due.
+
+      Lo scambio va fatto QUI, mentre la pagina si legge, non da React:
+      Chrome decide che app stai installando guardando il manifest presente
+      al momento, e iPhone guarda apple-touch-icon e il titolo quando si
+      tocca "Aggiungi a schermata Home". Se aspettassimo il primo render,
+      chi apre /admin da un collegamento diretto si installerebbe l'app dei
+      clienti. React aggiorna comunque questi stessi tag quando si cambia
+      pagina senza ricaricare (src/lib/installazione.ts).
+    -->
+    <script>
+      (function () {
+        if (location.pathname.indexOf('/admin') !== 0) return;
+        document.getElementById('manifesto').href = '/manifest-agenda.json';
+        document.getElementById('icona-ios').href = '/icons/agenda-apple-touch.png';
+        document.getElementById('nome-ios').content = 'Agenda';
+        var tema = document.querySelector('meta[name="theme-color"]');
+        if (tema) tema.content = '#1f3e33';
+      })();
+    </script>
 
     <!--
       Rete di sicurezza contro la pagina bianca.

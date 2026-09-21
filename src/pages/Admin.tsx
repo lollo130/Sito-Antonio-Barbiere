@@ -5,6 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import AdminLogin from '../components/admin/AdminLogin';
 import { auth, db } from '../lib/firebase';
 import AggiungiPrenotazione from './admin/AggiungiPrenotazione';
+import AppSulTelefono from './admin/AppSulTelefono';
 import Oggi from './admin/Oggi';
 import Assenze from './admin/impostazioni/Assenze';
 import MenuImpostazioni from './admin/impostazioni/MenuImpostazioni';
@@ -76,6 +77,9 @@ export default function Admin() {
     <Routes>
       <Route path="/" element={<Oggi />} />
       <Route path="/aggiungi" element={<AggiungiPrenotazione />} />
+      {/* Nessun menu ci porta: l'indirizzo si manda al titolare e basta.
+          Il perché sta in cima a AppSulTelefono.tsx. */}
+      <Route path="/installa" element={<AppSulTelefono />} />
       <Route path="/impostazioni" element={<MenuImpostazioni />} />
       <Route path="/impostazioni/operatori" element={<Operatori />} />
       <Route path="/impostazioni/servizi" element={<Servizi />} />

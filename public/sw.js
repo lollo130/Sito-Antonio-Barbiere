@@ -5,12 +5,13 @@
 
 // Alzare questo numero a ogni modifica del guscio: al primo caricamento
 // successivo le cache vecchie vengono cancellate (vedi 'activate').
-const CACHE = 'salone-v3';
+const CACHE = 'salone-v4';
 
-// manifest.json NON sta qui di proposito. Serviva dalla cache, e chi aveva
+// I manifest NON stanno qui di proposito. Servivano dalla cache, e chi aveva
 // già visitato il sito continuava a ricevere il manifest vecchio: installava
 // l'app sbagliata, con il nome e la schermata d'avvio di prima. Il manifest
-// va sempre chiesto alla rete.
+// va sempre chiesto alla rete. Sono due: manifest.json per i clienti,
+// manifest-agenda.json per l'agenda del titolare sotto /admin.
 const GUSCIO = ['/', '/index.html', '/offline.html'];
 
 self.addEventListener('install', (e) => {
@@ -50,7 +51,7 @@ self.addEventListener('fetch', (e) => {
 
   // Manifest e collegamento dell'app Android: sempre dalla rete, così un
   // cambio di nome, icona o schermata d'avvio arriva subito a tutti.
-  if (url.pathname === '/manifest.json' || url.pathname.startsWith('/.well-known/')) {
+  if (url.pathname.startsWith('/manifest') || url.pathname.startsWith('/.well-known/')) {
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
     return;
   }

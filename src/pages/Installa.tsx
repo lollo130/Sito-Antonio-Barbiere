@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useInstallazione } from '../lib/installazione';
 
 // Il QR punta al dominio da cui la pagina è servita davvero. Prima leggeva
 // VITE_SITE_URL, che è facile dimenticare al segnaposto: il codice veniva
@@ -20,62 +21,16 @@ function urlDiQuestaPagina(): string {
  * che non hanno mai installato niente in vita loro.
  */
 
-type Ambiente = 'installata' | 'android' | 'ios-safari' | 'ios-altro' | 'desktop';
-
-function rilevaAmbiente(): Ambiente {
-  if (window.matchMedia('(display-mode: standalone)').matches) return 'installata';
-  // iOS segnala l'app installata su una proprietà non standard di navigator
-  if ((navigator as unknown as { standalone?: boolean }).standalone) return 'installata';
-
-  const ua = navigator.userAgent;
-  const iOS = /iPad|iPhone|iPod/.test(ua) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPad recenti
-
-  if (iOS) {
-    const safari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
-    return safari ? 'ios-safari' : 'ios-altro';
-  }
-  if (/Android/.test(ua)) return 'android';
-  return 'desktop';
-}
-
 export default function Installa() {
-  const [ambiente, setAmbiente] = useState<Ambiente>('desktop');
-  const [promptInstall, setPromptInstall] = useState<Event | null>(null);
-  const [esito, setEsito] = useState<'idle' | 'in-corso' | 'rifiutata'>('idle');
+  // Il riconoscimento del telefono e l'invito di Chrome stanno in
+  // src/lib/installazione.ts: li usa anche la pagina che installa l'agenda
+  // del titolare, e due copie della stessa lettura dello user agent prima o
+  // poi si mettono a dire cose diverse.
+  const { ambiente, installa, invito, esito } = useInstallazione();
   const [urlInstalla, setUrlInstalla] = useState('');
   const [copiato, setCopiato] = useState(false);
 
-  useEffect(() => {
-    setAmbiente(rilevaAmbiente());
-    setUrlInstalla(urlDiQuestaPagina());
-
-    const onPrompt = (e: Event) => {
-      e.preventDefault();       // blocca il banner automatico di Chrome
-      setPromptInstall(e);      // lo useremo noi al tocco del pulsante
-    };
-    const onInstalled = () => setAmbiente('installata');
-
-    window.addEventListener('beforeinstallprompt', onPrompt);
-    window.addEventListener('appinstalled', onInstalled);
-    return () => {
-      window.removeEventListener('beforeinstallprompt', onPrompt);
-      window.removeEventListener('appinstalled', onInstalled);
-    };
-  }, []);
-
-  async function installa() {
-    if (!promptInstall) return;
-    setEsito('in-corso');
-    const evento = promptInstall as Event & {
-      prompt: () => Promise<void>;
-      userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-    };
-    await evento.prompt();
-    const { outcome } = await evento.userChoice;
-    setPromptInstall(null);
-    setEsito(outcome === 'accepted' ? 'idle' : 'rifiutata');
-  }
+  useEffect(() => setUrlInstalla(urlDiQuestaPagina()), []);
 
   return (
     <main className="mx-auto max-w-md px-5 py-10 text-[18px] leading-relaxed">
@@ -100,7 +55,7 @@ export default function Installa() {
           <p className="mb-6">
             Tocca il pulsante qui sotto. L'icona del salone comparirà tra le altre app.
           </p>
-          {promptInstall ? (
+          {invito ? (
             <button
               onClick={installa}
               disabled={esito === 'in-corso'}

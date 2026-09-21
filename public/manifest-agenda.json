@@ -1,0 +1,23 @@
+{
+  "id": "/admin",
+  "name": "Agenda — Antonio Barbiere",
+  "short_name": "Agenda",
+  "description": "L'agenda del salone: prenotazioni, orari, operatori",
+  "start_url": "/admin",
+  "scope": "/admin",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fbf8f1",
+  "theme_color": "#1f3e33",
+  "lang": "it-IT",
+  "icons": [
+    { "src": "/icons/agenda-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/agenda-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    {
+      "src": "/icons/agenda-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
